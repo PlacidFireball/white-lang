@@ -28,7 +28,8 @@ impl Display for TokenType {
 struct Token {
     typ: TokenType,
     string_value: String,
-    position: usize,
+    start: usize,
+    end: usize,
     line: usize,
     line_offset: usize
 }
@@ -38,11 +39,12 @@ impl Display for Token {
     }
 }
 impl Token {
-    fn init(typ: TokenType, string_value: String, position: usize, line: usize, line_offset: usize) -> Token {
+    fn init(typ: TokenType, string_value: String, start: usize, end: usize, line: usize, line_offset: usize) -> Token {
         Token {
             typ,
             string_value,
-            position,
+            start,
+            end,
             line,
             line_offset
         }
@@ -126,6 +128,12 @@ impl Tokenizer {
         }
         self.char_vec[self.position]
     }
+    fn peek_next(&mut self) -> char {
+        if self.char_vec.is_empty() {
+            self.char_vec = self.src.chars().collect();
+        }
+        self.char_vec[self.position + 1]
+    }
 
     fn scan_token(&mut self) { 
         if self.scan_number() {
@@ -153,8 +161,25 @@ impl Tokenizer {
     }
     fn scan_number(&mut self) -> bool {
         while !self.tokenization_end() {
+            let start = self.position;
+            let mut float_flag: bool = false;
             while self.peek().is_numeric() {
-
+                self.consume_char();
+                if self.peek() == '.' && self.peek_next().is_numeric() {
+                    self.consume_char();
+                    float_flag = true;
+                }
+            }
+            let substr: String = self.src.as_mut_str()[start..self.position].to_string();
+            if float_flag {
+                let tok = Token::init(TokenType::Float, substr, start, self.position, self.line, self.line_offset);
+                self.token_list.push(tok);
+                return true;
+            }
+            else {
+                let tok = Token::init(TokenType::Int, substr, start, self.position, self.line, self.line_offset);
+                self.token_list.push(tok);
+                return true;
             }
         }
         false
