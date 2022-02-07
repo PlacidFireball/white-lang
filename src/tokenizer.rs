@@ -24,7 +24,7 @@ impl Display for TokenType {
     }
 }
 
-#[derive(PartialEq, Debug)]
+#[derive(PartialEq, Debug, Clone)]
 struct Token {
     typ: TokenType,
     string_value: String,
@@ -52,6 +52,9 @@ impl Token {
     fn get_type(&self) -> TokenType {
         self.typ
     }
+    fn get_string_value(&self) -> String {
+        self.string_value.clone()
+    }
 }
 
 fn initKeyWords() -> HashMap<String, TokenType> {
@@ -75,7 +78,7 @@ fn initKeyWords() -> HashMap<String, TokenType> {
 }
 
 #[derive(Debug)]
-struct Tokenizer {
+pub struct Tokenizer {
     token_list: Vec<Token>,
     keywords: HashMap<String, TokenType>,
     src: String, 
@@ -90,7 +93,7 @@ impl std::fmt::Display for Tokenizer {
     }
 }
 impl Tokenizer {
-    fn init(src: String) -> Tokenizer {
+    pub fn init(src: String) -> Tokenizer {
         Tokenizer {
             token_list: vec![],
             keywords: initKeyWords(),
@@ -100,6 +103,10 @@ impl Tokenizer {
             line: 1, 
             line_offset: 0
         }
+    }
+
+    fn get_token(&self, idx: usize) -> Token {
+        self.token_list[idx].clone()
     }
 
     
@@ -142,9 +149,10 @@ impl Tokenizer {
         else if self.scan_string() {
             return
         }
-        else {
+        else if self.scan_identifier() {
             return
         }
+        self.scan_syntax();
     }
 
     fn scan_syntax(&mut self) -> bool {
@@ -165,6 +173,9 @@ impl Tokenizer {
             let mut float_flag: bool = false;
             while self.peek().is_numeric() {
                 self.consume_char();
+                if self.tokenization_end() {
+                    break;
+                }
                 if self.peek() == '.' && self.peek_next().is_numeric() {
                     self.consume_char();
                     float_flag = true;
@@ -185,32 +196,47 @@ impl Tokenizer {
         false
     }
 
+    fn scan_identifier(&mut self) -> bool {
+        while !self.tokenization_end() {
+            if self.peek().is_alphabetic() {
+                let start = self.position;
+                self.consume_char();
+                while self.peek().is_alphanumeric() {
+                    self.consume_char();
+                }
+            }
+        }
+        false
+    }
     fn consume_whitespace(&mut self) {
         while !self.tokenization_end() {
             if self.peek() == '\r' || self.peek() == '\t' || self.peek() == ' ' {
                 self.consume_char();
                 self.line_offset += 1;
+                continue;
             }
             if self.peek() == '\n' {
                 self.consume_char();
                 self.line += 1;
                 self.line_offset = 0;
+                continue;
             }
-            
+            break;
         }
     }
 
-    fn tokenize(&mut self) {
+    pub fn tokenize(&mut self) {
         while !self.tokenization_end() {
             self.consume_whitespace();
             self.scan_token();
-        }   
+        }  
     }
 }
 
 #[cfg(test)]
 mod test {
     use super::*;
+
     #[test]
     fn test_keywords() {
         let tokenizer = Tokenizer::init("".to_string());
@@ -225,5 +251,23 @@ mod test {
         assert_eq!('b', tokenizer.consume_char());
         assert_eq!('c', tokenizer.consume_char());
         assert_eq!('\0', tokenizer.consume_char());
+    }
+
+    #[test]
+    fn test_tokenize_int() {
+        let mut tokenizer = Tokenizer::init("1".to_string());
+        tokenizer.tokenize();
+        let token = tokenizer.get_token(0);
+        assert_eq!(token.get_type(), TokenType::Int);
+        assert_eq!(token.get_string_value(), String::from("1"));
+    }
+
+    #[test]
+    fn test_tokenize_float() {
+        let mut tokenizer = Tokenizer::init("1.1".to_string());
+        tokenizer.tokenize();
+        let token = tokenizer.get_token(0);
+        assert_eq!(token.get_type(), TokenType::Float);
+        assert_eq!(token.get_string_value(), String::from("1.1"));
     }
 }
