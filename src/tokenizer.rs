@@ -79,14 +79,42 @@ impl Tokenizer {
         }
     }
 
-    fn charAt(&mut self, src: String) -> char {
+    
+    fn isKeyword(&self, kw: String) -> bool {
+        self.keywords.contains_key(&kw)
+    }
+    fn tokenization_end(&self) -> bool {
+        self.position >= self.src.len()
+    }
+    fn consume_char(&mut self) -> char {
         if self.char_vec.is_empty() {
-            self.char_vec = src.chars().collect();
+            self.char_vec = self.src.chars().collect();
         }        
+        if self.tokenization_end() {
+            return '\0';
+        }
         let chr = self.char_vec[self.position];
         self.position += 1;
         chr
     }
-    
 }
 
+#[cfg(test)]
+mod test {
+    use super::*;
+    #[test]
+    fn test_keywords() {
+        let tokenizer = Tokenizer::init("".to_string());
+        assert_eq!(false, tokenizer.isKeyword("not_a_keyword".to_string()));
+        assert_eq!(true, tokenizer.isKeyword("for".to_string()));
+        println!("Test keywords:\t OK");
+    }
+    #[test]
+    fn test_consume_char() {
+        let mut tokenizer = Tokenizer::init("abc".to_string());
+        assert_eq!('a', tokenizer.consume_char());
+        assert_eq!('b', tokenizer.consume_char());
+        assert_eq!('c', tokenizer.consume_char());
+        assert_eq!('\0', tokenizer.consume_char());
+    }
+}
