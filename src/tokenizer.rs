@@ -1,20 +1,27 @@
-
+use std::char;
 use std::collections::HashMap;
+use std::fmt;
+use std::fmt::Display;
 
-#[derive(PartialEq, Debug)]
+#[derive(PartialEq, Debug, Clone, Copy)]
 #[allow(dead_code)]
 enum TokenType {
     Identifier, Var,
 	Print, Function,
 	EqualEqual, Greater, Less, BangEqual,
 	GreaterEqual, LessEqual,
-	Str, Int, Long, Char, List, Boolean,
+	Str, Int, Long, Char, List, Boolean, Float,
     True, False,
 	LeftParen, RightParen, LeftBracket,
 	RightBracket, LeftBrace, RightBrace,
 	Plus, Minus, Star, Slash, Land, Lor, Lnot, 
 	Lxor, 
 	And, Not, If, While, For, In, Else, Return
+}
+impl Display for TokenType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{:?}, ", self)
+    }
 }
 
 #[derive(PartialEq, Debug)]
@@ -25,6 +32,11 @@ struct Token {
     line: usize,
     line_offset: usize
 }
+impl Display for Token {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.typ)
+    }
+}
 impl Token {
     fn init(typ: TokenType, string_value: String, position: usize, line: usize, line_offset: usize) -> Token {
         Token {
@@ -34,6 +46,9 @@ impl Token {
             line,
             line_offset
         }
+    }
+    fn get_type(&self) -> TokenType {
+        self.typ
     }
 }
 
@@ -57,6 +72,7 @@ fn initKeyWords() -> HashMap<String, TokenType> {
     keywords
 }
 
+#[derive(Debug)]
 struct Tokenizer {
     token_list: Vec<Token>,
     keywords: HashMap<String, TokenType>,
@@ -65,6 +81,11 @@ struct Tokenizer {
     position: usize, 
     line: usize, 
     line_offset: usize
+}
+impl std::fmt::Display for Tokenizer {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "Token List: {:?}\nsrc: {}\n", self.token_list, self.src)
+    }
 }
 impl Tokenizer {
     fn init(src: String) -> Tokenizer {
@@ -83,9 +104,11 @@ impl Tokenizer {
     fn isKeyword(&self, kw: String) -> bool {
         self.keywords.contains_key(&kw)
     }
+
     fn tokenization_end(&self) -> bool {
         self.position >= self.src.len()
     }
+
     fn consume_char(&mut self) -> char {
         if self.char_vec.is_empty() {
             self.char_vec = self.src.chars().collect();
@@ -96,6 +119,67 @@ impl Tokenizer {
         let chr = self.char_vec[self.position];
         self.position += 1;
         chr
+    }
+    fn peek(&mut self) -> char {
+        if self.char_vec.is_empty() {
+            self.char_vec = self.src.chars().collect();
+        }
+        self.char_vec[self.position]
+    }
+
+    fn scan_token(&mut self) { 
+        if self.scan_number() {
+            return
+        }
+        else if self.scan_string() {
+            return
+        }
+        else {
+            return
+        }
+    }
+
+    fn scan_syntax(&mut self) -> bool {
+        while !self.tokenization_end() {
+            break;
+        }
+        false
+    }
+    fn scan_string(&mut self) -> bool {
+        while !self.tokenization_end() {
+            break;
+        }
+        false
+    }
+    fn scan_number(&mut self) -> bool {
+        while !self.tokenization_end() {
+            while self.peek().is_numeric() {
+
+            }
+        }
+        false
+    }
+
+    fn consume_whitespace(&mut self) {
+        while !self.tokenization_end() {
+            if self.peek() == '\r' || self.peek() == '\t' || self.peek() == ' ' {
+                self.consume_char();
+                self.line_offset += 1;
+            }
+            if self.peek() == '\n' {
+                self.consume_char();
+                self.line += 1;
+                self.line_offset = 0;
+            }
+            
+        }
+    }
+
+    fn tokenize(&mut self) {
+        while !self.tokenization_end() {
+            self.consume_whitespace();
+            self.scan_token();
+        }   
     }
 }
 
