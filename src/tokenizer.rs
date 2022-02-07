@@ -16,7 +16,8 @@ enum TokenType {
 	RightBracket, LeftBrace, RightBrace,
 	Plus, Minus, Star, Slash, Land, Lor, Lnot, 
 	Lxor, 
-	And, Not, If, While, For, In, Else, Return
+	And, Not, If, While, For, In, Else, Return,
+    Eof
 }
 impl Display for TokenType {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -108,16 +109,20 @@ impl Tokenizer {
     fn get_token(&self, idx: usize) -> Token {
         self.token_list[idx].clone()
     }
-
-    
     fn isKeyword(&self, kw: String) -> bool {
         self.keywords.contains_key(&kw)
     }
-
     fn tokenization_end(&self) -> bool {
         self.position >= self.src.len()
     }
 
+    fn match_and_consume(&mut self, a: char) -> bool {
+        if self.peek() == a {
+            self.consume_char();
+            return true;
+        }
+        false
+    }
     fn consume_char(&mut self) -> char {
         if self.char_vec.is_empty() {
             self.char_vec = self.src.chars().collect();
@@ -162,49 +167,83 @@ impl Tokenizer {
         false
     }
     fn scan_string(&mut self) -> bool {
-        while !self.tokenization_end() {
-            break;
+        if !self.tokenization_end() {
+            if self.peek() == '"' {
+                let start = self.position;
+                self.consume_char();
+                while !self.tokenization_end() {
+                    if self.match_and_consume('\\') {
+                        if self.match_and_consume('"') {
+
+                        }
+                    }
+                    else if self.match_and_consume('"') {
+                        break;
+                    }    
+                    else if self.tokenization_end() {
+                        // TODO: add error (Unterminated String)
+                        return false;
+                    }
+                    else {
+                        self.consume_char();
+                    }            
+                }
+                let substr: String = self.src.as_mut_str()[start..self.position].to_string();
+                let tok = Token::init(TokenType::Str, substr, start, self.position, self.line, self.line_offset);
+                self.token_list.push(tok);
+                return true;
+            }
         }
         false
     }
     fn scan_number(&mut self) -> bool {
-        while !self.tokenization_end() {
+        if !self.tokenization_end() {
             let start = self.position;
             let mut float_flag: bool = false;
-            while self.peek().is_numeric() {
-                self.consume_char();
-                if self.tokenization_end() {
-                    break;
-                }
-                if self.peek() == '.' && self.peek_next().is_numeric() {
+            if self.peek().is_numeric() {
+                while self.peek().is_numeric() {
                     self.consume_char();
-                    float_flag = true;
+                    if self.tokenization_end() {
+                        break;
+                    }
+                    if self.peek() == '.' && self.peek_next().is_numeric() {
+                        self.consume_char();
+                        float_flag = true;
+                    }
                 }
-            }
-            let substr: String = self.src.as_mut_str()[start..self.position].to_string();
-            if float_flag {
-                let tok = Token::init(TokenType::Float, substr, start, self.position, self.line, self.line_offset);
-                self.token_list.push(tok);
-                return true;
+                let substr: String = self.src.as_mut_str()[start..self.position].to_string();
+                if float_flag {
+                    let tok = Token::init(TokenType::Float, substr, start, self.position, self.line, self.line_offset);
+                    self.token_list.push(tok);
+                    return true;
+                }
+                else {
+                    let tok = Token::init(TokenType::Int, substr, start, self.position, self.line, self.line_offset);
+                    self.token_list.push(tok);
+                    return true;
+                }
             }
             else {
-                let tok = Token::init(TokenType::Int, substr, start, self.position, self.line, self.line_offset);
-                self.token_list.push(tok);
-                return true;
+                return false;
             }
         }
         false
     }
 
     fn scan_identifier(&mut self) -> bool {
-        while !self.tokenization_end() {
-            if self.peek().is_alphabetic() {
-                let start = self.position;
+        if self.peek().is_alphabetic() {
+            let start = self.position;
+            self.consume_char();
+            while self.peek().is_alphanumeric() {
                 self.consume_char();
-                while self.peek().is_alphanumeric() {
-                    self.consume_char();
+                if self.tokenization_end() {
+                    break;
                 }
             }
+            let substr: String = self.src.as_mut_str()[start..self.position].to_string();
+            let tok = Token::init(TokenType::Identifier, substr, start, self.position, self.line, self.line_offset);
+            self.token_list.push(tok);
+            return true;
         }
         false
     }
@@ -226,10 +265,13 @@ impl Tokenizer {
     }
 
     pub fn tokenize(&mut self) {
+        self.consume_whitespace();
         while !self.tokenization_end() {
             self.consume_whitespace();
             self.scan_token();
-        }  
+        } 
+        let eof = Token::init(TokenType::Eof, "".to_string(), self.position, self.position, self.line, self.line_offset);
+        self.token_list.push(eof);
     }
 }
 
@@ -242,7 +284,6 @@ mod test {
         let tokenizer = Tokenizer::init("".to_string());
         assert_eq!(false, tokenizer.isKeyword("not_a_keyword".to_string()));
         assert_eq!(true, tokenizer.isKeyword("for".to_string()));
-        println!("Test keywords:\t OK");
     }
     #[test]
     fn test_consume_char() {
@@ -269,5 +310,23 @@ mod test {
         let token = tokenizer.get_token(0);
         assert_eq!(token.get_type(), TokenType::Float);
         assert_eq!(token.get_string_value(), String::from("1.1"));
+    }
+
+    #[test]
+    fn test_tokenize_identifier() {
+        let mut tokenizer = Tokenizer::init("a123b567".to_string());
+        tokenizer.tokenize();
+        let token = tokenizer.get_token(0);
+        assert_eq!(token.get_type(), TokenType::Identifier);
+        assert_eq!(token.get_string_value(), String::from("a123b567"));
+    }
+
+    #[test]
+    fn test_tokenize_string() {
+        let mut tokenizer = Tokenizer::init("\"abc\"".to_string());
+        tokenizer.tokenize();
+        let token = tokenizer.get_token(0);
+        assert_eq!(token.get_type(), TokenType::Str);
+        assert_eq!(token.get_string_value(), String::from("\"abc\""));
     }
 }
