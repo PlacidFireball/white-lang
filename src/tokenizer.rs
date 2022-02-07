@@ -10,10 +10,10 @@ enum TokenType {
 	Str, Int, Long, Char, List, Boolean, Float,
     // Syntax
 	LeftParen, RightParen, LeftBracket,
-	RightBracket, LeftBrace, RightBrace,
+	RightBracket, LeftBrace, RightBrace, Equal, Bang,
 	Plus, PlusPlus, PlusEqual, Minus, MinusMinus, 
-    MinusEqual, Star, Slash, Land, Lor, Lnot, 
-	Lxor, SemiColon, Colon, EqualEqual, 
+    MinusEqual, Star, Slash, Band, Land, Bor, Lor, Lnot, 
+	Lxor, SemiColon, Colon, EqualEqual, Comma, Dot,
     Greater, Less, BangEqual, GreaterEqual, LessEqual,
     // Keywords
 	And, Not, If, While, For, In, Else, Return,
@@ -164,8 +164,11 @@ impl Tokenizer {
             else if self.match_and_consume('[') { self.add_token(TokenType::LeftBracket, String::from("[")); }
             else if self.match_and_consume(']') { self.add_token(TokenType::RightBracket, String::from("]")); }
             else if self.match_and_consume('(') { self.add_token(TokenType::LeftParen, String::from("(")); }
+            else if self.match_and_consume(')') { self.add_token(TokenType::RightParen, String::from(")")) }
             else if self.match_and_consume(';') { self.add_token(TokenType::SemiColon, String::from(";")); }
             else if self.match_and_consume(':') { self.add_token(TokenType::Colon, String::from(":")); }
+            else if self.match_and_consume(',') { self.add_token(TokenType::Comma, String::from(",")); }
+            else if self.match_and_consume('.') { self.add_token(TokenType::Dot, String::from(".")); }
             else if self.match_and_consume('>') { 
                 if self.match_and_consume('=') { self.add_token(TokenType::GreaterEqual, String::from(">=")) }
                 else { self.add_token(TokenType::Greater, String::from(">")); }
@@ -181,48 +184,55 @@ impl Tokenizer {
                         if self.tokenization_end() { break; }
                     }
                 }
-                else {
-                    self.add_token(TokenType::Slash, String::from("/"));
-                }
+                else { self.add_token(TokenType::Slash, String::from("/")); }
             }
             else if self.match_and_consume('+') {
-                if self.match_and_consume('+') {
-                    self.add_token(TokenType::PlusPlus, String::from("++"));
-                }
-                else if self.match_and_consume('=') {
-                    self.add_token(TokenType::PlusEqual, String::from("+="));
-                }
-                else {
-                    self.add_token(TokenType::Plus, String::from("+"));
-                }
+                if self.match_and_consume('+') { self.add_token(TokenType::PlusPlus, String::from("++")); }
+                else if self.match_and_consume('=') { self.add_token(TokenType::PlusEqual, String::from("+=")); }
+                else { self.add_token(TokenType::Plus, String::from("+")); }
             }
             else if self.match_and_consume('-') {
-                if self.match_and_consume('-') {
-                    self.add_token(TokenType::MinusMinus, String::from("--"));
-                }
-                else if self.match_and_consume('=') {
-                    self.add_token(TokenType::MinusEqual, String::from("-="));
-                }
-                else {
-                    self.add_token(TokenType::Minus, String::from("-"));
-                }
+                if self.match_and_consume('-') { self.add_token(TokenType::MinusMinus, String::from("--")); }
+                else if self.match_and_consume('=') { self.add_token(TokenType::MinusEqual, String::from("-=")); }
+                else { self.add_token(TokenType::Minus, String::from("-")); }
             }
             else if self.match_and_consume('*') {
                 self.add_token(TokenType::Star, String::from("*"));
             }
-            
-            
+            else if self.match_and_consume('&') {
+                if self.match_and_consume('&') { self.add_token(TokenType::Land, String::from("&&")); }
+                else { self.add_token(TokenType::Band, String::from("&")); }
+            }
+            else if self.match_and_consume('|') {
+                if self.match_and_consume('|') { self.add_token(TokenType::Lor, String::from("||")); }
+                else { self.add_token(TokenType::Bor, String::from("|")); }
+            }
+            else if self.match_and_consume('=') {
+                if self.match_and_consume('=') { self.add_token(TokenType::EqualEqual, String::from("==")); }
+                else { self.add_token(TokenType::Equal, String::from("=")); }
+            }
+            else if self.match_and_consume('!') {
+                if self.match_and_consume('=') { self.add_token(TokenType::BangEqual, String::from("!=")); }
+                else { self.add_token(TokenType::Bang, String::from("!")); }
+            }
+            else if self.match_and_consume('~') { self.add_token(TokenType::Lnot, String::from("~")); }
+            else if self.match_and_consume('^') { self.add_token(TokenType::Lxor, String::from("^")); }
+            else {
+                let error = self.consume_char();
+                self.add_token(TokenType::Error, String::from(error));
+            }
         }
     }
     fn scan_string(&mut self) -> bool {
         if !self.tokenization_end() {
             if self.peek() == '"' {
                 let start = self.position;
-                self.consume_char();
+                let mut build_str = String::new();
+                build_str.push(self.consume_char());
                 while !self.tokenization_end() {
                     if self.match_and_consume('\\') {
                         if self.match_and_consume('"') {
-
+                            build_str.push('"');
                         }
                     }
                     else if self.match_and_consume('"') {
@@ -233,11 +243,10 @@ impl Tokenizer {
                         return false;
                     }
                     else {
-                        self.consume_char();
+                        build_str.push(self.consume_char());
                     }            
                 }
-                let substr: String = self.src.as_mut_str()[start..self.position].to_string();
-                let tok = Token::init(TokenType::Str, substr, start, self.position, self.line, self.line_offset);
+                let tok = Token::init(TokenType::Str, build_str, start, self.position, self.line, self.line_offset);
                 self.token_list.push(tok);
                 return true;
             }
@@ -327,8 +336,7 @@ impl Tokenizer {
             self.consume_whitespace();
             self.scan_token();
         } 
-        let eof = Token::init(TokenType::Eof, "".to_string(), self.position, self.position, self.line, self.line_offset);
-        self.token_list.push(eof);
+        self.add_token(TokenType::Eof, String::new());
     }
 }
 
@@ -395,17 +403,38 @@ mod test {
         let mut tokenizer = init_test(String::from("\"abc\"")); // "abc"
         let token = tokenizer.get_token(0);
         assert_eq!(token.get_type(), TokenType::Str);
-        assert_eq!(token.get_string_value(), String::from("\"abc\""));
+        assert_eq!(token.get_string_value(), String::from("abc"));
+    }
+
+    #[test]
+    fn test_escaped_strings() {
+        let tokenizer = init_test(String::from("\"abc\\\"\"")); // "abc\""
+        let token = tokenizer.get_token(0);
+        assert_eq!(token.get_type(), TokenType::Str);
+        assert_eq!(token.get_string_value(), String::from("abc\""));
     }
 
     #[test]
     fn test_line_comments() {
-        let mut tokenizer = init_test(String::from("1 \"abc\"// this is a comment/ ** :) with all kinds of random junk"));
+        let tokenizer = init_test(String::from("1 \"abc\"// this is a comment/ ** :) with all kinds of random junk"));
         let int_tok = tokenizer.get_token(0);
         let str_tok = tokenizer.get_token(1);
         let eof_tok = tokenizer.get_token(2);
         assert_eq!(int_tok.get_type(), TokenType::Int);
         assert_eq!(str_tok.get_type(), TokenType::Str);
         assert_eq!(eof_tok.get_type(), TokenType::Eof);
+    }
+
+    #[test]
+    fn test_syntax_tokenization() {
+        let mut tokenizer = Tokenizer::init(String::from("{ } [ ] ( ) , . ; : + ++ += - -- -= = == != ! > >= < <= & && | || ~ ^"));
+        tokenizer.tokenize();
+        use TokenType::*;
+        let tok_l = tokenizer.token_list.clone();
+        let type_vec: Vec<TokenType> = vec![LeftBrace, RightBrace, LeftBracket, RightBracket, LeftParen, RightParen, Comma, Dot, SemiColon, Colon, Plus, PlusPlus, 
+        PlusEqual, Minus, MinusMinus, MinusEqual, Equal, EqualEqual, BangEqual, Bang, Greater, GreaterEqual, Less, LessEqual, Band, Land,Bor, Lor, Lnot, Lxor];
+        for i in 0..tok_l.len()-1 {
+            assert_eq!(tok_l[i].get_type(), type_vec[i]);
+        }
     }
 }
