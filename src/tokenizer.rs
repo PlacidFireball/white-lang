@@ -85,6 +85,7 @@ pub struct Tokenizer {
     keywords: HashMap<String, TokenType>,
     src: String, 
     char_vec: Vec<char>,
+    curr_char: char,
     position: usize, 
     line: usize, 
     line_offset: usize
@@ -102,6 +103,7 @@ impl Tokenizer {
             keywords: init_keywords(),
             src,
             char_vec: char_vec,
+            curr_char: 'a',
             position: 0,
             line: 1, 
             line_offset: 0
@@ -124,7 +126,7 @@ impl Tokenizer {
 
     fn match_and_consume(&mut self, a: char) -> bool {
         if self.peek() == a {
-            self.consume_char();
+            self.curr_char = self.consume_char();
             return true;
         }
         false
@@ -134,6 +136,7 @@ impl Tokenizer {
             return '\0';
         }
         let chr = self.char_vec[self.position];
+        self.curr_char = chr; 
         self.position += 1;
         chr
     }
@@ -225,28 +228,25 @@ impl Tokenizer {
     }
     fn scan_string(&mut self) -> bool {
         if !self.tokenization_end() {
-            if self.peek() == '"' {
+            if self.match_and_consume('"') {
                 let start = self.position;
-                let mut build_str = String::new();
-                build_str.push(self.consume_char());
-                while !self.tokenization_end() {
-                    if self.match_and_consume('\\') {
-                        if self.match_and_consume('"') {
-                            build_str.push('"');
-                        }
+                while !self.match_and_consume('"') {
+                    if self.tokenization_end() {
+                        // TODO: add error (Unterminated String)
+                        return true;
+                    }
+                    else if self.match_and_consume('\\') {
+                        if self.match_and_consume('"') {}
                     }
                     else if self.match_and_consume('"') {
                         break;
                     }    
-                    else if self.tokenization_end() {
-                        // TODO: add error (Unterminated String)
-                        return false;
-                    }
-                    else {
-                        build_str.push(self.consume_char());
+                    else if !self.tokenization_end() {
+                        self.consume_char();
                     }            
                 }
-                let tok = Token::init(TokenType::Str, build_str, start, self.position, self.line, self.line_offset);
+                let substr = self.src.as_str()[start..self.position-1].to_string();
+                let tok = Token::init(TokenType::Str, substr, start, self.position, self.line, self.line_offset);
                 self.token_list.push(tok);
                 return true;
             }
@@ -254,7 +254,7 @@ impl Tokenizer {
         false
     }
     fn scan_number(&mut self) -> bool {
-        if !self.tokenization_end() {
+        if !self.tokenization_end() { // regex: [0-9]+\.[0-9]
             let start = self.position;
             let mut float_flag: bool = false;
             if self.peek().is_numeric() {
@@ -297,7 +297,6 @@ impl Tokenizer {
                     break;
                 }
             }
-            // TODO: substr works with unicode chars
             let mut substr: String = self.src.as_mut_str()[start..self.position].to_string(); // this breaks down if the compiler encounters a non-ascii char :/
             let substr_clone = substr.clone();
             if self.is_keyword(&substr) {
@@ -400,18 +399,22 @@ mod test {
 
     #[test]
     fn test_tokenize_string() {
-        let mut tokenizer = init_test(String::from("\"abc\"")); // "abc"
-        let token = tokenizer.get_token(0);
-        assert_eq!(token.get_type(), TokenType::Str);
-        assert_eq!(token.get_string_value(), String::from("abc"));
+        let mut tokenizer = Tokenizer::init("\"abc\" \"\"".to_string());
+        tokenizer.tokenize();
+        let abc = tokenizer.get_token(0);
+        let empty = tokenizer.get_token(1);
+        assert_eq!(abc.get_type(), TokenType::Str);
+        assert_eq!(abc.get_string_value(), String::from("abc"));
+        assert_eq!(empty.get_type(), TokenType::Str);
+        assert_eq!(empty.get_string_value(), String::from(""));
     }
 
     #[test]
     fn test_escaped_strings() {
-        let tokenizer = init_test(String::from("\"abc\\\"\"")); // "abc\""
+        let tokenizer = init_test(String::from("\"abc\\\"\"")); // 'abc\"'
         let token = tokenizer.get_token(0);
         assert_eq!(token.get_type(), TokenType::Str);
-        assert_eq!(token.get_string_value(), String::from("abc\""));
+        assert_eq!(token.get_string_value(), String::from("abc\\\""));
     }
 
     #[test]
@@ -433,6 +436,18 @@ mod test {
         let tok_l = tokenizer.token_list.clone();
         let type_vec: Vec<TokenType> = vec![LeftBrace, RightBrace, LeftBracket, RightBracket, LeftParen, RightParen, Comma, Dot, SemiColon, Colon, Plus, PlusPlus, 
         PlusEqual, Minus, MinusMinus, MinusEqual, Equal, EqualEqual, BangEqual, Bang, Greater, GreaterEqual, Less, LessEqual, Band, Land,Bor, Lor, Lnot, Lxor];
+        for i in 0..tok_l.len()-1 {
+            assert_eq!(tok_l[i].get_type(), type_vec[i]);
+        }
+    }
+
+    #[test]
+    fn test_list_literal_tokenization() {
+        let mut tokenizer = Tokenizer::init("[1, 2, 3]".to_string());
+        tokenizer.tokenize();
+        use TokenType::*;
+        let tok_l = tokenizer.token_list.clone();
+        let type_vec: Vec<TokenType> = vec![LeftBracket, Int, Comma, Int, Comma, Int, RightBracket];
         for i in 0..tok_l.len()-1 {
             assert_eq!(tok_l[i].get_type(), type_vec[i]);
         }
