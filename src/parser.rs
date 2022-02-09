@@ -1,24 +1,23 @@
-
 use crate::tokenizer::*;
 
 enum ParserErrorType {
     UnexpectedToken,
-
 }
 
 // The White-lang parser
 pub struct Parser {
-    tokenizer: Tokenizer, // gets the tokenizer
-    curr_idx: usize, // what token its on
-    errors: Vec<ParserErrorType> // and possible errors
+    tokenizer: Tokenizer,         // gets the tokenizer
+    curr_idx: usize,              // what token its on
+    errors: Vec<ParserErrorType>, // and possible errors
 }
 #[allow(dead_code)]
 impl Parser {
-    pub fn init(tokenizer: Tokenizer) -> Parser { // the constructor
+    pub fn init(tokenizer: Tokenizer) -> Parser {
+        // the constructor
         Parser {
             tokenizer: tokenizer,
             curr_idx: 0,
-            errors: vec![]
+            errors: vec![],
         }
     }
 
@@ -37,7 +36,6 @@ impl Parser {
 
     // will match and consume a token at token_list[curr_idx] if its type = typ
     fn match_token(typ: TokenType) -> bool {
-        
         false
     }
 }

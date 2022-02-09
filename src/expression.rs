@@ -1,6 +1,6 @@
 #[allow(dead_code)]
-trait Expression<T> {
-    fn evaluate() -> T;
-    fn compile() -> String;
-    fn transpile() -> String;
+pub trait Expression<T> {
+    pub fn evaluate() -> T;
+    pub fn compile() -> String;
+    pub fn transpile() -> String;
 }
