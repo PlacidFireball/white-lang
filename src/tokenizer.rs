@@ -2,11 +2,10 @@ use std::char;
 use std::collections::HashMap;
 use std::fmt;
 use std::fmt::Display;
-use std::borrow::*;
 
 #[allow(dead_code)]
 #[derive(PartialEq, Debug, Clone, Copy)]
-enum ErrorType {
+enum ErrorType { // Errors, will probably add more
     UnterminatedString,
     UnexpectedToken
 }
@@ -21,7 +20,7 @@ impl Display for ErrorType {
 }
 
 #[derive(PartialEq, Debug, Clone, Copy)]
-pub enum TokenType {
+pub enum TokenType { // all token types that White-Lang implements
     // Types
 	Str, Int, Float,
     // Syntax
@@ -43,21 +42,22 @@ impl Display for TokenType {
 }
 
 #[derive(PartialEq, Debug, Clone)]
-pub struct Token {
-    typ: TokenType,
-    string_value: String,
-    start: usize,
+pub struct Token { // the Token
+    typ: TokenType, // has a type
+    string_value: String, // stores its string value 
+    start: usize, // and maintains location data for future error reporting TODO
     end: usize,
     line: usize,
     line_offset: usize
 }
-impl Display for Token {
+impl Display for Token { // for debug info
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}", self.typ)
     }
 }
 #[allow(dead_code)]
-impl Token {
+impl Token { 
+    // the constructor
     fn init(typ: TokenType, string_value: String, start: usize, end: usize, line: usize, line_offset: usize) -> Token {
         Token {
             typ,
@@ -97,24 +97,24 @@ fn init_keywords() -> HashMap<String, TokenType> {
 }
 
 #[derive(Debug, Clone)]
-pub struct Tokenizer {
-    token_list: Vec<Token>,
-    errors: Vec<ErrorType>,
-    keywords: HashMap<String, TokenType>,
-    src: String, 
-    char_vec: Vec<char>,
-    curr_char: char,
-    position: usize, 
-    line: usize, 
-    line_offset: usize
+pub struct Tokenizer {      // the tokenizer
+    token_list: Vec<Token>, // maintains a list of tokens
+    errors: Vec<ErrorType>, // associated errors
+    keywords: HashMap<String, TokenType>, // all the keywords in White-Lang
+    src: String,            // the source code
+    char_vec: Vec<char>,    // the source code, but characters
+    curr_char: char,        // the current char we are reading
+    position: usize,        // position data in the string
+    line: usize,            // what line we are on
+    line_offset: usize      // what the line offset is on the line
 }
 impl std::fmt::Display for Tokenizer {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result { // for printing off the tokenizer data
         write!(f, "Token List: {:?}\nsrc: {}\n", self.token_list, self.src)
     }
 }
 impl Tokenizer {
-    pub fn init(src: String) -> Tokenizer {
+    pub fn init(src: String) -> Tokenizer { // the constructor
         let char_vec: Vec<char> = src.chars().collect();
         Tokenizer {
             token_list: vec![],
@@ -128,26 +128,32 @@ impl Tokenizer {
             line_offset: 0
         }
     }
+    // for the parser, to let us know when we are done with parsing
     pub fn has_tokens(&self) -> bool {
         !self.token_list.is_empty()
     }
+    // returns a reference to the token list
     pub fn get_token_list(&self) -> &Vec<Token> {
         &self.token_list
     }
-    fn get_token(&self, idx: usize) -> Token {
+    // gets a specific token at a specific index
+    pub fn get_token(&self, idx: usize) -> Token {
         self.token_list[idx].clone()
     }
+    // a quick little function for putting tokens into the list instead of typing out the whole function every time
     fn add_token(&mut self, typ: TokenType, strval: String) {
         let len = strval.len();
         self.token_list.push(Token::init(typ, strval, self.position, self.position+len, self.line, self.line_offset));
     }
+    // tells you if an identifier is a keyword or not
     fn is_keyword(&self, kw: &String) -> bool {
         self.keywords.contains_key(kw)
     }
+    // tells you if you are done tokenizing src
     fn tokenization_end(&self) -> bool {
         self.position >= self.src.len()
     }
-
+    // if `a` matches whatever is at src[position], consume it, otherwise move on
     fn match_and_consume(&mut self, a: char) -> bool {
         if self.peek() == a {
             self.curr_char = self.consume_char();
@@ -155,6 +161,7 @@ impl Tokenizer {
         }
         false
     }
+    // consumes the character at src[position]
     fn consume_char(&mut self) -> char {    
         if self.tokenization_end() {
             return '\0';
@@ -164,15 +171,17 @@ impl Tokenizer {
         self.position += 1;
         chr
     }
+    // returns the character at src[position] without consuming it
     fn peek(&mut self) -> char {
         self.char_vec[self.position]
     }
+    // for cases when you want to look at the character at src[position + 1]
     fn peek_next(&mut self) -> char {
         self.char_vec[self.position + 1]
     }
-
+    // the crux of token scanning
     fn scan_token(&mut self) { 
-        if self.scan_number() {
+        if self.scan_number() { // scan number, then string if that fails, then identifier, then syntax if all those fail
             return
         }
         else if self.scan_string() {
@@ -183,9 +192,9 @@ impl Tokenizer {
         }
         self.scan_syntax();
     }
-
+    // scans all the syntax supported by White-Lang, code pretty self explanatory
     fn scan_syntax(&mut self) {
-        if !self.tokenization_end() {
+        if !self.tokenization_end() { 
             if self.match_and_consume('{') { self.add_token(TokenType::LeftBrace, String::from("{")); }
             else if self.match_and_consume('}') { self.add_token(TokenType::RightBrace, String::from("}")); }
             else if self.match_and_consume('[') { self.add_token(TokenType::LeftBracket, String::from("[")); }
@@ -250,28 +259,29 @@ impl Tokenizer {
             }
         }
     }
+    // String scanning [regex: "[literally anything in unicode]"]
     fn scan_string(&mut self) -> bool {
         if !self.tokenization_end() {
             if self.match_and_consume('"') {
-                let start = self.position;
-                while !self.match_and_consume('"') {
-                    if self.tokenization_end() {
-                        // TODO: add error (Unterminated String)
+                let start = self.position;              // set the start
+                while !self.match_and_consume('"') {    // while we haven't terminated the string
+                    if self.tokenization_end() {        // if we got to the end of tokenization, we have an unterminated string
+                        self.errors.push(ErrorType::UnterminatedString); // push the error and exit
                         return true;
                     }
-                    else if self.match_and_consume('\\') {
+                    else if self.match_and_consume('\\') {      // deal with escaped quotes or just backslashes
                         if self.match_and_consume('"') {}
                     }
-                    else if self.match_and_consume('"') {
+                    else if self.match_and_consume('"') {       // checks for the end of the string
                         break;
                     }    
-                    else if !self.tokenization_end() {
+                    else if !self.tokenization_end() {          // otherwise consume whatever is there
                         self.consume_char();
                     }            
                 }
-                let substr = self.src.as_str()[start..self.position-1].to_string();
-                let tok = Token::init(TokenType::Str, substr, start, self.position, self.line, self.line_offset);
-                self.token_list.push(tok);
+                let substr = self.src.as_str()[start..self.position-1].to_string();         // retrieve the substring, kinda wonky, will break with unicode chars
+                let tok = Token::init(TokenType::Str, substr, start, self.position, self.line, self.line_offset); // create the token
+                self.token_list.push(tok);      // push it
                 return true;
             }
         }
@@ -280,20 +290,20 @@ impl Tokenizer {
     fn scan_number(&mut self) -> bool {
         if !self.tokenization_end() { // regex: [0-9]+\.[0-9]
             let start = self.position;
-            let mut float_flag: bool = false;
-            if self.peek().is_numeric() {
-                while self.peek().is_numeric() {
-                    self.consume_char();
-                    if self.tokenization_end() {
+            let mut float_flag: bool = false; // handle decimal numbers
+            if self.peek().is_numeric() { // rust has nice built int char functions that tell you if stuff is alphabetic or numeric, in this case
+                while self.peek().is_numeric() { // while we are dealing with numbers
+                    self.consume_char(); // consume the character
+                    if self.tokenization_end() { // check for the end
                         break;
                     }
-                    if self.peek() == '.' && self.peek_next().is_numeric() {
+                    if self.peek() == '.' && self.peek_next().is_numeric() { // for dealing with decimals, not sure if this is correct: ex. 9.
                         self.consume_char();
                         float_flag = true;
                     }
                 }
-                let substr: String = self.src.as_mut_str()[start..self.position].to_string();
-                if float_flag {
+                let substr: String = self.src.as_mut_str()[start..self.position].to_string(); // retrieve the substring
+                if float_flag { // create either int or float token based on whether or not we encountered "."
                     let tok = Token::init(TokenType::Float, substr, start, self.position, self.line, self.line_offset);
                     self.token_list.push(tok);
                     return true;
@@ -312,23 +322,23 @@ impl Tokenizer {
     }
 
     fn scan_identifier(&mut self) -> bool {
-        if self.peek().is_alphabetic() { // regex: [a-zA-Z_][a-zA-Z0-9]*
-            let start = self.position;
-            self.consume_char();
-            while self.peek().is_alphanumeric() {
+        if self.peek().is_alphabetic() { // regex: [a-zA-Z_][a-zA-Z_0-9]*
+            let start = self.position; // set start
+            self.consume_char(); // consume the first char
+            while self.peek().is_alphanumeric() { // while we have anything [a-zA-Z_0-9]
                 self.consume_char();
                 if self.tokenization_end() {
                     break;
                 }
             }
-            let mut substr: String = self.src.as_mut_str()[start..self.position].to_string(); // this breaks down if the compiler encounters a non-ascii char :/
+            let substr: String = self.src.as_mut_str()[start..self.position].to_string(); // this breaks down if the compiler encounters a non-ascii char :/
             let substr_clone = substr.clone();
-            if self.is_keyword(&substr) {
-                let typ = *self.keywords.get(&substr.clone()).unwrap_or(&TokenType::Error);
-                let tok = Token::init(typ, substr, start, self.position, self.line, self.line_offset);
+            if self.is_keyword(&substr) { // this is weird rust spaghetti, because the memory thing is pissy otherwise, feels dumb
+                let typ = *self.keywords.get(&substr.clone()).unwrap_or(&TokenType::Error); // retrieve the type from the keywords hashmap
+                let tok = Token::init(typ, substr, start, self.position, self.line, self.line_offset); // init the token
                 self.token_list.push(tok);
             }
-            else {
+            else { // if we don't have a keyword, we just have an identifier, which is pretty cash money
                 let tok = Token::init(TokenType::Identifier, substr_clone, start, self.position, self.line, self.line_offset);
                 self.token_list.push(tok);
             }
@@ -337,10 +347,10 @@ impl Tokenizer {
         false
     }
     fn consume_whitespace(&mut self) {
-        while !self.tokenization_end() {
+        while !self.tokenization_end() { // consume whitespace
             if self.peek() == '\r' || self.peek() == '\t' || self.peek() == ' ' {
                 self.consume_char();
-                self.line_offset += 1;
+                self.line_offset += 1; // updates line_offset and line as needed
                 continue;
             }
             if self.peek() == '\n' {
@@ -353,16 +363,18 @@ impl Tokenizer {
         }
     }
 
+    // our main loop, drives all the above code
     pub fn tokenize(&mut self) {
-        self.consume_whitespace();
-        while !self.tokenization_end() {
-            self.consume_whitespace();
-            self.scan_token();
+        self.consume_whitespace(); // get rid of whitespace at the beginning of src
+        while !self.tokenization_end() { // while we've still got chars to read
+            self.consume_whitespace(); // consume that whitespace
+            self.scan_token(); // scan them tokens
         } 
-        self.add_token(TokenType::Eof, String::new());
+        self.add_token(TokenType::Eof, String::new()); // add eof at the end of token_list
     }
 }
 
+// Tests! 
 #[cfg(test)]
 mod test {
     use super::*;
@@ -403,6 +415,17 @@ mod test {
         let token = tokenizer.get_token(0);
         assert_eq!(token.get_type(), TokenType::Float);
         assert_eq!(token.get_string_value(), String::from("1.1"));
+    }
+
+    #[test]
+    fn test_tokenize_bad_float() { // TODO: figure out how we are going to define this behaviour
+        let mut tokenizer = init_test("1.".to_string());
+        tokenizer.tokenize();
+        let token = tokenizer.get_token(0);
+        assert_eq!(tokenizer.get_token_list().len(), 2);
+        assert_eq!(token.get_type(), TokenType::Int);
+        assert_eq!(token.get_string_value(), String::from("1"));
+
     }
 
     #[test]
