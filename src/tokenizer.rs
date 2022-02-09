@@ -2,6 +2,7 @@ use std::char;
 use std::collections::HashMap;
 use std::fmt;
 use std::fmt::Display;
+use std::borrow::*;
 
 #[allow(dead_code)]
 #[derive(PartialEq, Debug, Clone, Copy)]

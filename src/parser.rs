@@ -1,8 +1,5 @@
 
-#[path = "../tokenizer/tokenizer.rs"] mod tokenizer;
-use tokenizer::Tokenizer;
-use tokenizer::Token;
-use tokenizer::TokenType;
+use crate::tokenizer::*;
 
 enum ParserErrorType {
     UnexpectedToken,
@@ -18,7 +15,7 @@ pub struct Parser {
 impl Parser {
     pub fn init(tokenizer: Tokenizer) -> Parser {
         Parser {
-            tokenizer: tokenizer.clone(),
+            tokenizer: tokenizer,
             curr_token_idx: 0,
             errors: vec![]
         }
