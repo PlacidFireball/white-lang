@@ -3,11 +3,26 @@ use std::collections::HashMap;
 use std::fmt;
 use std::fmt::Display;
 
-#[derive(PartialEq, Debug, Clone, Copy)]
 #[allow(dead_code)]
+#[derive(PartialEq, Debug, Clone, Copy)]
+enum ErrorType {
+    UnterminatedString,
+    UnexpectedToken
+}
+impl Display for ErrorType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let s: String = match self {
+            ErrorType::UnterminatedString => String::from("Unterminated String"),
+            ErrorType::UnexpectedToken => String::from("Unexpected Token"),
+        };
+        write!(f, "{}", s)
+    }
+}
+
+#[derive(PartialEq, Debug, Clone, Copy)]
 enum TokenType {
     // Types
-	Str, Int, Long, Char, List, Boolean, Float,
+	Str, Int, Float,
     // Syntax
 	LeftParen, RightParen, LeftBracket,
 	RightBracket, LeftBrace, RightBrace, Equal, Bang,
@@ -40,6 +55,7 @@ impl Display for Token {
         write!(f, "{}", self.typ)
     }
 }
+#[allow(dead_code)]
 impl Token {
     fn init(typ: TokenType, string_value: String, start: usize, end: usize, line: usize, line_offset: usize) -> Token {
         Token {
@@ -82,6 +98,7 @@ fn init_keywords() -> HashMap<String, TokenType> {
 #[derive(Debug)]
 pub struct Tokenizer {
     token_list: Vec<Token>,
+    errors: Vec<ErrorType>,
     keywords: HashMap<String, TokenType>,
     src: String, 
     char_vec: Vec<char>,
@@ -100,6 +117,7 @@ impl Tokenizer {
         let char_vec: Vec<char> = src.chars().collect();
         Tokenizer {
             token_list: vec![],
+            errors: vec![],
             keywords: init_keywords(),
             src,
             char_vec: char_vec,
