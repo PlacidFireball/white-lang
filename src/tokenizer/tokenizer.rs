@@ -20,7 +20,7 @@ impl Display for ErrorType {
 }
 
 #[derive(PartialEq, Debug, Clone, Copy)]
-enum TokenType {
+pub enum TokenType {
     // Types
 	Str, Int, Float,
     // Syntax
@@ -42,7 +42,7 @@ impl Display for TokenType {
 }
 
 #[derive(PartialEq, Debug, Clone)]
-struct Token {
+pub struct Token {
     typ: TokenType,
     string_value: String,
     start: usize,
@@ -67,10 +67,10 @@ impl Token {
             line_offset
         }
     }
-    fn get_type(&self) -> TokenType {
+    pub fn get_type(&self) -> TokenType {
         self.typ
     }
-    fn get_string_value(&self) -> String {
+    pub fn get_string_value(&self) -> String {
         self.string_value.clone()
     }
 }
@@ -95,7 +95,7 @@ fn init_keywords() -> HashMap<String, TokenType> {
     keywords
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Tokenizer {
     token_list: Vec<Token>,
     errors: Vec<ErrorType>,
@@ -127,7 +127,12 @@ impl Tokenizer {
             line_offset: 0
         }
     }
-
+    pub fn has_tokens(&self) -> bool {
+        !self.token_list.is_empty()
+    }
+    pub fn get_token_list(&self) -> &Vec<Token> {
+        &self.token_list
+    }
     fn get_token(&self, idx: usize) -> Token {
         self.token_list[idx].clone()
     }
