@@ -7,7 +7,7 @@ enum ParserErrorType {
 // The White-lang parser
 pub struct Parser {
     tokenizer: Tokenizer,         // gets the tokenizer
-    curr_idx: usize,              // what token its on
+    curr_idx: usize,              // what token it's on
     errors: Vec<ParserErrorType>, // and possible errors
 }
 #[allow(dead_code)]

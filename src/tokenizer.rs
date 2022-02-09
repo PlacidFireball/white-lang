@@ -25,59 +25,59 @@ impl Display for ErrorType {
 pub enum TokenType {
     // all token types that White-Lang implements
     // Types
-    Str,
-    Int,
-    Float,
+    Str,   // "string"
+    Int,   // 123
+    Float, // 123.456
     // Syntax
-    LeftParen,
-    RightParen,
-    LeftBracket,
-    RightBracket,
-    LeftBrace,
-    RightBrace,
-    Equal,
-    Bang,
-    Plus,
-    PlusPlus,
-    PlusEqual,
-    Minus,
-    MinusMinus,
-    MinusEqual,
-    Star,
-    Slash,
-    Band,
-    Land,
-    Bor,
-    Lor,
-    Lnot,
-    Lxor,
-    SemiColon,
-    Colon,
-    EqualEqual,
-    Comma,
-    Dot,
-    Greater,
-    Less,
-    BangEqual,
-    GreaterEqual,
-    LessEqual,
+    LeftParen,    // (
+    RightParen,   // )
+    LeftBracket,  // [
+    RightBracket, // ]
+    LeftBrace,    // {
+    RightBrace,   // }
+    Equal,        // =
+    Bang,         // !
+    Plus,         // +
+    PlusPlus,     // ++
+    PlusEqual,    // +=
+    Minus,        // -
+    MinusMinus,   // --
+    MinusEqual,   // -=
+    Star,         // *
+    Slash,        // /
+    Band,         // & (bitwise and)
+    Land,         // &&
+    Bor,          // | (bitwise or)
+    Lor,          // ||
+    Lnot,         // ~
+    Lxor,         // ^
+    SemiColon,    // ;
+    Colon,        // :
+    EqualEqual,   // ==
+    Comma,        // ,
+    Dot,          // .
+    Greater,      // >
+    Less,         // <
+    BangEqual,    // !=
+    GreaterEqual, // >=
+    LessEqual,    // <=
     // Keywords
-    And,
-    Not,
-    If,
-    While,
-    For,
-    In,
-    Else,
-    Return,
-    Eof,
-    Error,
-    Identifier,
-    Let,
-    Print,
-    Function,
-    True,
-    False,
+    And,        // and
+    Not,        // not
+    If,         // if
+    While,      // while
+    For,        // for
+    In,         // in
+    Else,       // else
+    Return,     // return
+    Eof,        // not technically a keyword
+    Error,      // error reporting
+    Identifier, // a123b456
+    Let,        // let
+    Print,      // print
+    Function,   // fn
+    True,       // true
+    False,      // false
 }
 impl Display for TokenType {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
