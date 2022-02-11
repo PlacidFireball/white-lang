@@ -1,21 +1,38 @@
 use std::ptr::null;
+use std::any::Any;
 use crate::tokenizer::*;
+use crate::tokenizer::TokenType::*;
 // expressions
 mod booleanliteralexpression;
+use crate::parser::booleanliteralexpression::BooleanLiteralExpression;
 mod integerliteralexpression;
+use crate::parser::integerliteralexpression::IntegerLiteralExpression;
 mod floatliteralexpression;
+use crate::parser::floatliteralexpression::FloatLiteralExpression;
 mod additiveexpression;
+use crate::parser::additiveexpression::AdditiveExpression;
 mod comparisonexpression;
+use crate::parser::comparisonexpression::ComparisonExpression;
 mod equalityexpression;
+use crate::parser::equalityexpression::EqualityExpression;
 mod factorexpression;
+use crate::parser::factorexpression::FactorExpression;
 mod functioncallexpression;
+use crate::parser::functioncallexpression::FunctionCallExpression;
 mod identifierexpression;
+use crate::parser::identifierexpression::IdentifierExpression;
 mod listliteralexpression;
+use crate::parser::listliteralexpression::ListLiteralExpression;
 mod nullliteralexpression;
+use crate::parser::nullliteralexpression::NullLiteralExpression;
 mod parenthesizedexpression;
+use crate::parser::parenthesizedexpression::ParenthesizedExpression;
 mod stringliteralexpression;
+use crate::parser::stringliteralexpression::StringLiteralExpression;
 mod syntaxerrorexpression;
+use crate::parser::syntaxerrorexpression::SyntaxErrorExpression;
 mod unaryexpression;
+use crate::parser::unaryexpression::UnaryExpression;
 mod typeliteral;
 // statements
 mod assignmentstatement;
@@ -31,7 +48,7 @@ mod syntaxerrorstatement;
 
 
 pub trait Expression {
-    fn evaluate<T>(&self) -> T;
+    fn evaluate(&self) -> dyn Any;
     fn compile(&self) -> String;
     fn transpile(&self) -> String;
 }
@@ -131,14 +148,14 @@ mod test {
     fn test_match_and_consume() {
         let mut parser = init_parser(String::from("1"));
         assert_eq!(parser.curr_idx, 0);
-        assert_eq!(parser.match_and_consume(TokenType::Int), true);
+        assert_eq!(parser.match_and_consume(Int), true);
         assert_eq!(parser.curr_idx, 1);
     }
 
     #[test]
     fn test_require() {
         let mut parser = init_parser("\"\"".to_string());
-        parser.require_token(TokenType::Int);
+        parser.require_token(Int);
         assert_eq!(parser.has_errors(), true);
     }
 }

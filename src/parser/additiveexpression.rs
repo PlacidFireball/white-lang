@@ -1,10 +1,11 @@
 use crate::parser::Expression;
 
-struct AdditiveExpression {
+
+pub(crate) struct AdditiveExpression {
 
 }
 impl Expression for AdditiveExpression {
-    fn evaluate<f64>(&self) -> f64 {
+    fn evaluate(&self) -> f64 {
         todo!()
     }
 

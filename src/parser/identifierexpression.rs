@@ -1,11 +1,11 @@
 use crate::parser::Expression;
 
-struct IdentifierExpression {
-
+pub(crate) struct IdentifierExpression {
+    name: String
 }
 impl Expression for IdentifierExpression {
-    fn evaluate<String>(&self) -> String {
-        todo!()
+    fn evaluate(&self) -> String {
+        self.name.clone()
     }
 
     fn compile(&self) -> String {

@@ -1,10 +1,10 @@
 use crate::parser::Expression;
 
-struct FunctionCallExpression {
+pub(crate) struct FunctionCallExpression {
 
 }
 impl Expression for FunctionCallExpression {
-    fn evaluate<String>(&self) -> String {
+    fn evaluate(&self) -> String {
         todo!()
     }
 

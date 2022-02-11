@@ -1,10 +1,10 @@
 use crate::parser::Expression;
 
-struct ComparisonExpression {
+pub(crate) struct ComparisonExpression {
 
 }
 impl Expression for ComparisonExpression {
-    fn evaluate<bool>(&self) -> bool {
+    fn evaluate(&self) -> bool {
         todo!()
     }
 

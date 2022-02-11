@@ -1,11 +1,11 @@
 use crate::parser::Expression;
 
-struct IntegerLiteralExpression {
-
+pub(crate) struct IntegerLiteralExpression {
+    value: isize
 }
 impl Expression for IntegerLiteralExpression {
-    fn evaluate<isize>(&self) -> isize {
-        todo!()
+    fn evaluate(&self) -> isize {
+        self.value
     }
 
     fn compile(&self) -> String {

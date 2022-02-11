@@ -1,10 +1,10 @@
 use crate::parser::Expression;
 
-struct FloatLiteralExpression {
+pub(crate) struct FloatLiteralExpression {
 
 }
 impl Expression for FloatLiteralExpression {
-    fn evaluate<f64>(&self) -> f64 {
+    fn evaluate(&self) -> f64 {
         todo!()
     }
 

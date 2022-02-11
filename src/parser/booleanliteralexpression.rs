@@ -1,11 +1,12 @@
 
 use crate::parser::Expression;
 
-struct BooleanLiteralExpression {
+pub(crate) struct BooleanLiteralExpression {
     boolean: bool
 }
 impl Expression for BooleanLiteralExpression {
-    fn evaluate<bool>(&self) -> bool {
+
+    fn evaluate(&self) -> bool {
         self.boolean
     }
 
