@@ -1,3 +1,4 @@
+use std::any::Any;
 use crate::parser::Expression;
 
 
@@ -5,7 +6,7 @@ pub(crate) struct AdditiveExpression {
 
 }
 impl Expression for AdditiveExpression {
-    fn evaluate(&self) -> f64 {
+    fn evaluate(&self) -> Box<dyn Any> {
         todo!()
     }
 
@@ -15,5 +16,13 @@ impl Expression for AdditiveExpression {
 
     fn transpile(&self) -> String {
         String::from("")
+    }
+
+    fn get_type(&self) -> String {
+        todo!()
+    }
+
+    fn set_type(&self, s: String) {
+        todo!()
     }
 }

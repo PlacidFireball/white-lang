@@ -1,5 +1,6 @@
 use std::ptr::null;
-use std::any::Any;
+use std::any::{Any, TypeId};
+use std::any::type_name;
 use crate::tokenizer::*;
 use crate::tokenizer::TokenType::*;
 // expressions
@@ -45,12 +46,17 @@ mod returnstatement;
 mod variablestatement;
 mod syntaxerrorstatement;
 
-
+fn type_of<T>(_: T) -> &'static str {
+    type_name::<T>()
+}
 
 pub trait Expression {
-    fn evaluate(&self) -> dyn Any;
+    fn evaluate(&self) -> Box<dyn Any>;
     fn compile(&self) -> String;
     fn transpile(&self) -> String;
+
+    fn get_type(&self) -> String;
+    fn set_type(&self, s: String);
 }
 
 pub trait Statement {
@@ -87,12 +93,13 @@ impl Parser {
 
     // main loop (eventually)
     pub fn parse(&self) {
+
         while self.has_tokens() {
             break;
         }
     }
 
-    // 
+    // tells us if parsing is done or not
     fn has_tokens(&self) -> bool {
         !self.token_list.len() <= self.curr_idx
     }
@@ -124,7 +131,8 @@ impl Parser {
         false
     }
 
-    // requires that a specific tokentype be at curr_idx, 
+    // requires that a specific tokentype be at curr_idx,
+    // if it matches, it consumes it
     // otherwise pushes an error onto errors
     fn require_token(&mut self, typ: TokenType) {
         use self::ParserErrorType::*;
@@ -132,12 +140,39 @@ impl Parser {
             self.errors.push(UnexpectedToken);
         }
     }
+
+    fn parse_expression(&mut self) -> Box<dyn Expression>{
+        self.parse_additive_expression()
+    }
+
+    fn parse_additive_expression(&mut self) -> Box<dyn Expression> {
+        let expr = self.parse_integer_literal_expression();
+        while self.match_token(Plus) || self.match_token(Minus) {
+            self.consume_token()
+        }
+        expr
+    }
+
+    fn parse_integer_literal_expression(&mut self) -> Box<dyn Expression> {
+        if self.match_token(Int) {
+            let expr = IntegerLiteralExpression::new(
+                self.token_list[self.curr_idx].get_string_value().parse::<isize>().unwrap()
+            );
+            return Box::new(expr);
+        }
+        Box::new(SyntaxErrorExpression::new())
+    }
+
+
+
+
 }
 
 #[cfg(test)]
 mod test {
     
     use super::*;
+    use crate::parser::type_of;
 
     fn init_parser(src: String) -> Parser {
         let tokenizer: Tokenizer = Tokenizer::init(src);
@@ -157,5 +192,12 @@ mod test {
         let mut parser = init_parser("\"\"".to_string());
         parser.require_token(Int);
         assert_eq!(parser.has_errors(), true);
+    }
+
+    #[test]
+    fn test_parse_integer_expression() {
+        let mut parser = init_parser("1".to_string());
+        let expr = parser.parse_expression();
+        assert_eq!(type_of(expr), "IntegerLiteralExpression");
     }
 }

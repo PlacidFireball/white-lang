@@ -1,10 +1,11 @@
+use std::any::Any;
 use crate::parser::Expression;
 
 pub(crate) struct ListLiteralExpression {
 
 }
 impl Expression for ListLiteralExpression {
-    fn evaluate(&self) {
+    fn evaluate(&self) -> Box<dyn Any>{
         todo!()
     }
 
@@ -13,6 +14,14 @@ impl Expression for ListLiteralExpression {
     }
 
     fn transpile(&self) -> String {
+        todo!()
+    }
+
+    fn get_type(&self) -> String {
+        todo!()
+    }
+
+    fn set_type(&self) {
         todo!()
     }
 }
