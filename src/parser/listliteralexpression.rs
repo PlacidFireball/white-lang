@@ -15,6 +15,10 @@ impl Expression for ListLiteralExpression {
         todo!()
     }
 
+    fn debug(&self) -> String {
+        todo!()
+    }
+
     fn get_type(&self) -> String {
         todo!()
     }

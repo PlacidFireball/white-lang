@@ -15,6 +15,10 @@ impl Expression for AdditiveExpression {
         String::from("")
     }
 
+    fn debug(&self) -> String {
+        todo!()
+    }
+
     fn get_type(&self) -> String {
         todo!()
     }

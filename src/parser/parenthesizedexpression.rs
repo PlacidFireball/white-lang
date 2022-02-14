@@ -17,6 +17,10 @@ impl Expression for ParenthesizedExpression {
         todo!()
     }
 
+    fn debug(&self) -> String {
+        String::from("(")+ &*self.expr.debug()+ &*String::from(")")
+    }
+
     fn get_type(&self) -> String {
         String::from("ParenthesizedExpression")
     }

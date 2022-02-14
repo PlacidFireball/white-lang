@@ -15,6 +15,10 @@ impl Expression for SyntaxErrorExpression {
         todo!()
     }
 
+    fn debug(&self) -> String {
+        String::from("Syntax Error")
+    }
+
     fn get_type(&self) -> String {
         todo!()
     }

@@ -17,6 +17,10 @@ impl Expression for FloatLiteralExpression {
         todo!()
     }
 
+    fn debug(&self) -> String {
+        String::from(self.value.to_string())
+    }
+
     fn get_type(&self) -> String {
         String::from("FloatLiteralExpression")
     }

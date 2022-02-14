@@ -16,6 +16,10 @@ impl Expression for NullLiteralExpression {
         todo!()
     }
 
+    fn debug(&self) -> String {
+        String::from("null")
+    }
+
     fn get_type(&self) -> String {
         String::from("NullLiteralExpression")
     }

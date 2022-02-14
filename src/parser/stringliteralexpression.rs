@@ -17,6 +17,10 @@ impl Expression for StringLiteralExpression {
         todo!()
     }
 
+    fn debug(&self) -> String {
+        self.string_value.clone()
+    }
+
     fn get_type(&self) -> String {
         String::from("StringLiteralExpression")
     }

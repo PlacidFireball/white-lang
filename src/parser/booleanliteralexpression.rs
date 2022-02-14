@@ -17,7 +17,18 @@ impl Expression for BooleanLiteralExpression {
         todo!()
     }
 
+    fn debug(&self) -> String {
+        String::from(self.boolean.to_string())
+    }
+
     fn get_type(&self) -> String {
-        todo!()
+        String::from("BooleanLiteralExpression")
+    }
+}
+impl BooleanLiteralExpression {
+    pub fn new(boolean: bool) -> BooleanLiteralExpression {
+        BooleanLiteralExpression {
+            boolean
+        }
     }
 }

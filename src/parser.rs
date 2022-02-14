@@ -51,6 +51,8 @@ pub trait Expression {
     fn compile(&self) -> String;
     fn transpile(&self) -> String;
 
+    fn debug(&self) -> String;
+
     fn get_type(&self) -> String;
 }
 
@@ -60,6 +62,7 @@ pub trait Statement {
 
 enum ParserErrorType {
     UnexpectedToken,
+    UnterminatedArgList
 }
 
 // The White-lang parser
@@ -95,12 +98,16 @@ impl Parser {
 
     // tells us if parsing is done or not
     fn has_tokens(&self) -> bool {
-        !self.token_list.len() >= self.curr_idx
+        !(self.get_curr_tok().get_type() == Eof)
     }
 
     // tells us if we have errors
     pub fn has_errors(&self) -> bool {
         !self.errors.is_empty()
+    }
+
+    fn get_curr_tok(&self) -> &Token {
+        &self.token_list[self.curr_idx]
     }
 
     // consumes the token unconditionally
@@ -145,17 +152,47 @@ impl Parser {
     }
 
     fn parse_additive_expression(&mut self) -> Box<dyn Expression> {
-        let expr = self.parse_float_literal_expression();
+        let expr = self.parse_function_call_expression();
         while self.match_token(Plus) || self.match_token(Minus) {
             self.consume_token()
         }
         expr
     }
 
+    fn parse_comparison_expression(&mut self) -> Box<dyn Expression> {
+        let expr = self.parse_function_call_expression();
+        while self.match_token(Greater) // >
+            || self.match_token(GreaterEqual) // >=
+            || self.match_token(Less) // <
+            || self.match_token(LessEqual)  { // <=
+            let operator = self.get_curr_tok().get_string_value();
+            self.consume_token(); // consume op
+            let rhs = self.parse_function_call_expression();
+            let comparison_expr = ComparisonExpression::new(expr, operator.clone(), rhs);
+            return Box::new(comparison_expr);
+        }
+        expr
+    }
+
     fn parse_function_call_expression(&mut self) -> Box<dyn Expression> {
-        todo!();
         if self.match_token(Identifier) && self.peek_next_token(LeftParen) {
-            let expr = FunctionCallExpression::new();
+            let mut expr = FunctionCallExpression::new(
+                self.get_curr_tok()
+                    .get_string_value()
+            );
+            self.require_token(Identifier);
+            self.require_token(LeftParen);
+            loop {
+                if self.match_and_consume(RightParen) { break; }
+                let arg = self.parse_expression();
+                expr.add_arg(arg);
+                self.match_and_consume(Comma);
+                if !self.has_tokens() {
+                    self.errors.push(ParserErrorType::UnterminatedArgList);
+                    break;
+                }
+            }
+            return Box::new(expr);
         }
         self.parse_float_literal_expression()
     }
@@ -179,7 +216,8 @@ impl Parser {
     fn parse_string_literal_expression(&mut self) -> Box<dyn Expression> {
         if self.match_token(Str) {
             let expr = StringLiteralExpression::new(
-                self.token_list[self.curr_idx].get_string_value()
+                self.get_curr_tok()
+                    .get_string_value()
             );
             self.consume_token();
             return Box::new(expr);
@@ -196,6 +234,20 @@ impl Parser {
                     .get_string_value()
                     .parse::<isize>()
                     .unwrap(),
+            );
+            self.consume_token();
+            return Box::new(expr);
+        }
+        self.parse_boolean_literal_expression()
+    }
+
+    fn parse_boolean_literal_expression(&mut self) -> Box<dyn Expression> {
+        if self.match_token(True) || self.match_token(False) {
+            let expr = BooleanLiteralExpression::new(
+                self.get_curr_tok()
+                .get_string_value()
+                .parse::<bool>()
+                .unwrap()
             );
             self.consume_token();
             return Box::new(expr);
@@ -257,6 +309,7 @@ mod test {
         let mut parser = init_parser("1.1".to_string());
         let expr = parser.parse_expression();
         assert_eq!(expr.get_type(), "FloatLiteralExpression");
+        assert_eq!(expr.debug(), "1.1");
     }
 
     #[test]
@@ -265,4 +318,40 @@ mod test {
         let expr = parser.parse_expression();
         assert_eq!(expr.get_type(), "NullLiteralExpression");
     }
+
+    #[test]
+    fn test_boolean_literal_expression() {
+        let mut parser = init_parser("true false".to_string());
+        let mut expr = parser.parse_expression();
+        assert_eq!(expr.get_type(), "BooleanLiteralExpression");
+        assert_eq!(expr.debug(), "true");
+        expr = parser.parse_expression();
+        assert_eq!(expr.get_type(), "BooleanLiteralExpression");
+        assert_eq!(expr.debug(), "false");
+    }
+
+    #[test]
+    fn test_function_call_expression() {
+        let mut parser = init_parser("x()".to_string());
+        let expr = parser.parse_expression();
+        assert_eq!(expr.get_type(), "FunctionCallExpression");
+        assert_eq!(expr.debug(), "x: ");
+    }
+
+    #[test]
+    fn test_function_call_args_expression() {
+        let mut parser = init_parser("x(1, 2)".to_string());
+        let expr = parser.parse_expression();
+        assert_eq!(expr.get_type(), "FunctionCallExpression");
+        assert_eq!(expr.debug(), "x: 1 2 ");
+    }
+
+    #[test]
+    fn test_fn_unterminated_args() {
+        let mut parser = init_parser("x(".to_string());
+        let expr = parser.parse_expression();
+        assert_eq!(expr.get_type(), "FunctionCallExpression");
+        assert!(parser.has_errors());
+    }
+
 }

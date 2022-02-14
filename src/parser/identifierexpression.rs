@@ -17,6 +17,10 @@ impl Expression for IdentifierExpression {
         todo!()
     }
 
+    fn debug(&self) -> String {
+        self.name.clone()
+    }
+
     fn get_type(&self) -> String {
         todo!()
     }
