@@ -30,6 +30,14 @@ impl Expression for EqualityExpression {
     fn get_type(&self) -> String {
         String::from("EqualityExpression")
     }
+
+    fn get_lhs(&self) -> &Box<dyn Expression> {
+        &self.lhs
+    }
+
+    fn get_rhs(&self) -> &Box<dyn Expression> {
+        &self.rhs
+    }
 }
 impl EqualityExpression {
     pub fn new(lhs: Box<dyn Expression>, operator: String, rhs: Box<dyn Expression>) -> EqualityExpression {

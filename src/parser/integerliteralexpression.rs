@@ -24,6 +24,14 @@ impl Expression for IntegerLiteralExpression {
     fn get_type(&self) -> String {
         String::from("IntegerLiteralExpression")
     }
+
+    fn get_lhs(&self) -> &Box<dyn Expression> {
+        &Box::new(self)
+    }
+
+    fn get_rhs(&self) -> &Box<dyn Expression> {
+        &Box::new(Self)
+    }
 }
 impl IntegerLiteralExpression {
     pub fn new(value: isize) -> IntegerLiteralExpression {

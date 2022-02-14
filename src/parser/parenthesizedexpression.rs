@@ -24,4 +24,12 @@ impl Expression for ParenthesizedExpression {
     fn get_type(&self) -> String {
         String::from("ParenthesizedExpression")
     }
+
+    fn get_lhs(&self) -> &Box<dyn Expression> {
+        &Box::new(Self)
+    }
+
+    fn get_rhs(&self) -> &Box<dyn Expression> {
+        &Box::new(self)
+    }
 }

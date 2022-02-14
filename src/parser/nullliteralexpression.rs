@@ -23,6 +23,14 @@ impl Expression for NullLiteralExpression {
     fn get_type(&self) -> String {
         String::from("NullLiteralExpression")
     }
+
+    fn get_lhs(&self) -> &Box<dyn Expression> {
+        &Box::new(Self)
+    }
+
+    fn get_rhs(&self) -> &Box<dyn Expression> {
+        &Box::new(Self)
+    }
 }
 impl NullLiteralExpression {
     pub fn new() -> NullLiteralExpression {

@@ -1,4 +1,4 @@
-use crate::parser::{Expression, Sided};
+use crate::parser::{Expression};
 use std::any::Any;
 
 pub struct FactorExpression {
@@ -30,8 +30,7 @@ impl Expression for FactorExpression {
     fn get_type(&self) -> String {
         String::from("FactorExpression")
     }
-}
-impl Sided for FactorExpression {
+
     fn get_lhs(&self) -> &Box<dyn Expression> {
         &self.lhs
     }

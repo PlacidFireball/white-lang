@@ -24,6 +24,14 @@ impl Expression for FloatLiteralExpression {
     fn get_type(&self) -> String {
         String::from("FloatLiteralExpression")
     }
+
+    fn get_lhs(&self) -> &Box<dyn Expression> {
+        &Box::new(Self)
+    }
+
+    fn get_rhs(&self) -> &Box<dyn Expression> {
+        &Box::new(Self)
+    }
 }
 impl FloatLiteralExpression {
     pub(crate) fn new(value: f64) -> FloatLiteralExpression {

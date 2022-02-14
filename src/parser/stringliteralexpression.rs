@@ -24,6 +24,14 @@ impl Expression for StringLiteralExpression {
     fn get_type(&self) -> String {
         String::from("StringLiteralExpression")
     }
+
+    fn get_lhs(&self) -> &Box<dyn Expression> {
+        &Box::new(Self)
+    }
+
+    fn get_rhs(&self) -> &Box<dyn Expression> {
+        &Box::new(Self)
+    }
 }
 impl StringLiteralExpression {
     pub fn new(string_value: String) -> StringLiteralExpression {

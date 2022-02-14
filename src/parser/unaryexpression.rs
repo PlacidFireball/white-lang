@@ -22,4 +22,12 @@ impl Expression for UnaryExpression {
     fn get_type(&self) -> String {
         todo!()
     }
+
+    fn get_lhs(&self) -> &Box<dyn Expression> {
+        todo!()
+    }
+
+    fn get_rhs(&self) -> &Box<dyn Expression> {
+        todo!()
+    }
 }

@@ -30,6 +30,14 @@ impl Expression for ComparisonExpression {
     fn get_type(&self) -> String {
         String::from("ComparisonExpression")
     }
+
+    fn get_lhs(&self) -> &Box<dyn Expression> {
+        &self.lhs
+    }
+
+    fn get_rhs(&self) -> &Box<dyn Expression> {
+        &self.rhs
+    }
 }
 impl ComparisonExpression {
     pub fn new(

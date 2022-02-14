@@ -32,6 +32,14 @@ impl Expression for FunctionCallExpression {
     fn get_type(&self) -> String {
         String::from("FunctionCallExpression")
     }
+
+    fn get_lhs(&self) -> &Box<dyn Expression> {
+        &Box::new(Self)
+    }
+
+    fn get_rhs(&self) -> &Box<dyn Expression> {
+        &Box::new(Self)
+    }
 }
 impl FunctionCallExpression {
     pub fn new(name: String) -> FunctionCallExpression {

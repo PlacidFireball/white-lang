@@ -24,6 +24,14 @@ impl Expression for BooleanLiteralExpression {
     fn get_type(&self) -> String {
         String::from("BooleanLiteralExpression")
     }
+
+    fn get_lhs(&self) -> &Box<dyn Expression> {
+        todo!()
+    }
+
+    fn get_rhs(&self) -> &Box<dyn Expression> {
+        todo!()
+    }
 }
 impl BooleanLiteralExpression {
     pub fn new(boolean: bool) -> BooleanLiteralExpression {

@@ -54,9 +54,6 @@ pub trait Expression {
     fn debug(&self) -> String;
 
     fn get_type(&self) -> String;
-}
-
-pub trait Sided {
     fn get_lhs(&self) -> &Box<dyn Expression>;
     fn get_rhs(&self) -> &Box<dyn Expression>;
 }
@@ -401,10 +398,21 @@ mod test {
 
     #[test]
     fn test_parse_additive_expression() {
-        let mut parser = init_parser("1+1".to_string());
-        let expr = parser.parse_expression();
+        let mut parser = init_parser("1 + 1 1 - 1".to_string());
+        let mut expr = parser.parse_expression();
         assert_eq!(expr.get_type(), "AdditiveExpression");
         assert_eq!(expr.debug(), "1 + 1");
+        expr = parser.parse_expression();
+        assert_eq!(expr.get_type(), "AdditiveExpression");
+        assert_eq!(expr.debug(), "1 - 1");
+    }
+
+    #[test]
+    fn additive_expressions_are_associative() {
+        let mut parser = init_parser("1 + 1 - 1".to_string());
+        let mut expr = parser.parse_expression();
+        assert_eq!(expr.get_lhs().get_type(), "AdditiveExpression");
+        assert_eq!(expr.get_rhs().get_type(), "IntegerLiteralExpression");
     }
 
     #[test]
