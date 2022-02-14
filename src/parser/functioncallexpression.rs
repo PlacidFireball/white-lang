@@ -1,9 +1,7 @@
-use std::any::Any;
 use crate::parser::Expression;
+use std::any::Any;
 
-pub(crate) struct FunctionCallExpression {
-
-}
+pub(crate) struct FunctionCallExpression {}
 impl Expression for FunctionCallExpression {
     fn evaluate(&self) -> Box<dyn Any> {
         todo!()

@@ -1,8 +1,8 @@
-use std::any::Any;
 use crate::parser::Expression;
+use std::any::Any;
 
 pub(crate) struct ParenthesizedExpression {
-    expr: dyn Expression
+    expr: dyn Expression,
 }
 impl Expression for ParenthesizedExpression {
     fn evaluate(&self) -> Box<dyn Any> {

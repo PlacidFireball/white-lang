@@ -1,11 +1,9 @@
-use std::any::Any;
 use crate::parser::Expression;
+use std::any::Any;
 
-pub(crate) struct ListLiteralExpression {
-
-}
+pub(crate) struct ListLiteralExpression {}
 impl Expression for ListLiteralExpression {
-    fn evaluate(&self) -> Box<dyn Any>{
+    fn evaluate(&self) -> Box<dyn Any> {
         todo!()
     }
 

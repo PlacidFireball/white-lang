@@ -1,8 +1,8 @@
-use std::any::Any;
 use crate::parser::Expression;
+use std::any::Any;
 
 pub(crate) struct IdentifierExpression {
-    name: String
+    name: String,
 }
 impl Expression for IdentifierExpression {
     fn evaluate(&self) -> Box<dyn Any> {

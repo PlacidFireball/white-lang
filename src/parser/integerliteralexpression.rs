@@ -1,8 +1,8 @@
-use std::any::Any;
 use crate::parser::Expression;
+use std::any::Any;
 
 pub(crate) struct IntegerLiteralExpression {
-    value: isize
+    value: isize,
 }
 impl Expression for IntegerLiteralExpression {
     fn evaluate(&self) -> Box<dyn Any> {

@@ -1,8 +1,8 @@
-use std::ptr::null;
-use std::any::{Any, TypeId};
-use std::any::type_name;
-use crate::tokenizer::*;
 use crate::tokenizer::TokenType::*;
+use crate::tokenizer::*;
+use std::any::type_name;
+use std::any::{Any, TypeId};
+use std::ptr::null;
 // expressions
 mod booleanliteralexpression;
 use crate::parser::booleanliteralexpression::BooleanLiteralExpression;
@@ -43,12 +43,8 @@ mod functiondefinitionstatement;
 mod ifstatement;
 mod printstatement;
 mod returnstatement;
-mod variablestatement;
 mod syntaxerrorstatement;
-
-fn type_of<T>(_: T) -> &'static str {
-    type_name::<T>()
-}
+mod variablestatement;
 
 pub trait Expression {
     fn evaluate(&self) -> Box<dyn Any>;
@@ -68,9 +64,9 @@ enum ParserErrorType {
 
 // The White-lang parser
 pub struct Parser {
-    token_list: Vec<Token>,       // gets the token list
+    token_list: Vec<Token>, // gets the token list
     //statement_list: Vec<dyn Statement>,
-    //expression: dyn Expression<T>,
+    //expression: dyn Expression,
     curr_idx: usize,              // what token it's on
     errors: Vec<ParserErrorType>, // and possible errors
 }
@@ -92,7 +88,6 @@ impl Parser {
 
     // main loop (eventually)
     pub fn parse(&self) {
-
         while self.has_tokens() {
             break;
         }
@@ -100,7 +95,7 @@ impl Parser {
 
     // tells us if parsing is done or not
     fn has_tokens(&self) -> bool {
-        !self.token_list.len() <= self.curr_idx
+        !self.token_list.len() >= self.curr_idx
     }
 
     // tells us if we have errors
@@ -117,7 +112,7 @@ impl Parser {
     fn match_token(&self, typ: TokenType) -> bool {
         self.token_list[self.curr_idx].get_type() == typ
     }
-    
+
     // will match and consume a token at token_list[curr_idx] if type = typ
     fn match_and_consume(&mut self, typ: TokenType) -> bool {
         if !self.has_tokens() {
@@ -140,36 +135,65 @@ impl Parser {
         }
     }
 
-    fn parse_expression(&mut self) -> Box<dyn Expression>{
+    fn parse_expression(&mut self) -> Box<dyn Expression> {
         self.parse_additive_expression()
     }
 
     fn parse_additive_expression(&mut self) -> Box<dyn Expression> {
-        let expr = self.parse_integer_literal_expression();
+        let expr = self.parse_float_literal_expression();
         while self.match_token(Plus) || self.match_token(Minus) {
             self.consume_token()
         }
         expr
     }
 
+    fn parse_float_literal_expression(&mut self) -> Box<dyn Expression> {
+        if self.match_token(Float) {
+            let expr = FloatLiteralExpression::new(
+                self.token_list[self.curr_idx]
+                    .get_string_value()
+                    .parse::<f64>()
+                    .unwrap()
+            );
+            self.consume_token();
+            return Box::new(expr);
+        }
+        else {
+            return self.parse_string_literal_expression();
+        }
+    }
+
+    fn parse_string_literal_expression(&mut self) -> Box<dyn Expression> {
+        if self.match_token(Str) {
+            let expr = StringLiteralExpression::new(
+                self.token_list[self.curr_idx].get_string_value()
+            );
+            self.consume_token();
+            return Box::new(expr);
+        }
+        else {
+            return self.parse_integer_literal_expression();
+        }
+    }
+
     fn parse_integer_literal_expression(&mut self) -> Box<dyn Expression> {
         if self.match_token(Int) {
             let expr = IntegerLiteralExpression::new(
-                self.token_list[self.curr_idx].get_string_value().parse::<isize>().unwrap()
+                self.token_list[self.curr_idx]
+                    .get_string_value()
+                    .parse::<isize>()
+                    .unwrap(),
             );
+            self.consume_token();
             return Box::new(expr);
         }
         Box::new(SyntaxErrorExpression::new())
     }
-
-
-
-
 }
 
 #[cfg(test)]
 mod test {
-    
+
     use super::*;
     use crate::parser::type_of;
 
@@ -178,7 +202,7 @@ mod test {
         Parser::init(&mut tokenizer.clone())
     }
 
-    #[test] 
+    #[test]
     fn test_match_and_consume() {
         let mut parser = init_parser(String::from("1"));
         assert_eq!(parser.curr_idx, 0);
@@ -198,5 +222,19 @@ mod test {
         let mut parser = init_parser("1".to_string());
         let expr = parser.parse_expression();
         assert_eq!(expr.get_type(), "IntegerLiteralExpression");
+    }
+
+    #[test]
+    fn test_parse_string_expression() {
+        let mut parser = init_parser("\"Hello World\"".to_string());
+        let expr = parser.parse_expression();
+        assert_eq!(expr.get_type(), "StringLiteralExpression");
+    }
+
+    #[test]
+    fn test_parse_float_expression() {
+        let mut parser = init_parser("1.1".to_string());
+        let expr = parser.parse_expression();
+        assert_eq!(expr.get_type(), "FloatLiteralExpression");
     }
 }

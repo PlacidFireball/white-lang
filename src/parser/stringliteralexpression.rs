@@ -1,8 +1,8 @@
-use std::any::Any;
 use crate::parser::Expression;
+use std::any::Any;
 
 pub(crate) struct StringLiteralExpression {
-    string_value: String
+    string_value: String,
 }
 impl Expression for StringLiteralExpression {
     fn evaluate(&self) -> Box<dyn Any> {
@@ -18,6 +18,13 @@ impl Expression for StringLiteralExpression {
     }
 
     fn get_type(&self) -> String {
-        todo!()
+        String::from("StringLiteralExpression")
+    }
+}
+impl StringLiteralExpression {
+    pub fn new(string_value: String) -> StringLiteralExpression {
+        StringLiteralExpression {
+            string_value
+        }
     }
 }

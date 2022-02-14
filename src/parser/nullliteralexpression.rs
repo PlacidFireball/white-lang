@@ -1,13 +1,11 @@
+use crate::parser::Expression;
 use std::any::Any;
 use std::ptr::null;
-use crate::parser::Expression;
 
-pub(crate) struct NullLiteralExpression {
-
-}
+pub(crate) struct NullLiteralExpression {}
 impl Expression for NullLiteralExpression {
-    fn evaluate(&self) -> Box<dyn Any>{
-        todo!()
+    fn evaluate(&self) -> Box<dyn Any> {
+        Box::new(String::from("null"))
     }
 
     fn compile(&self) -> String {
@@ -19,6 +17,11 @@ impl Expression for NullLiteralExpression {
     }
 
     fn get_type(&self) -> String {
-        todo!()
+        String::from("NullLiteralExpression")
+    }
+}
+impl NullLiteralExpression {
+    pub fn new() -> NullLiteralExpression {
+        NullLiteralExpression { }
     }
 }

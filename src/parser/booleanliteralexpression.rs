@@ -1,11 +1,10 @@
-use std::any::Any;
 use crate::parser::Expression;
+use std::any::Any;
 
 pub(crate) struct BooleanLiteralExpression {
-    boolean: bool
+    boolean: bool,
 }
 impl Expression for BooleanLiteralExpression {
-
     fn evaluate(&self) -> Box<dyn Any> {
         Box::new(self.boolean)
     }
@@ -21,5 +20,4 @@ impl Expression for BooleanLiteralExpression {
     fn get_type(&self) -> String {
         todo!()
     }
-
 }

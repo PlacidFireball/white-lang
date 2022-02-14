@@ -1,9 +1,7 @@
-use std::any::Any;
 use crate::parser::Expression;
+use std::any::Any;
 
-pub(crate) struct SyntaxErrorExpression {
-
-}
+pub(crate) struct SyntaxErrorExpression {}
 impl Expression for SyntaxErrorExpression {
     fn evaluate(&self) -> Box<dyn Any> {
         todo!()
@@ -23,6 +21,6 @@ impl Expression for SyntaxErrorExpression {
 }
 impl SyntaxErrorExpression {
     pub fn new() -> SyntaxErrorExpression {
-        SyntaxErrorExpression { }
+        SyntaxErrorExpression {}
     }
 }

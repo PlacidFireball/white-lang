@@ -1,12 +1,12 @@
-use std::any::Any;
 use crate::parser::Expression;
+use std::any::Any;
 
 pub(crate) struct FloatLiteralExpression {
-
+    value: f64,
 }
 impl Expression for FloatLiteralExpression {
-    fn evaluate(&self) -> Box<dyn Any>{
-        todo!()
+    fn evaluate(&self) -> Box<dyn Any> {
+        Box::new(self.value)
     }
 
     fn compile(&self) -> String {
@@ -18,6 +18,13 @@ impl Expression for FloatLiteralExpression {
     }
 
     fn get_type(&self) -> String {
-        todo!()
+        String::from("FloatLiteralExpression")
+    }
+}
+impl FloatLiteralExpression {
+    pub(crate) fn new(value: f64) -> FloatLiteralExpression {
+        FloatLiteralExpression {
+            value
+        }
     }
 }

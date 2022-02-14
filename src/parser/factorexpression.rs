@@ -1,11 +1,8 @@
-use std::any::Any;
 use crate::parser::Expression;
+use std::any::Any;
 
-pub struct FactorExpression {
-
-}
+pub struct FactorExpression {}
 impl Expression for FactorExpression {
-
     fn evaluate(&self) -> Box<dyn Any> {
         todo!()
     }

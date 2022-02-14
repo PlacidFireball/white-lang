@@ -1,9 +1,7 @@
-use std::any::Any;
 use crate::parser::Expression;
+use std::any::Any;
 
-pub struct EqualityExpression {
-
-}
+pub struct EqualityExpression {}
 impl Expression for EqualityExpression {
     fn evaluate(&self) -> Box<dyn Any> {
         todo!()
