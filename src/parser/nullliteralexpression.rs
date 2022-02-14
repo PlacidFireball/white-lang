@@ -26,6 +26,6 @@ impl Expression for NullLiteralExpression {
 }
 impl NullLiteralExpression {
     pub fn new() -> NullLiteralExpression {
-        NullLiteralExpression { }
+        NullLiteralExpression {}
     }
 }

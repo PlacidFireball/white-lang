@@ -62,7 +62,7 @@ pub trait Statement {
 
 enum ParserErrorType {
     UnexpectedToken,
-    UnterminatedArgList
+    UnterminatedArgList,
 }
 
 // The White-lang parser
@@ -152,7 +152,7 @@ impl Parser {
     }
 
     fn parse_additive_expression(&mut self) -> Box<dyn Expression> {
-        let expr = self.parse_function_call_expression();
+        let expr = self.parse_comparison_expression();
         while self.match_token(Plus) || self.match_token(Minus) {
             self.consume_token()
         }
@@ -164,7 +164,8 @@ impl Parser {
         while self.match_token(Greater) // >
             || self.match_token(GreaterEqual) // >=
             || self.match_token(Less) // <
-            || self.match_token(LessEqual)  { // <=
+            || self.match_token(LessEqual) // <=
+        {
             let operator = self.get_curr_tok().get_string_value();
             self.consume_token(); // consume op
             let rhs = self.parse_function_call_expression();
@@ -176,14 +177,13 @@ impl Parser {
 
     fn parse_function_call_expression(&mut self) -> Box<dyn Expression> {
         if self.match_token(Identifier) && self.peek_next_token(LeftParen) {
-            let mut expr = FunctionCallExpression::new(
-                self.get_curr_tok()
-                    .get_string_value()
-            );
+            let mut expr = FunctionCallExpression::new(self.get_curr_tok().get_string_value());
             self.require_token(Identifier);
             self.require_token(LeftParen);
             loop {
-                if self.match_and_consume(RightParen) { break; }
+                if self.match_and_consume(RightParen) {
+                    break;
+                }
                 let arg = self.parse_expression();
                 expr.add_arg(arg);
                 self.match_and_consume(Comma);
@@ -203,26 +203,21 @@ impl Parser {
                 self.token_list[self.curr_idx]
                     .get_string_value()
                     .parse::<f64>()
-                    .unwrap()
+                    .unwrap(),
             );
             self.consume_token();
             return Box::new(expr);
-        }
-        else {
+        } else {
             return self.parse_string_literal_expression();
         }
     }
 
     fn parse_string_literal_expression(&mut self) -> Box<dyn Expression> {
         if self.match_token(Str) {
-            let expr = StringLiteralExpression::new(
-                self.get_curr_tok()
-                    .get_string_value()
-            );
+            let expr = StringLiteralExpression::new(self.get_curr_tok().get_string_value());
             self.consume_token();
             return Box::new(expr);
-        }
-        else {
+        } else {
             return self.parse_integer_literal_expression();
         }
     }
@@ -245,9 +240,9 @@ impl Parser {
         if self.match_token(True) || self.match_token(False) {
             let expr = BooleanLiteralExpression::new(
                 self.get_curr_tok()
-                .get_string_value()
-                .parse::<bool>()
-                .unwrap()
+                    .get_string_value()
+                    .parse::<bool>()
+                    .unwrap(),
             );
             self.consume_token();
             return Box::new(expr);
@@ -354,4 +349,11 @@ mod test {
         assert!(parser.has_errors());
     }
 
+    #[test]
+    fn test_parse_comparison_expression() {
+        let mut parser = init_parser("2 > 1".to_string());
+        let expr = parser.parse_expression();
+        assert_eq!(expr.get_type(), "ComparisonExpression");
+        assert_eq!(expr.debug(), "2 > 1");
+    }
 }

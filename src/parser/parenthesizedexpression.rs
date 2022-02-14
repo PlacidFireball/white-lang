@@ -18,7 +18,7 @@ impl Expression for ParenthesizedExpression {
     }
 
     fn debug(&self) -> String {
-        String::from("(")+ &*self.expr.debug()+ &*String::from(")")
+        String::from("(") + &*self.expr.debug() + &*String::from(")")
     }
 
     fn get_type(&self) -> String {

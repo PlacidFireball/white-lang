@@ -4,7 +4,7 @@ use std::any::Any;
 pub(crate) struct ComparisonExpression {
     lhs: Box<dyn Expression>,
     operator: String,
-    rhs: Box<dyn Expression>
+    rhs: Box<dyn Expression>,
 }
 impl Expression for ComparisonExpression {
     fn evaluate(&self) -> Box<dyn Any> {
@@ -20,19 +20,23 @@ impl Expression for ComparisonExpression {
     }
 
     fn debug(&self) -> String {
-        todo!()
+        let mut builder = String::new();
+        builder = builder + &*self.lhs.debug() + " ";
+        builder = builder + &*self.operator + " ";
+        builder = builder + &*self.rhs.debug();
+        builder
     }
 
     fn get_type(&self) -> String {
-        todo!()
+        String::from("ComparisonExpression")
     }
 }
 impl ComparisonExpression {
-    pub fn new(lhs: Box<dyn Expression>, operator: String, rhs: Box<dyn Expression>) -> ComparisonExpression {
-        ComparisonExpression {
-            lhs,
-            operator,
-            rhs
-        }
+    pub fn new(
+        lhs: Box<dyn Expression>,
+        operator: String,
+        rhs: Box<dyn Expression>,
+    ) -> ComparisonExpression {
+        ComparisonExpression { lhs, operator, rhs }
     }
 }

@@ -27,8 +27,6 @@ impl Expression for StringLiteralExpression {
 }
 impl StringLiteralExpression {
     pub fn new(string_value: String) -> StringLiteralExpression {
-        StringLiteralExpression {
-            string_value
-        }
+        StringLiteralExpression { string_value }
     }
 }

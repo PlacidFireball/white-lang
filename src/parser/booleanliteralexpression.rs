@@ -27,8 +27,6 @@ impl Expression for BooleanLiteralExpression {
 }
 impl BooleanLiteralExpression {
     pub fn new(boolean: bool) -> BooleanLiteralExpression {
-        BooleanLiteralExpression {
-            boolean
-        }
+        BooleanLiteralExpression { boolean }
     }
 }

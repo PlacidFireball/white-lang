@@ -27,8 +27,6 @@ impl Expression for FloatLiteralExpression {
 }
 impl FloatLiteralExpression {
     pub(crate) fn new(value: f64) -> FloatLiteralExpression {
-        FloatLiteralExpression {
-            value
-        }
+        FloatLiteralExpression { value }
     }
 }

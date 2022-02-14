@@ -3,7 +3,7 @@ use std::any::Any;
 
 pub(crate) struct FunctionCallExpression {
     name: String,
-    args: Vec<Box<dyn Expression>>
+    args: Vec<Box<dyn Expression>>,
 }
 impl Expression for FunctionCallExpression {
     fn evaluate(&self) -> Box<dyn Any> {
@@ -19,15 +19,11 @@ impl Expression for FunctionCallExpression {
     }
 
     fn debug(&self) -> String {
-        let mut builder : String = String::new();
+        let mut builder: String = String::new();
         builder.push_str(&*self.name);
         builder.push_str(": ");
         for arg in &self.args {
-            builder.push_str(
-                arg
-                .debug()
-                .as_str()
-            );
+            builder.push_str(arg.debug().as_str());
             builder.push_str(" ")
         }
         builder
@@ -39,10 +35,7 @@ impl Expression for FunctionCallExpression {
 }
 impl FunctionCallExpression {
     pub fn new(name: String) -> FunctionCallExpression {
-        FunctionCallExpression {
-            name,
-            args: vec![]
-        }
+        FunctionCallExpression { name, args: vec![] }
     }
     pub fn add_arg(&mut self, arg: Box<dyn Expression>) {
         self.args.push(arg);
