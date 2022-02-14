@@ -108,6 +108,11 @@ impl Parser {
         self.curr_idx += 1;
     }
 
+    // peeks at the next token and sees if it matches typ
+    fn peek_next_token(&self, typ: TokenType) -> bool {
+        self.token_list[self.curr_idx + 1].get_type() == typ
+    }
+
     // will match and a token at token_list[curr_idx] if its type = typ
     fn match_token(&self, typ: TokenType) -> bool {
         self.token_list[self.curr_idx].get_type() == typ
@@ -145,6 +150,14 @@ impl Parser {
             self.consume_token()
         }
         expr
+    }
+
+    fn parse_function_call_expression(&mut self) -> Box<dyn Expression> {
+        todo!();
+        if self.match_token(Identifier) && self.peek_next_token(LeftParen) {
+            let expr = FunctionCallExpression::new();
+        }
+        self.parse_float_literal_expression()
     }
 
     fn parse_float_literal_expression(&mut self) -> Box<dyn Expression> {
@@ -187,6 +200,15 @@ impl Parser {
             self.consume_token();
             return Box::new(expr);
         }
+        self.parse_null_literal_expression()
+    }
+
+    fn parse_null_literal_expression(&mut self) -> Box<dyn Expression> {
+        if self.match_token(Null) {
+            let expr = NullLiteralExpression::new();
+            self.consume_token();
+            return Box::new(expr);
+        }
         Box::new(SyntaxErrorExpression::new())
     }
 }
@@ -195,7 +217,6 @@ impl Parser {
 mod test {
 
     use super::*;
-    use crate::parser::type_of;
 
     fn init_parser(src: String) -> Parser {
         let tokenizer: Tokenizer = Tokenizer::init(src);
@@ -236,5 +257,12 @@ mod test {
         let mut parser = init_parser("1.1".to_string());
         let expr = parser.parse_expression();
         assert_eq!(expr.get_type(), "FloatLiteralExpression");
+    }
+
+    #[test]
+    fn test_null_literal_expression() {
+        let mut parser = init_parser("null".to_string());
+        let expr = parser.parse_expression();
+        assert_eq!(expr.get_type(), "NullLiteralExpression");
     }
 }

@@ -62,6 +62,7 @@ pub enum TokenType {
     GreaterEqual, // >=
     LessEqual,    // <=
     // Keywords
+    Null,       // null
     And,        // and
     Not,        // not
     If,         // if
@@ -139,6 +140,7 @@ fn init_keywords() -> HashMap<String, TokenType> {
     keywords.insert("false".to_string(), TokenType::False);
     keywords.insert("true".to_string(), TokenType::True);
 
+    keywords.insert("null".to_string(), TokenType::Null);
     keywords.insert("if".to_string(), TokenType::If);
     keywords.insert("while".to_string(), TokenType::While);
     keywords.insert("for".to_string(), TokenType::For);
