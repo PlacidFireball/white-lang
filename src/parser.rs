@@ -56,8 +56,13 @@ pub trait Expression {
     fn get_type(&self) -> String;
 }
 
+pub trait Sided {
+    fn get_lhs(&self) -> &Box<dyn Expression>;
+    fn get_rhs(&self) -> &Box<dyn Expression>;
+}
+
 pub trait Statement {
-    fn execute<T>() -> T;
+    fn execute() -> String;
 }
 
 enum ParserErrorType {
@@ -146,21 +151,42 @@ impl Parser {
             self.errors.push(UnexpectedToken);
         }
     }
-
+    // -------------------------------------------------------------------------- //
+    /* Expression Parsing - all lexemes that can be evaluated to a specific value */
+    // -------------------------------------------------------------------------- //
     fn parse_expression(&mut self) -> Box<dyn Expression> {
         self.parse_additive_expression()
     }
 
+    // <expr> + <expr>
     fn parse_additive_expression(&mut self) -> Box<dyn Expression> {
-        let expr = self.parse_comparison_expression();
+        let expr = self.parse_factor_expression();
         while self.match_token(Plus) || self.match_token(Minus) {
-            self.consume_token()
+            let operator = self.get_curr_tok().get_string_value(); // get the operator value
+            self.consume_token();
+            let rhs = self.parse_function_call_expression(); // get the right hand side
+            let additive_expr = AdditiveExpression::new(expr, operator.clone(), rhs);
+            return Box::new(additive_expr);
         }
         expr
     }
 
+    // <expr> * <expr>
+    fn parse_factor_expression(&mut self) -> Box<dyn Expression> {
+        let expr = self.parse_comparison_expression();
+        while self.match_token(Star) || self.match_token(Slash) {
+            let operator = self.get_curr_tok().get_string_value();
+            self.consume_token();
+            let rhs = self.parse_function_call_expression();
+            let factor_expr = FactorExpression::new(expr, operator.clone(), rhs);
+            return Box::new(factor_expr);
+        }
+        expr
+    }
+
+    // <expr> (> | >= | < | <=) <expr>
     fn parse_comparison_expression(&mut self) -> Box<dyn Expression> {
-        let expr = self.parse_function_call_expression();
+        let expr = self.parse_equality_expression();
         while self.match_token(Greater) // >
             || self.match_token(GreaterEqual) // >=
             || self.match_token(Less) // <
@@ -171,6 +197,18 @@ impl Parser {
             let rhs = self.parse_function_call_expression();
             let comparison_expr = ComparisonExpression::new(expr, operator.clone(), rhs);
             return Box::new(comparison_expr);
+        }
+        expr
+    }
+
+    fn parse_equality_expression(&mut  self) -> Box<dyn Expression> {
+        let expr = self.parse_function_call_expression();
+        if self.match_token(EqualEqual) || self.match_token(BangEqual) {
+            let operator = self.get_curr_tok().get_string_value();
+            self.consume_token();
+            let rhs = self.parse_function_call_expression();
+            let equality_expr = EqualityExpression::new(expr, operator.clone(), rhs);
+            return Box::new(equality_expr);
         }
         expr
     }
@@ -195,6 +233,10 @@ impl Parser {
             return Box::new(expr);
         }
         self.parse_float_literal_expression()
+    }
+
+    fn parse_list_literal_expression(&mut self) -> Box<dyn Expression> {
+        todo!()
     }
 
     fn parse_float_literal_expression(&mut self) -> Box<dyn Expression> {
@@ -355,5 +397,29 @@ mod test {
         let expr = parser.parse_expression();
         assert_eq!(expr.get_type(), "ComparisonExpression");
         assert_eq!(expr.debug(), "2 > 1");
+    }
+
+    #[test]
+    fn test_parse_additive_expression() {
+        let mut parser = init_parser("1+1".to_string());
+        let expr = parser.parse_expression();
+        assert_eq!(expr.get_type(), "AdditiveExpression");
+        assert_eq!(expr.debug(), "1 + 1");
+    }
+
+    #[test]
+    fn test_parse_factor_expression() {
+        let mut parser = init_parser("1 * 1".to_string());
+        let expr = parser.parse_expression();
+        assert_eq!(expr.get_type(), "FactorExpression");
+        assert_eq!(expr.debug(), "1 * 1");
+    }
+
+    #[test]
+    fn test_parse_equality_expression() {
+        let mut parser = init_parser("1 == 1".to_string());
+        let expr = parser.parse_expression();
+        assert_eq!(expr.get_type(), "EqualityExpression");
+        assert_eq!(expr.debug(), "1 == 1");
     }
 }
