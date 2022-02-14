@@ -16,4 +16,8 @@ impl Expression for ParenthesizedExpression {
     fn transpile(&self) -> String {
         todo!()
     }
+
+    fn get_type(&self) -> String {
+        String::from("ParenthesizedExpression")
+    }
 }

@@ -20,10 +20,6 @@ impl Expression for IntegerLiteralExpression {
     fn get_type(&self) -> String {
         String::from("IntegerLiteralExpression")
     }
-
-    fn set_type(&self) {
-        todo!()
-    }
 }
 impl IntegerLiteralExpression {
     pub fn new(value: isize) -> IntegerLiteralExpression {

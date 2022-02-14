@@ -56,7 +56,6 @@ pub trait Expression {
     fn transpile(&self) -> String;
 
     fn get_type(&self) -> String;
-    fn set_type(&self, s: String);
 }
 
 pub trait Statement {
@@ -198,6 +197,6 @@ mod test {
     fn test_parse_integer_expression() {
         let mut parser = init_parser("1".to_string());
         let expr = parser.parse_expression();
-        assert_eq!(type_of(expr), "IntegerLiteralExpression");
+        assert_eq!(expr.get_type(), "IntegerLiteralExpression");
     }
 }

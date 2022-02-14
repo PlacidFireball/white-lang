@@ -22,7 +22,4 @@ impl Expression for BooleanLiteralExpression {
         todo!()
     }
 
-    fn set_type(&self) {
-        todo!()
-    }
 }

@@ -20,10 +20,6 @@ impl Expression for SyntaxErrorExpression {
     fn get_type(&self) -> String {
         todo!()
     }
-
-    fn set_type(&self) {
-        todo!()
-    }
 }
 impl SyntaxErrorExpression {
     pub fn new() -> SyntaxErrorExpression {

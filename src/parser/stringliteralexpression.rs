@@ -20,8 +20,4 @@ impl Expression for StringLiteralExpression {
     fn get_type(&self) -> String {
         todo!()
     }
-
-    fn set_type(&self) {
-        todo!()
-    }
 }

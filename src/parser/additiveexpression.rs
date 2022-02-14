@@ -22,7 +22,4 @@ impl Expression for AdditiveExpression {
         todo!()
     }
 
-    fn set_type(&self, s: String) {
-        todo!()
-    }
 }

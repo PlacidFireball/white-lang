@@ -21,8 +21,4 @@ impl Expression for FactorExpression {
     fn get_type(&self) -> String {
         todo!()
     }
-
-    fn set_type(&self) {
-        todo!()
-    }
 }
