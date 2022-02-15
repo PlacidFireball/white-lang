@@ -242,6 +242,9 @@ impl Tokenizer {
     }
     // for cases when you want to look at the character at src[position + 1]
     fn peek_next(&mut self) -> char {
+        if self.tokenization_end() {
+            return '\0';
+        }
         self.char_vec[self.position + 1]
     }
     // the crux of token scanning

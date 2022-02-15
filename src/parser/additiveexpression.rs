@@ -1,4 +1,6 @@
 use crate::parser::{Expression};
+use crate::parser::whitetypes::{Type, ListType};
+
 use std::any::Any;
 
 pub(crate) struct AdditiveExpression {

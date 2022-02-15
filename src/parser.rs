@@ -187,84 +187,85 @@ impl Parser {
 
     // <expr> (> | >= | < | <=) <expr>
     fn parse_comparison_expression(&mut self) -> Box<dyn Expression> {
-        let expr = self.parse_equality_expression();
-        while self.match_token(Greater) // >
-            || self.match_token(GreaterEqual) // >=
-            || self.match_token(Less) // <
-            || self.match_token(LessEqual) // <=
+        let expr = self.parse_equality_expression(); // try to parse a lower level expression first
+        if self.match_token(Greater)                // If we match either >
+            || self.match_token(GreaterEqual)       // >=,
+            || self.match_token(Less)               // <,
+            || self.match_token(LessEqual)          // or <=
         {
-            let operator = self.get_curr_tok().get_string_value();
-            self.consume_token(); // consume op
-            let rhs = self.parse_function_call_expression();
-            let comparison_expr = ComparisonExpression::new(expr, operator.clone(), rhs);
-            return Box::new(comparison_expr);
+            let operator = self.get_curr_tok().get_string_value();  // retrieve op sign
+            self.consume_token();       // consume op
+            let rhs = self.parse_function_call_expression();        // get the right hand side expression
+            let comparison_expr = ComparisonExpression::new(expr, operator.clone(), rhs); // create the expression
+            return Box::new(comparison_expr); // return a box wrapper of the expression
         }
-        expr
+        expr // if we didn't parse a comparison expression, return whatever we parsed earlier
     }
 
+    // <expr> (== | !=) <expr>
     fn parse_equality_expression(&mut  self) -> Box<dyn Expression> {
-        let expr = self.parse_function_call_expression();
-        if self.match_token(EqualEqual) || self.match_token(BangEqual) {
-            let operator = self.get_curr_tok().get_string_value();
-            self.consume_token();
-            let rhs = self.parse_function_call_expression();
+        let expr = self.parse_function_call_expression();            // first try to parse a lower level expr
+        if self.match_token(EqualEqual) || self.match_token(BangEqual) {      // if we match either != or ==
+            let operator = self.get_curr_tok().get_string_value();              // get the op
+            self.consume_token();       // consume the token
+            let rhs = self.parse_expression();          // parse some other expression
             let equality_expr = EqualityExpression::new(expr, operator.clone(), rhs);
-            return Box::new(equality_expr);
+            return Box::new(equality_expr);                           // return a box wrapper to the expr
         }
         expr
     }
 
     fn parse_function_call_expression(&mut self) -> Box<dyn Expression> {
-        if self.match_token(Identifier) && self.peek_next_token(LeftParen) {
+        if self.match_token(Identifier) && self.peek_next_token(LeftParen) { // function_name(
             let mut expr = FunctionCallExpression::new(self.get_curr_tok().get_string_value());
-            self.require_token(Identifier);
+            self.require_token(Identifier);             // consume the name and paren
             self.require_token(LeftParen);
             loop {
-                if self.match_and_consume(RightParen) {
+                if self.match_and_consume(RightParen) { // while the arg list hasn't terminated
                     break;
                 }
-                let arg = self.parse_expression();
-                expr.add_arg(arg);
-                self.match_and_consume(Comma);
-                if !self.has_tokens() {
-                    self.errors.push(ParserErrorType::UnterminatedArgList);
+                let arg = self.parse_expression(); // parse some expression
+                expr.add_arg(arg);                          // add the argument to the argument vector
+                self.match_and_consume(Comma);          // consume a comma if we have one
+                if !self.has_tokens() {                     // check to see if we've run out of tokens
+                    self.errors.push(ParserErrorType::UnterminatedArgList); // add an error if we have
                     break;
                 }
             }
-            return Box::new(expr);
+            return Box::new(expr); // return whatever we have parsed
         }
-        self.parse_list_literal_expression()
+        self.parse_list_literal_expression() // otherwise parse a list literal
     }
 
     fn parse_list_literal_expression(&mut self) -> Box<dyn Expression> {
-        if self.match_and_consume(LeftBracket) {
-            let mut lle = ListLiteralExpression::new();
-            while !self.match_and_consume(RightBracket) {
-                lle.add_expr(self.parse_expression());
-                self.match_and_consume(Comma);
-                if !self.has_tokens() {
-                    self.errors.push(ParserErrorType::UnterminatedList);
+        if self.match_and_consume(LeftBracket) {            // match some [
+            let mut lle = ListLiteralExpression::new(); // create a new list literal
+            while !self.match_and_consume(RightBracket) {   // while the list hasn't been terminated
+                lle.add_expr(self.parse_expression());     // add some new expression to the list
+                self.match_and_consume(Comma);              // consume a comma if there is any
+                if !self.has_tokens() {                         // check to see if we have an unterminated list
+                    self.errors.push(ParserErrorType::UnterminatedList); // if we do add an error
                     break;
                 }
             }
-            return Box::new(lle);
+            return Box::new(lle);                           // return a box wrapper of the lle
         }
-        self.parse_unary_expression()
+        self.parse_unary_expression()                           // try to parse a unary expression
     }
 
     fn parse_unary_expression(&mut self) -> Box<dyn Expression> {
-        if self.match_token(Not) || self.match_token(Minus) {
-            let operator = self.get_curr_tok().get_string_value();
-            self.consume_token();
-            let expr = self.parse_integer_literal_expression();
-            let unary_expr = UnaryExpression::new(operator, expr);
-            return Box::new(unary_expr);
+        if self.match_token(Not) || self.match_token(Minus) {         // match either not or -
+            let operator = self.get_curr_tok().get_string_value();      // get the op sign
+            self.consume_token();                   // consume the token
+            let expr = self.parse_integer_literal_expression(); // parse some lower level expression
+            let unary_expr = UnaryExpression::new(operator, expr); // create the new expr
+            return Box::new(unary_expr);        // return a box wrapper
         }
         self.parse_float_literal_expression()
     }
 
     fn parse_float_literal_expression(&mut self) -> Box<dyn Expression> {
-        if self.match_token(Float) {
+        if self.match_token(Float) {    // parse float
             let expr = FloatLiteralExpression::new(
                 self.token_list[self.curr_idx]
                     .get_string_value()
@@ -279,7 +280,7 @@ impl Parser {
     }
 
     fn parse_string_literal_expression(&mut self) -> Box<dyn Expression> {
-        if self.match_token(Str) {
+        if self.match_token(Str) {      // parse string
             let expr = StringLiteralExpression::new(self.get_curr_tok().get_string_value());
             self.consume_token();
             return Box::new(expr);
@@ -289,7 +290,7 @@ impl Parser {
     }
 
     fn parse_integer_literal_expression(&mut self) -> Box<dyn Expression> {
-        if self.match_token(Int) {
+        if self.match_token(Int) {      // parse integers
             let expr = IntegerLiteralExpression::new(
                 self.token_list[self.curr_idx]
                     .get_string_value()
@@ -303,7 +304,7 @@ impl Parser {
     }
 
     fn parse_boolean_literal_expression(&mut self) -> Box<dyn Expression> {
-        if self.match_token(True) || self.match_token(False) {
+        if self.match_token(True) || self.match_token(False) { // parse boolean literals
             let expr = BooleanLiteralExpression::new(
                 self.get_curr_tok()
                     .get_string_value()
@@ -317,7 +318,7 @@ impl Parser {
     }
 
     fn parse_null_literal_expression(&mut self) -> Box<dyn Expression> {
-        if self.match_token(Null) {
+        if self.match_token(Null) {     // parse null literals
             let expr = NullLiteralExpression::new();
             self.consume_token();
             return Box::new(expr);
