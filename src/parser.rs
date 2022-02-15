@@ -4,6 +4,8 @@ use std::any::type_name;
 use std::any::{Any, TypeId};
 use std::ptr::null;
 // expressions
+mod whitetypes;
+use crate::parser::whitetypes::*;
 mod booleanliteralexpression;
 use crate::parser::booleanliteralexpression::BooleanLiteralExpression;
 mod integerliteralexpression;
@@ -50,6 +52,7 @@ pub trait Expression {
     fn evaluate(&self) -> Box<dyn Any>;
     fn compile(&self) -> String;
     fn transpile(&self) -> String;
+    fn validate(&self);
 
     fn debug(&self) -> String;
 
@@ -65,6 +68,7 @@ pub trait Statement {
 enum ParserErrorType {
     UnexpectedToken,
     UnterminatedArgList,
+    UnterminatedList
 }
 
 // The White-lang parser
@@ -157,26 +161,26 @@ impl Parser {
 
     // <expr> + <expr>
     fn parse_additive_expression(&mut self) -> Box<dyn Expression> {
-        let expr = self.parse_factor_expression();
+        let mut expr = self.parse_factor_expression();
         while self.match_token(Plus) || self.match_token(Minus) {
             let operator = self.get_curr_tok().get_string_value(); // get the operator value
             self.consume_token();
-            let rhs = self.parse_function_call_expression(); // get the right hand side
+            let rhs = self.parse_factor_expression(); // get the right hand side
             let additive_expr = AdditiveExpression::new(expr, operator.clone(), rhs);
-            return Box::new(additive_expr);
+            expr = Box::new(additive_expr);
         }
         expr
     }
 
     // <expr> * <expr>
     fn parse_factor_expression(&mut self) -> Box<dyn Expression> {
-        let expr = self.parse_comparison_expression();
+        let mut expr = self.parse_comparison_expression();
         while self.match_token(Star) || self.match_token(Slash) {
             let operator = self.get_curr_tok().get_string_value();
             self.consume_token();
             let rhs = self.parse_function_call_expression();
             let factor_expr = FactorExpression::new(expr, operator.clone(), rhs);
-            return Box::new(factor_expr);
+            expr = Box::new(factor_expr);
         }
         expr
     }
@@ -229,11 +233,34 @@ impl Parser {
             }
             return Box::new(expr);
         }
-        self.parse_float_literal_expression()
+        self.parse_list_literal_expression()
     }
 
     fn parse_list_literal_expression(&mut self) -> Box<dyn Expression> {
-        todo!()
+        if self.match_and_consume(LeftBracket) {
+            let mut lle = ListLiteralExpression::new();
+            while !self.match_and_consume(RightBracket) {
+                lle.add_expr(self.parse_expression());
+                self.match_and_consume(Comma);
+                if !self.has_tokens() {
+                    self.errors.push(ParserErrorType::UnterminatedList);
+                    break;
+                }
+            }
+            return Box::new(lle);
+        }
+        self.parse_unary_expression()
+    }
+
+    fn parse_unary_expression(&mut self) -> Box<dyn Expression> {
+        if self.match_token(Not) || self.match_token(Minus) {
+            let operator = self.get_curr_tok().get_string_value();
+            self.consume_token();
+            let expr = self.parse_integer_literal_expression();
+            let unary_expr = UnaryExpression::new(operator, expr);
+            return Box::new(unary_expr);
+        }
+        self.parse_float_literal_expression()
     }
 
     fn parse_float_literal_expression(&mut self) -> Box<dyn Expression> {
@@ -411,6 +438,7 @@ mod test {
     fn additive_expressions_are_associative() {
         let mut parser = init_parser("1 + 1 - 1".to_string());
         let mut expr = parser.parse_expression();
+        let x = expr.debug();
         assert_eq!(expr.get_lhs().get_type(), "AdditiveExpression");
         assert_eq!(expr.get_rhs().get_type(), "IntegerLiteralExpression");
     }
@@ -429,5 +457,13 @@ mod test {
         let expr = parser.parse_expression();
         assert_eq!(expr.get_type(), "EqualityExpression");
         assert_eq!(expr.debug(), "1 == 1");
+    }
+
+    #[test]
+    fn test_parse_list_expression() {
+        let mut parser = init_parser("[1, 2, 3, 4]".to_string());
+        let expr = parser.parse_expression();
+        assert_eq!(expr.get_type(), "ListLiteralExpression");
+        assert_eq!(expr.debug(), "[1, 2, 3, 4]");
     }
 }

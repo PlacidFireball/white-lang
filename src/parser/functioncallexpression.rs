@@ -34,11 +34,11 @@ impl Expression for FunctionCallExpression {
     }
 
     fn get_lhs(&self) -> &Box<dyn Expression> {
-        &Box::new(Self)
+        todo!()
     }
 
     fn get_rhs(&self) -> &Box<dyn Expression> {
-        &Box::new(Self)
+        todo!()
     }
 }
 impl FunctionCallExpression {

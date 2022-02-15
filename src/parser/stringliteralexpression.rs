@@ -26,11 +26,11 @@ impl Expression for StringLiteralExpression {
     }
 
     fn get_lhs(&self) -> &Box<dyn Expression> {
-        &Box::new(Self)
+        todo!()
     }
 
     fn get_rhs(&self) -> &Box<dyn Expression> {
-        &Box::new(Self)
+        todo!()
     }
 }
 impl StringLiteralExpression {

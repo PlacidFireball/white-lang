@@ -17,6 +17,8 @@ impl Expression for FloatLiteralExpression {
         todo!()
     }
 
+    fn validate(&self) { }
+
     fn debug(&self) -> String {
         String::from(self.value.to_string())
     }
@@ -26,11 +28,11 @@ impl Expression for FloatLiteralExpression {
     }
 
     fn get_lhs(&self) -> &Box<dyn Expression> {
-        &Box::new(Self)
+        todo!()
     }
 
     fn get_rhs(&self) -> &Box<dyn Expression> {
-        &Box::new(Self)
+        todo!()
     }
 }
 impl FloatLiteralExpression {

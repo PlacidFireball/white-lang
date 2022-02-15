@@ -17,6 +17,8 @@ impl Expression for BooleanLiteralExpression {
         todo!()
     }
 
+    fn validate(&self) { }
+
     fn debug(&self) -> String {
         String::from(self.boolean.to_string())
     }

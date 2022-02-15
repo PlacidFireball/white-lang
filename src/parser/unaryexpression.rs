@@ -1,7 +1,10 @@
 use crate::parser::Expression;
 use std::any::Any;
 
-pub(crate) struct UnaryExpression {}
+pub(crate) struct UnaryExpression {
+    operator: String,
+    expr: Box<dyn Expression>
+}
 impl Expression for UnaryExpression {
     fn evaluate(&self) -> Box<dyn Any> {
         todo!()
@@ -16,7 +19,9 @@ impl Expression for UnaryExpression {
     }
 
     fn debug(&self) -> String {
-        todo!()
+        let mut builder = self.operator.clone();
+        builder += &*self.expr.debug();
+        builder
     }
 
     fn get_type(&self) -> String {
@@ -29,5 +34,13 @@ impl Expression for UnaryExpression {
 
     fn get_rhs(&self) -> &Box<dyn Expression> {
         todo!()
+    }
+}
+impl UnaryExpression {
+    pub(crate) fn new(operator: String, expr: Box<dyn Expression>) -> UnaryExpression {
+        UnaryExpression {
+            operator,
+            expr
+        }
     }
 }

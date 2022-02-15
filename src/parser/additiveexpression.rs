@@ -19,6 +19,17 @@ impl Expression for AdditiveExpression {
         String::from("")
     }
 
+    fn validate(&self) {
+        self.lhs.validate();
+        self.rhs.validate();
+        if self.lhs.get_type() == "IntegerLiteralExpression" {
+            if self.rhs.get_type() ==
+            {
+
+            }
+        }
+    }
+
     fn debug(&self) -> String {
         let mut builder = String::new();
         builder = builder + &*self.lhs.debug() + " ";

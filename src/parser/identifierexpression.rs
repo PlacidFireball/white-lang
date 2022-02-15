@@ -26,10 +26,10 @@ impl Expression for IdentifierExpression {
     }
 
     fn get_lhs(&self) -> &Box<dyn Expression> {
-        &Box::new(Self)
+        todo!()
     }
 
     fn get_rhs(&self) -> &Box<dyn Expression> {
-        &Box::new(Self)
+        todo!()
     }
 }
