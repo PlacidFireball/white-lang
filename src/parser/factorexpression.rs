@@ -19,6 +19,10 @@ impl Expression for FactorExpression {
         todo!()
     }
 
+    fn validate(&self) {
+        todo!()
+    }
+
     fn debug(&self) -> String {
         let mut builder = String::new();
         builder = builder + &*self.lhs.debug() + " ";

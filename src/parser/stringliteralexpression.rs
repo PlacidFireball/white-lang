@@ -17,6 +17,10 @@ impl Expression for StringLiteralExpression {
         todo!()
     }
 
+    fn validate(&self) {
+        todo!()
+    }
+
     fn debug(&self) -> String {
         self.string_value.clone()
     }

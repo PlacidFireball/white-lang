@@ -23,10 +23,7 @@ impl Expression for AdditiveExpression {
         self.lhs.validate();
         self.rhs.validate();
         if self.lhs.get_type() == "IntegerLiteralExpression" {
-            if self.rhs.get_type() ==
-            {
 
-            }
         }
     }
 

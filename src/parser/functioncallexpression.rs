@@ -18,6 +18,10 @@ impl Expression for FunctionCallExpression {
         todo!()
     }
 
+    fn validate(&self) {
+        todo!()
+    }
+
     fn debug(&self) -> String {
         let mut builder: String = String::new();
         builder.push_str(&*self.name);

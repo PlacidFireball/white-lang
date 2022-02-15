@@ -18,6 +18,10 @@ impl Expression for UnaryExpression {
         todo!()
     }
 
+    fn validate(&self) {
+        todo!()
+    }
+
     fn debug(&self) -> String {
         let mut builder = self.operator.clone();
         builder += &*self.expr.debug();

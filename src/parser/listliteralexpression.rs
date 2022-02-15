@@ -17,6 +17,10 @@ impl Expression for ListLiteralExpression {
         todo!()
     }
 
+    fn validate(&self) {
+        todo!()
+    }
+
     fn debug(&self) -> String {
         let mut builder = String::from("[");
         for x in 0..self.exprs.len() {
