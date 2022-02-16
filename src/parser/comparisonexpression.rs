@@ -1,10 +1,12 @@
-use crate::parser::Expression;
+use crate::parser::{Expression, ParserErrorType};
 use std::any::Any;
+use crate::parser::whitetypes::Type;
 
 pub(crate) struct ComparisonExpression {
     lhs: Box<dyn Expression>,
     operator: String,
     rhs: Box<dyn Expression>,
+    errors: Vec<ParserErrorType>
 }
 impl Expression for ComparisonExpression {
     fn evaluate(&self) -> Box<dyn Any> {
@@ -19,7 +21,7 @@ impl Expression for ComparisonExpression {
         todo!()
     }
 
-    fn validate(&self) {
+    fn validate(&mut self) {
         todo!()
     }
 
@@ -31,7 +33,15 @@ impl Expression for ComparisonExpression {
         builder
     }
 
-    fn get_type(&self) -> String {
+    fn get_white_type(&self) -> Type {
+        Type::Boolean
+    }
+
+    fn has_errors(&self) -> bool {
+        !self.errors.is_empty()
+    }
+
+    fn get_expr_type(&self) -> String {
         String::from("ComparisonExpression")
     }
 
@@ -49,6 +59,6 @@ impl ComparisonExpression {
         operator: String,
         rhs: Box<dyn Expression>,
     ) -> ComparisonExpression {
-        ComparisonExpression { lhs, operator, rhs }
+        ComparisonExpression { lhs, operator, rhs, errors: vec![]}
     }
 }

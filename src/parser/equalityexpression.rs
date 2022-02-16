@@ -1,10 +1,12 @@
-use crate::parser::Expression;
+use crate::parser::{Expression, ParserErrorType};
 use std::any::Any;
+use crate::parser::whitetypes::Type;
 
 pub struct EqualityExpression {
     lhs: Box<dyn Expression>,
     operator: String,
     rhs: Box<dyn Expression>,
+    errors: Vec<ParserErrorType>
 }
 impl Expression for EqualityExpression {
     fn evaluate(&self) -> Box<dyn Any> {
@@ -19,7 +21,7 @@ impl Expression for EqualityExpression {
         todo!()
     }
 
-    fn validate(&self) {
+    fn validate(&mut self) {
         todo!()
     }
 
@@ -31,7 +33,15 @@ impl Expression for EqualityExpression {
         builder
     }
 
-    fn get_type(&self) -> String {
+    fn get_white_type(&self) -> Type {
+        Type::Boolean
+    }
+
+    fn has_errors(&self) -> bool {
+        todo!()
+    }
+
+    fn get_expr_type(&self) -> String {
         String::from("EqualityExpression")
     }
 
@@ -48,7 +58,8 @@ impl EqualityExpression {
         EqualityExpression {
             lhs,
             operator,
-            rhs
+            rhs,
+            errors: vec![]
         }
     }
 }

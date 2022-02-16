@@ -1,10 +1,12 @@
-use crate::parser::{Expression};
+use crate::parser::{Expression, ParserErrorType};
 use std::any::Any;
+use crate::parser::whitetypes::Type;
 
 pub struct FactorExpression {
     lhs: Box<dyn Expression>,
     operator: String,
     rhs: Box<dyn Expression>,
+    errors: Vec<ParserErrorType>
 }
 impl Expression for FactorExpression {
     fn evaluate(&self) -> Box<dyn Any> {
@@ -19,7 +21,7 @@ impl Expression for FactorExpression {
         todo!()
     }
 
-    fn validate(&self) {
+    fn validate(&mut self) {
         todo!()
     }
 
@@ -31,7 +33,15 @@ impl Expression for FactorExpression {
         builder
     }
 
-    fn get_type(&self) -> String {
+    fn get_white_type(&self) -> Type {
+        todo!()
+    }
+
+    fn has_errors(&self) -> bool {
+        !self.errors.is_empty()
+    }
+
+    fn get_expr_type(&self) -> String {
         String::from("FactorExpression")
     }
 
@@ -48,7 +58,8 @@ impl FactorExpression {
         FactorExpression {
             lhs,
             operator,
-            rhs
+            rhs,
+            errors: vec![]
         }
     }
 }

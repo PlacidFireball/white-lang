@@ -1,5 +1,6 @@
 use crate::parser::Expression;
 use std::any::Any;
+use crate::parser::whitetypes::Type;
 
 pub(crate) struct IdentifierExpression {
     name: String,
@@ -17,7 +18,7 @@ impl Expression for IdentifierExpression {
         todo!()
     }
 
-    fn validate(&self) {
+    fn validate(&mut self) {
         todo!()
     }
 
@@ -25,7 +26,15 @@ impl Expression for IdentifierExpression {
         self.name.clone()
     }
 
-    fn get_type(&self) -> String {
+    fn get_white_type(&self) -> Type {
+        todo!()
+    }
+
+    fn has_errors(&self) -> bool {
+        todo!()
+    }
+
+    fn get_expr_type(&self) -> String {
         todo!()
     }
 
@@ -36,4 +45,7 @@ impl Expression for IdentifierExpression {
     fn get_rhs(&self) -> &Box<dyn Expression> {
         todo!()
     }
+}
+impl IdentifierExpression {
+
 }

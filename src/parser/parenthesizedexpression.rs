@@ -1,8 +1,9 @@
 use crate::parser::Expression;
 use std::any::Any;
+use crate::parser::whitetypes::Type;
 
 pub(crate) struct ParenthesizedExpression {
-    expr: dyn Expression,
+    expr: Box<dyn Expression>,
 }
 impl Expression for ParenthesizedExpression {
     fn evaluate(&self) -> Box<dyn Any> {
@@ -17,7 +18,7 @@ impl Expression for ParenthesizedExpression {
         todo!()
     }
 
-    fn validate(&self) {
+    fn validate(&mut self) {
         todo!()
     }
 
@@ -25,7 +26,15 @@ impl Expression for ParenthesizedExpression {
         String::from("(") + &*self.expr.debug() + &*String::from(")")
     }
 
-    fn get_type(&self) -> String {
+    fn get_white_type(&self) -> Type {
+        self.expr.get_white_type()
+    }
+
+    fn has_errors(&self) -> bool {
+        self.expr.has_errors()
+    }
+
+    fn get_expr_type(&self) -> String {
         String::from("ParenthesizedExpression")
     }
 
@@ -35,5 +44,12 @@ impl Expression for ParenthesizedExpression {
 
     fn get_rhs(&self) -> &Box<dyn Expression> {
         todo!()
+    }
+}
+impl ParenthesizedExpression {
+    pub fn new(expr: Box<dyn Expression>) -> ParenthesizedExpression {
+        ParenthesizedExpression {
+            expr
+        }
     }
 }

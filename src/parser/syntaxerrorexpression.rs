@@ -1,5 +1,6 @@
 use crate::parser::Expression;
 use std::any::Any;
+use crate::parser::whitetypes::Type;
 
 pub(crate) struct SyntaxErrorExpression {}
 impl Expression for SyntaxErrorExpression {
@@ -15,7 +16,7 @@ impl Expression for SyntaxErrorExpression {
         todo!()
     }
 
-    fn validate(&self) {
+    fn validate(&mut self) {
         todo!()
     }
 
@@ -23,7 +24,15 @@ impl Expression for SyntaxErrorExpression {
         String::from("Syntax Error")
     }
 
-    fn get_type(&self) -> String {
+    fn get_white_type(&self) -> Type {
+        Type::Error
+    }
+
+    fn has_errors(&self) -> bool {
+        todo!()
+    }
+
+    fn get_expr_type(&self) -> String {
         todo!()
     }
 

@@ -1,8 +1,11 @@
-use crate::parser::Expression;
+use crate::parser::{Expression, ParserErrorType};
 use std::any::Any;
+use crate::parser::whitetypes::{ListType, Type};
 
 pub(crate) struct ListLiteralExpression {
-    exprs: Vec<Box<dyn Expression>>
+    exprs: Vec<Box<dyn Expression>>,
+    inferred_type: Type,
+    errors: Vec<ParserErrorType>
 }
 impl Expression for ListLiteralExpression {
     fn evaluate(&self) -> Box<dyn Any> {
@@ -17,8 +20,18 @@ impl Expression for ListLiteralExpression {
         todo!()
     }
 
-    fn validate(&self) {
-        todo!()
+    fn validate(&mut self) {
+        if self.exprs.is_empty() {
+
+            return;
+        }
+        self.inferred_type = self.exprs[0].get_white_type();
+        for expr in &mut self.exprs {
+            expr.validate();
+            if expr.get_white_type() != self.inferred_type {
+                self.errors.push(ParserErrorType::MismatchedTypes);
+            }
+        }
     }
 
     fn debug(&self) -> String {
@@ -33,7 +46,15 @@ impl Expression for ListLiteralExpression {
         builder
     }
 
-    fn get_type(&self) -> String {
+    fn get_white_type(&self) -> Type {
+        self.inferred_type.clone()
+    }
+
+    fn has_errors(&self) -> bool {
+        !self.errors.is_empty()
+    }
+
+    fn get_expr_type(&self) -> String {
         String::from("ListLiteralExpression")
     }
 
@@ -48,10 +69,11 @@ impl Expression for ListLiteralExpression {
 impl ListLiteralExpression {
     pub fn new() -> ListLiteralExpression {
         ListLiteralExpression {
-            exprs: vec![]
+            exprs: vec![],
+            inferred_type: Type::Initialized,
+            errors: vec![]
         }
     }
-
     pub fn add_expr(&mut self, expr: Box<dyn Expression>) {
         self.exprs.push(expr);
     }

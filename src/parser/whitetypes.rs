@@ -4,9 +4,11 @@ pub enum ListType {
     Float, Boolean, Error
 }
 
+#[derive(Clone, Debug, PartialEq)]
 pub enum Type {
     Char, String, Integer,
-    Float, Boolean, List,
+    Float, Boolean, List, Null,
+    Initialized,
     Error
 }
 impl Type {

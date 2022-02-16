@@ -1,9 +1,12 @@
-use crate::parser::Expression;
+use crate::parser::{Expression, ParserErrorType};
 use std::any::Any;
+use crate::parser::whitetypes::Type;
+use crate::parser::whitetypes::Type::Integer;
 
 pub(crate) struct UnaryExpression {
     operator: String,
-    expr: Box<dyn Expression>
+    expr: Box<dyn Expression>,
+    errors: Vec<ParserErrorType>
 }
 impl Expression for UnaryExpression {
     fn evaluate(&self) -> Box<dyn Any> {
@@ -18,8 +21,13 @@ impl Expression for UnaryExpression {
         todo!()
     }
 
-    fn validate(&self) {
-        todo!()
+    fn validate(&mut self) {
+        if self.operator == "not" && self.expr.get_white_type() == Type::Integer {
+            self.errors.push(ParserErrorType::BadOperator);
+        }
+        if self.operator == "-" && self.expr.get_white_type() == Type::Boolean {
+            self.errors.push(ParserErrorType::BadOperator);
+        }
     }
 
     fn debug(&self) -> String {
@@ -28,7 +36,15 @@ impl Expression for UnaryExpression {
         builder
     }
 
-    fn get_type(&self) -> String {
+    fn get_white_type(&self) -> Type {
+        self.expr.get_white_type()
+    }
+
+    fn has_errors(&self) -> bool {
+        !self.errors.is_empty()
+    }
+
+    fn get_expr_type(&self) -> String {
         todo!()
     }
 
@@ -44,7 +60,8 @@ impl UnaryExpression {
     pub(crate) fn new(operator: String, expr: Box<dyn Expression>) -> UnaryExpression {
         UnaryExpression {
             operator,
-            expr
+            expr,
+            errors: vec![]
         }
     }
 }

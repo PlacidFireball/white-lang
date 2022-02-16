@@ -1,5 +1,6 @@
 use crate::parser::Expression;
 use std::any::Any;
+use crate::parser::whitetypes::Type;
 
 pub(crate) struct FunctionCallExpression {
     name: String,
@@ -18,7 +19,7 @@ impl Expression for FunctionCallExpression {
         todo!()
     }
 
-    fn validate(&self) {
+    fn validate(&mut self) {
         todo!()
     }
 
@@ -33,7 +34,15 @@ impl Expression for FunctionCallExpression {
         builder
     }
 
-    fn get_type(&self) -> String {
+    fn get_white_type(&self) -> Type {
+        todo!()
+    }
+
+    fn has_errors(&self) -> bool {
+        todo!()
+    }
+
+    fn get_expr_type(&self) -> String {
         String::from("FunctionCallExpression")
     }
 

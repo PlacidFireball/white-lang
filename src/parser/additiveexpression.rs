@@ -1,4 +1,4 @@
-use crate::parser::{Expression};
+use crate::parser::{Expression, ParserErrorType};
 use crate::parser::whitetypes::{Type, ListType};
 
 use std::any::Any;
@@ -7,6 +7,7 @@ pub(crate) struct AdditiveExpression {
     lhs: Box<dyn Expression>,
     operator: String,
     rhs: Box<dyn Expression>,
+    errors: Vec<ParserErrorType>
 }
 impl Expression for AdditiveExpression {
     fn evaluate(&self) -> Box<dyn Any> {
@@ -21,10 +22,10 @@ impl Expression for AdditiveExpression {
         String::from("")
     }
 
-    fn validate(&self) {
+    fn validate(&mut self) {
         self.lhs.validate();
         self.rhs.validate();
-        if self.lhs.get_type() == "IntegerLiteralExpression" {
+        if self.lhs.get_expr_type() == "IntegerLiteralExpression" {
 
         }
     }
@@ -37,7 +38,15 @@ impl Expression for AdditiveExpression {
         builder
     }
 
-    fn get_type(&self) -> String {
+    fn get_white_type(&self) -> Type {
+        todo!()
+    }
+
+    fn has_errors(&self) -> bool {
+        !self.errors.is_empty()
+    }
+
+    fn get_expr_type(&self) -> String {
         String::from("AdditiveExpression")
     }
 
@@ -54,7 +63,8 @@ impl AdditiveExpression {
         AdditiveExpression {
             lhs,
             operator,
-            rhs
+            rhs,
+            errors: vec![]
         }
     }
 }
