@@ -1,7 +1,6 @@
 use crate::parser::{Expression, ParserErrorType};
 use std::any::Any;
 use crate::parser::whitetypes::Type;
-use crate::parser::whitetypes::Type::Integer;
 
 pub(crate) struct UnaryExpression {
     operator: String,

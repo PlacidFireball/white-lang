@@ -1,11 +1,11 @@
 
-pub enum ListType {
+pub(crate) enum ListType {
     Char, String, Integer,
     Float, Boolean, Error
 }
 
 #[derive(Clone, Debug, PartialEq)]
-pub enum Type {
+pub(crate) enum Type {
     Char, String, Integer,
     Float, Boolean, List, Null,
     Initialized,

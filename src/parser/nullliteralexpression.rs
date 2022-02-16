@@ -1,6 +1,5 @@
 use crate::parser::Expression;
 use std::any::Any;
-use std::ptr::null;
 use crate::parser::whitetypes::Type;
 
 pub(crate) struct NullLiteralExpression {}

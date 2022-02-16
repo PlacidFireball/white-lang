@@ -5,9 +5,10 @@ use std::any::type_name;
 use std::any::{Any, TypeId};
 use std::collections::HashMap;
 use std::iter::Map;
+use std::ops::Deref;
 use std::ptr::null;
 // expressions
-mod whitetypes;
+pub(crate) mod whitetypes;
 use crate::parser::whitetypes::*;
 mod booleanliteralexpression;
 use crate::parser::booleanliteralexpression::BooleanLiteralExpression;
@@ -52,7 +53,8 @@ mod syntaxerrorstatement;
 mod variablestatement;
 
 /* Generic Expression type, implemented by all Expressions in white */
-pub trait Expression {
+#[allow(dead_code)]
+pub(crate) trait Expression {
     fn evaluate(&self) -> Box<dyn Any>; // evaluate the expression
     fn compile(&self) -> String;        // compile the expression to nasm
     fn transpile(&self) -> String;      // transpile the expression to javascript
@@ -66,37 +68,65 @@ pub trait Expression {
     fn get_rhs(&self) -> &Box<dyn Expression>;  // get the right hand expression
 }
 
-pub trait Statement {
-    fn execute() -> String;
-    fn get_expr() -> &Box<dyn Expression>;
+#[allow(dead_code)]
+pub(crate) trait Statement {
+    fn execute(&self) -> String;
+    fn get_expr(&self) -> &Box<dyn Expression>;
 }
 
 //fn instance_of<T>(_: T, ) -> bool {
 //    false
 //}
 
-pub struct SymbolTable {
-    symbol_stack: Vec<HashMap<String, Type>>
+pub(crate) struct SymbolTable {
+    symbol_stack: Vec<HashMap<String, Box<dyn Any>>>
 }
+#[allow(dead_code)]
 impl SymbolTable {
-    pub fn has_symbol(&self, name: String) -> bool {
-        self.get_symbol(name) != Option::None
+
+    pub fn new() -> SymbolTable {
+        SymbolTable {
+            symbol_stack: vec![HashMap::<String, Box<dyn Any>>::new()] // <- the global scope
+        }
     }
-    pub fn get_symbol(&self, name: String) -> Option<Type> {
-        for next in self.symbol_stack {
+
+    pub fn has_symbol(&self, name: String) -> bool {
+        self.get_symbol(name).is_some()
+    }
+
+    pub fn get_symbol(&self, name: String) -> Option<&Box<dyn Any>> {
+        for next in &self.symbol_stack {
             match next.get(&name) {
-                Some(S) => return Option::Some(S.clone()),
+                Some(s) => {
+                    return Option::Some(s);
+                },
                 None => { continue; }
             }
         }
         Option::None
     }
+
+    pub fn register_symbol(&mut self, name: String, typ: Type) {
+        self.symbol_stack[0].insert(name, Box::new(typ));
+    }
+
     pub fn get_symbol_type(&self, name: String) -> Option<Type> {
-        let thing = match self.get_symbol(name) {
-            Some(T) => Option::Some(T),
-            _ => {Option::None}
+        return match self.get_symbol(name) {
+            Some(t) => {
+                if t.downcast_ref::<Type>().is_some() {
+                    return Option::Some(t.downcast_ref::<Type>().unwrap().clone());
+                }
+                else { Option::None }
+            },
+            _ => Option::None
         };
-        thing
+    }
+
+    pub fn push_scope(&mut self) {
+        self.symbol_stack.push(HashMap::<String, Box<dyn Any>>::new());
+    }
+    pub fn pop_scope(&mut self) {
+        self.symbol_stack.pop();
     }
 }
 
@@ -109,6 +139,7 @@ enum ParserErrorType {
 }
 
 // The White-lang parser
+#[allow(dead_code)]
 pub struct Parser {
     token_list: Vec<Token>, // gets the token list
     statement_list: Vec<Box<dyn Statement>>,
@@ -340,7 +371,17 @@ impl Parser {
             self.consume_token();
             return Box::new(expr);
         }
-        self.parse_boolean_literal_expression()
+        self.parse_identifier_expression()
+    }
+
+    fn parse_identifier_expression(&mut self) -> Box<dyn Expression> {
+        if self.match_token(Identifier) {
+            let name = self.get_curr_tok().get_string_value();
+            self.consume_token();
+            let expr = IdentifierExpression::new(name);
+            return Box::new(expr);
+        }
+        return self.parse_boolean_literal_expression();
     }
 
     fn parse_boolean_literal_expression(&mut self) -> Box<dyn Expression> {
@@ -478,8 +519,7 @@ mod test {
     #[test]
     fn additive_expressions_are_associative() {
         let mut parser = init_parser("1 + 1 - 1".to_string());
-        let mut expr = parser.parse_expression();
-        let x = expr.debug();
+        let expr = parser.parse_expression();
         assert_eq!(expr.get_lhs().get_expr_type(), "AdditiveExpression");
         assert_eq!(expr.get_rhs().get_expr_type(), "IntegerLiteralExpression");
     }
@@ -506,5 +546,13 @@ mod test {
         let expr = parser.parse_expression();
         assert_eq!(expr.get_expr_type(), "ListLiteralExpression");
         assert_eq!(expr.debug(), "[1, 2, 3, 4]");
+    }
+
+    #[test]
+    fn test_parse_identifier_expression() {
+        let mut parser = init_parser("x".to_string());
+        let expr = parser.parse_expression();
+        assert_eq!(expr.get_expr_type(), "IdentifierExpression");
+        assert_eq!(expr.debug(), "x");
     }
 }

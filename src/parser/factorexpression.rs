@@ -2,7 +2,7 @@ use crate::parser::{Expression, ParserErrorType};
 use std::any::Any;
 use crate::parser::whitetypes::Type;
 
-pub struct FactorExpression {
+pub(crate) struct FactorExpression {
     lhs: Box<dyn Expression>,
     operator: String,
     rhs: Box<dyn Expression>,

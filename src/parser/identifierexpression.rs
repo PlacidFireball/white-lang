@@ -47,5 +47,7 @@ impl Expression for IdentifierExpression {
     }
 }
 impl IdentifierExpression {
-
+    pub fn new(name: String) -> IdentifierExpression {
+        IdentifierExpression { name }
+    }
 }

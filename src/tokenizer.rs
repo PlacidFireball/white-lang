@@ -187,7 +187,7 @@ impl Tokenizer {
         }
     }
     // for the parser, to let us know when we are done with parsing
-    pub fn has_tokens(&self) -> bool {
+    fn has_tokens(&self) -> bool {
         !self.token_list.is_empty()
     }
     // returns a reference to the token list
@@ -577,7 +577,7 @@ mod test {
 
     #[test]
     fn test_tokenize_identifier() {
-        let mut tokenizer = init_test(String::from("a123b567"));
+        let tokenizer = init_test(String::from("a123b567"));
         let token = tokenizer.get_token(0);
         assert_eq!(token.get_type(), TokenType::Identifier);
         assert_eq!(token.get_string_value(), String::from("a123b567"));
@@ -585,7 +585,7 @@ mod test {
 
     #[test]
     fn test_tokenize_keyword() {
-        let mut tokenizer = init_test(String::from("for"));
+        let tokenizer = init_test(String::from("for"));
         let token = tokenizer.get_token(0);
         assert_eq!(token.get_type(), TokenType::For);
         assert_eq!(token.get_string_value(), String::from("for"));

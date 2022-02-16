@@ -1,6 +1,6 @@
 use crate::parser::{Expression, ParserErrorType};
 use std::any::Any;
-use crate::parser::whitetypes::{ListType, Type};
+use crate::parser::whitetypes::{Type};
 
 pub(crate) struct ListLiteralExpression {
     exprs: Vec<Box<dyn Expression>>,
