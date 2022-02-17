@@ -1,4 +1,4 @@
-use crate::parser::{Expression, ParserErrorType};
+use crate::parser::{Expression, ParserErrorType, SymbolTable};
 use std::any::Any;
 use crate::parser::whitetypes::Type;
 
@@ -21,7 +21,7 @@ impl Expression for EqualityExpression {
         todo!()
     }
 
-    fn validate(&mut self) {
+    fn validate(&mut self, st: &SymbolTable) {
         todo!()
     }
 

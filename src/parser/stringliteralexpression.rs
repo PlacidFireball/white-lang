@@ -1,4 +1,4 @@
-use crate::parser::Expression;
+use crate::parser::{Expression, SymbolTable};
 use std::any::Any;
 use crate::parser::whitetypes::Type;
 
@@ -18,9 +18,7 @@ impl Expression for StringLiteralExpression {
         todo!()
     }
 
-    fn validate(&mut self) {
-        todo!()
-    }
+    fn validate(&mut self, st: &SymbolTable) { }
 
     fn debug(&self) -> String {
         self.string_value.clone()

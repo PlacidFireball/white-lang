@@ -1,4 +1,4 @@
-use crate::parser::Expression;
+use crate::parser::{Expression, SymbolTable};
 use std::any::Any;
 use crate::parser::whitetypes::Type;
 
@@ -19,7 +19,7 @@ impl Expression for FunctionCallExpression {
         todo!()
     }
 
-    fn validate(&mut self) {
+    fn validate(&mut self, st: &SymbolTable) {
         todo!()
     }
 

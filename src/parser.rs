@@ -46,6 +46,7 @@ mod assignmentstatement;
 mod forstatement;
 mod functioncallstatement;
 mod functiondefinitionstatement;
+use crate::parser::functiondefinitionstatement::FunctionDefinitionStatement;
 mod ifstatement;
 mod printstatement;
 mod returnstatement;
@@ -58,25 +59,25 @@ pub(crate) trait Expression {
     fn evaluate(&self) -> Box<dyn Any>; // evaluate the expression
     fn compile(&self) -> String;        // compile the expression to nasm
     fn transpile(&self) -> String;      // transpile the expression to javascript
-    fn validate(&mut self);             // validate the expression
+    fn validate(&mut self, st: &SymbolTable);  // validate the expression via the symbol table
     fn debug(&self) -> String;          // for retrieving information about the expression
     fn get_white_type(&self) -> Type;   // getting the type of the expression
     fn has_errors(&self) -> bool;       // check if the expression has errors
-    // fn get_errors(&self) -> Vec<ParserErrorType>; // potentially implement this in the future
+    // fn get_errors(&self) -> &Vec<ParserErrorType>; // potentially implement this in the future
     fn get_expr_type(&self) -> String;  // get the rust type of the expression
-    fn get_lhs(&self) -> &Box<dyn Expression>;  // get the left hand expresssion
+    fn get_lhs(&self) -> &Box<dyn Expression>;  // get the left hand expression
     fn get_rhs(&self) -> &Box<dyn Expression>;  // get the right hand expression
 }
 
 #[allow(dead_code)]
 pub(crate) trait Statement {
-    fn execute(&self) -> String;
-    fn get_expr(&self) -> &Box<dyn Expression>;
+    fn execute(&self) -> String;    // execute the statement
+    fn compile(&self) -> String;    // compile the statement to nasm
+    fn transpile(&self) -> String;  // transpile the statement to Javascript
+    fn validate(&self, st: &SymbolTable) -> String; // validate the statement via the symbol table
+    fn get_expr(&self) -> &Box<dyn Expression>; // retrieve the expression if the statement has one
 }
 
-//fn instance_of<T>(_: T, ) -> bool {
-//    false
-//}
 
 pub(crate) struct SymbolTable {
     symbol_stack: Vec<HashMap<String, Box<dyn Any>>>
@@ -110,6 +111,10 @@ impl SymbolTable {
         self.symbol_stack[0].insert(name, Box::new(typ));
     }
 
+    pub fn register_function(&mut self, name: String, def: i32/*FunctionDefinitionStatement*/) {
+        self.symbol_stack[0].insert(name, Box::new(def));
+    }
+
     pub fn get_symbol_type(&self, name: String) -> Option<Type> {
         return match self.get_symbol(name) {
             Some(t) => {
@@ -122,6 +127,18 @@ impl SymbolTable {
         };
     }
 
+    pub fn get_function(&self, name: String) -> Option<i32/*FunctionDefinitionStatement*/> {
+        return match self.get_symbol(name) {
+            Some(t) => {
+                if t.downcast_ref::<i32>().is_some() {
+                    Option::Some(t.downcast_ref::<i32>().unwrap().clone())
+                }
+                else { Option::None }
+            }
+            _ => Option::None
+        }
+    }
+
     pub fn push_scope(&mut self) {
         self.symbol_stack.push(HashMap::<String, Box<dyn Any>>::new());
     }
@@ -130,12 +147,14 @@ impl SymbolTable {
     }
 }
 
+// Parsing Errors
 enum ParserErrorType {
     UnexpectedToken,
     UnterminatedArgList,
     UnterminatedList,
     BadOperator,
-    MismatchedTypes
+    MismatchedTypes,
+    SymbolDefinitionError
 }
 
 // The White-lang parser
@@ -210,7 +229,7 @@ impl Parser {
         false
     }
 
-    // requires that a specific tokentype be at curr_idx,
+    // requires that a specific token type be at curr_idx,
     // if it matches, it consumes it
     // otherwise pushes an error onto errors
     fn require_token(&mut self, typ: TokenType) {
@@ -219,6 +238,20 @@ impl Parser {
             self.errors.push(UnexpectedToken);
         }
     }
+
+    // -------------------------------------------------------------------------- //
+    /* Statement Parsing - all the statements that White-Lang accepts for now     */
+    // -------------------------------------------------------------------------- //
+    fn parse_statement(&mut self) -> Box<dyn Statement> {
+        unimplemented!();
+    }
+
+    fn parse_function_definition_statement(&mut self) -> Option<FunctionDefinitionStatement> {
+        unimplemented!();
+    }
+
+
+
     // -------------------------------------------------------------------------- //
     /* Expression Parsing - all lexemes that can be evaluated to a specific value */
     // -------------------------------------------------------------------------- //
@@ -559,5 +592,13 @@ mod test {
         let expr = parser.parse_expression();
         assert_eq!(expr.get_expr_type(), "IdentifierExpression");
         assert_eq!(expr.debug(), "x");
+    }
+
+    #[test]
+    fn test_symbol_table() {
+        let mut st : SymbolTable = SymbolTable::new();
+        st.register_symbol(String::from("x"), Type::Integer);
+        assert!(st.has_symbol(String::from("x")));
+        assert_eq!(st.get_symbol_type(String::from("x")).unwrap(), Type::Integer);
     }
 }

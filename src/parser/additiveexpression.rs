@@ -1,4 +1,4 @@
-use crate::parser::{Expression, ParserErrorType};
+use crate::parser::{Expression, ParserErrorType, SymbolTable};
 use crate::parser::whitetypes::{Type, ListType};
 
 use std::any::Any;
@@ -22,9 +22,9 @@ impl Expression for AdditiveExpression {
         String::from("")
     }
 
-    fn validate(&mut self) {
-        self.lhs.validate();
-        self.rhs.validate();
+    fn validate(&mut self, st: &SymbolTable) {
+        self.lhs.validate(st);
+        self.rhs.validate(st);
         if self.lhs.get_expr_type() == "IntegerLiteralExpression" {
 
         }

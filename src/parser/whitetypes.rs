@@ -8,7 +8,7 @@ pub(crate) enum ListType {
 pub(crate) enum Type {
     Char, String, Integer,
     Float, Boolean, List, Null,
-    Initialized,
+    Initialized, Void,
     Error
 }
 impl Type {

@@ -1,4 +1,4 @@
-use crate::parser::Expression;
+use crate::parser::{Expression, SymbolTable};
 use std::any::Any;
 use crate::parser::whitetypes::Type;
 
@@ -16,9 +16,7 @@ impl Expression for NullLiteralExpression {
         todo!()
     }
 
-    fn validate(&mut self) {
-        todo!()
-    }
+    fn validate(&mut self, st: &SymbolTable) { }
 
     fn debug(&self) -> String {
         String::from("null")

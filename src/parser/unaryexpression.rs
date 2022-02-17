@@ -1,4 +1,4 @@
-use crate::parser::{Expression, ParserErrorType};
+use crate::parser::{Expression, ParserErrorType, SymbolTable};
 use std::any::Any;
 use crate::parser::whitetypes::Type;
 
@@ -20,7 +20,7 @@ impl Expression for UnaryExpression {
         todo!()
     }
 
-    fn validate(&mut self) {
+    fn validate(&mut self, st: &SymbolTable) {
         if self.operator == "not" && self.expr.get_white_type() == Type::Integer {
             self.errors.push(ParserErrorType::BadOperator);
         }

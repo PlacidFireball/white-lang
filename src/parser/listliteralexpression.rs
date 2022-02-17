@@ -1,4 +1,4 @@
-use crate::parser::{Expression, ParserErrorType};
+use crate::parser::{Expression, ParserErrorType, SymbolTable};
 use std::any::Any;
 use crate::parser::whitetypes::{Type};
 
@@ -20,14 +20,14 @@ impl Expression for ListLiteralExpression {
         todo!()
     }
 
-    fn validate(&mut self) {
+    fn validate(&mut self, st: &SymbolTable) {
         if self.exprs.is_empty() {
 
             return;
         }
         self.inferred_type = self.exprs[0].get_white_type();
         for expr in &mut self.exprs {
-            expr.validate();
+            expr.validate(st);
             if expr.get_white_type() != self.inferred_type {
                 self.errors.push(ParserErrorType::MismatchedTypes);
             }
