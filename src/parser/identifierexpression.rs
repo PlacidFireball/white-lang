@@ -35,7 +35,7 @@ impl Expression for IdentifierExpression {
     }
 
     fn get_expr_type(&self) -> String {
-        todo!()
+        String::from("IdentifierExpression")
     }
 
     fn get_lhs(&self) -> &Box<dyn Expression> {

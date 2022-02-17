@@ -270,7 +270,12 @@ impl Parser {
     }
 
     fn parse_parenthesized_expression(&mut self) -> Box<dyn Expression> {
-        todo!()
+        if self.match_token(LeftParen) {
+            let expr = self.parse_expression();
+            let pe = ParenthesizedExpression::new(expr);
+            return Box::new(pe);
+        }
+        self.parse_equality_expression()
     }
 
     // <expr> (== | !=) <expr>

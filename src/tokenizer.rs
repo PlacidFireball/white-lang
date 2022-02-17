@@ -238,6 +238,9 @@ impl Tokenizer {
     }
     // returns the character at src[position] without consuming it
     fn peek(&mut self) -> char {
+        if self.tokenization_end() {
+            return '\0';
+        }
         self.char_vec[self.position]
     }
     // for cases when you want to look at the character at src[position + 1]
