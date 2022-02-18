@@ -1,6 +1,6 @@
+use crate::parser::whitetypes::Type;
 use crate::parser::{Expression, SymbolTable};
 use std::any::Any;
-use crate::parser::whitetypes::Type;
 
 pub(crate) struct BooleanLiteralExpression {
     boolean: bool,
@@ -18,7 +18,7 @@ impl Expression for BooleanLiteralExpression {
         todo!()
     }
 
-    fn validate(&mut self, st: &SymbolTable) { }
+    fn validate(&mut self, st: &SymbolTable) {}
 
     fn debug(&self) -> String {
         String::from(self.boolean.to_string())

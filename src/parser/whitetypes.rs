@@ -1,15 +1,24 @@
-
 pub(crate) enum ListType {
-    Char, String, Integer,
-    Float, Boolean, Error
+    Char,
+    String,
+    Integer,
+    Float,
+    Boolean,
+    Error,
 }
 
 #[derive(Clone, Debug, PartialEq)]
 pub(crate) enum Type {
-    Char, String, Integer,
-    Float, Boolean, List, Null,
-    Initialized, Void,
-    Error
+    Char,
+    String,
+    Integer,
+    Float,
+    Boolean,
+    List,
+    Null,
+    Initialized,
+    Void,
+    Error,
 }
 impl Type {
     pub fn new(typ: &str) -> Type {
@@ -20,7 +29,7 @@ impl Type {
             "float" => Type::Float,
             "bool" => Type::Boolean,
             "list" => Type::Error,
-            _ => Type::Error
+            _ => Type::Error,
         }
     }
     pub fn get_list_type(&self) -> ListType {
@@ -31,7 +40,7 @@ impl Type {
             Type::Float => ListType::Float,
             Type::Boolean => ListType::Boolean,
             Type::List => ListType::Error,
-            _ => ListType::Error
+            _ => ListType::Error,
         }
     }
 }

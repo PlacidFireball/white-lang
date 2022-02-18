@@ -1,6 +1,6 @@
+use crate::parser::whitetypes::Type;
 use crate::parser::{Expression, SymbolTable};
 use std::any::Any;
-use crate::parser::whitetypes::Type;
 
 pub(crate) struct IntegerLiteralExpression {
     value: isize,
@@ -18,7 +18,7 @@ impl Expression for IntegerLiteralExpression {
         todo!()
     }
 
-    fn validate(&mut self, st: &SymbolTable) { }
+    fn validate(&mut self, st: &SymbolTable) {}
 
     fn debug(&self) -> String {
         String::from(self.value.to_string())

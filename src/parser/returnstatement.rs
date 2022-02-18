@@ -1,5 +1,5 @@
-use crate::parser::*;
 use crate::parser::FunctionDefinitionStatement;
+use crate::parser::*;
 
 struct ReturnStatement {
     expr: Box<dyn Expression>,
@@ -28,7 +28,10 @@ impl Statement for ReturnStatement {
     }
 }
 impl ReturnStatement {
-    pub fn new(expr: Box<dyn Expression>, function: &FunctionDefinitionStatement) -> ReturnStatement {
+    pub fn new(
+        expr: Box<dyn Expression>,
+        function: &FunctionDefinitionStatement,
+    ) -> ReturnStatement {
         ReturnStatement {
             expr,
             return_type: Type::Void,

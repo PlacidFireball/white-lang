@@ -1,12 +1,12 @@
+use crate::parser::whitetypes::Type;
 use crate::parser::{Expression, ParserErrorType, SymbolTable};
 use std::any::Any;
-use crate::parser::whitetypes::Type;
 
 pub(crate) struct EqualityExpression {
     lhs: Box<dyn Expression>,
     operator: String,
     rhs: Box<dyn Expression>,
-    errors: Vec<ParserErrorType>
+    errors: Vec<ParserErrorType>,
 }
 impl Expression for EqualityExpression {
     fn evaluate(&self) -> Box<dyn Any> {
@@ -54,12 +54,16 @@ impl Expression for EqualityExpression {
     }
 }
 impl EqualityExpression {
-    pub fn new(lhs: Box<dyn Expression>, operator: String, rhs: Box<dyn Expression>) -> EqualityExpression {
+    pub fn new(
+        lhs: Box<dyn Expression>,
+        operator: String,
+        rhs: Box<dyn Expression>,
+    ) -> EqualityExpression {
         EqualityExpression {
             lhs,
             operator,
             rhs,
-            errors: vec![]
+            errors: vec![],
         }
     }
 }

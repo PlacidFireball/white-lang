@@ -1,6 +1,6 @@
+use crate::parser::whitetypes::*;
 use crate::tokenizer::TokenType::*;
 use crate::tokenizer::*;
-use crate::parser::whitetypes::*;
 use std::any::type_name;
 use std::any::{Any, TypeId};
 use std::collections::HashMap;
@@ -57,37 +57,35 @@ mod variablestatement;
 #[allow(dead_code)]
 pub(crate) trait Expression {
     fn evaluate(&self) -> Box<dyn Any>; // evaluate the expression
-    fn compile(&self) -> String;        // compile the expression to nasm
-    fn transpile(&self) -> String;      // transpile the expression to javascript
-    fn validate(&mut self, st: &SymbolTable);  // validate the expression via the symbol table
-    fn debug(&self) -> String;          // for retrieving information about the expression
-    fn get_white_type(&self) -> Type;   // getting the type of the expression
-    fn has_errors(&self) -> bool;       // check if the expression has errors
-    // fn get_errors(&self) -> &Vec<ParserErrorType>; // potentially implement this in the future
-    fn get_expr_type(&self) -> String;  // get the rust type of the expression
-    fn get_lhs(&self) -> &Box<dyn Expression>;  // get the left hand expression
-    fn get_rhs(&self) -> &Box<dyn Expression>;  // get the right hand expression
+    fn compile(&self) -> String; // compile the expression to nasm
+    fn transpile(&self) -> String; // transpile the expression to javascript
+    fn validate(&mut self, st: &SymbolTable); // validate the expression via the symbol table
+    fn debug(&self) -> String; // for retrieving information about the expression
+    fn get_white_type(&self) -> Type; // getting the type of the expression
+    fn has_errors(&self) -> bool; // check if the expression has errors
+                                  // fn get_errors(&self) -> &Vec<ParserErrorType>; // potentially implement this in the future
+    fn get_expr_type(&self) -> String; // get the rust type of the expression
+    fn get_lhs(&self) -> &Box<dyn Expression>; // get the left hand expression
+    fn get_rhs(&self) -> &Box<dyn Expression>; // get the right hand expression
 }
 
 #[allow(dead_code)]
 pub(crate) trait Statement {
-    fn execute(&self) -> String;    // execute the statement
-    fn compile(&self) -> String;    // compile the statement to nasm
-    fn transpile(&self) -> String;  // transpile the statement to Javascript
+    fn execute(&self) -> String; // execute the statement
+    fn compile(&self) -> String; // compile the statement to nasm
+    fn transpile(&self) -> String; // transpile the statement to Javascript
     fn validate(&self, st: &SymbolTable) -> String; // validate the statement via the symbol table
     fn get_expr(&self) -> &Box<dyn Expression>; // retrieve the expression if the statement has one
 }
 
-
 pub(crate) struct SymbolTable {
-    symbol_stack: Vec<HashMap<String, Box<dyn Any>>>
+    symbol_stack: Vec<HashMap<String, Box<dyn Any>>>,
 }
 #[allow(dead_code)]
 impl SymbolTable {
-
     pub fn new() -> SymbolTable {
         SymbolTable {
-            symbol_stack: vec![HashMap::<String, Box<dyn Any>>::new()] // <- the global scope
+            symbol_stack: vec![HashMap::<String, Box<dyn Any>>::new()], // <- the global scope
         }
     }
 
@@ -100,8 +98,23 @@ impl SymbolTable {
             match next.get(&name) {
                 Some(s) => {
                     return Option::Some(s);
-                },
-                None => { continue; }
+                }
+                None => {
+                    continue;
+                }
+            }
+        }
+        Option::None
+    }
+
+    pub fn get_symbol_as<T: 'static>(&self, name: String) -> Option<T>
+    where
+        T: Clone,
+    {
+        let retrieve = self.get_symbol(name);
+        if retrieve.is_some() {
+            if retrieve.unwrap().downcast_ref::<T>().is_some() {
+                return Option::Some(retrieve.unwrap().downcast_ref::<T>().unwrap().clone());
             }
         }
         Option::None
@@ -111,7 +124,11 @@ impl SymbolTable {
         self.symbol_stack[0].insert(name, Box::new(typ));
     }
 
-    pub fn register_function(&mut self, name: String, def: i32/*FunctionDefinitionStatement*/) {
+    pub fn register_function(
+        &mut self,
+        name: String,
+        def: i32, /*FunctionDefinitionStatement*/
+    ) {
         self.symbol_stack[0].insert(name, Box::new(def));
     }
 
@@ -120,27 +137,30 @@ impl SymbolTable {
             Some(t) => {
                 if t.downcast_ref::<Type>().is_some() {
                     return Option::Some(t.downcast_ref::<Type>().unwrap().clone());
+                } else {
+                    Option::None
                 }
-                else { Option::None }
-            },
-            _ => Option::None
+            }
+            _ => Option::None,
         };
     }
 
-    pub fn get_function(&self, name: String) -> Option<i32/*FunctionDefinitionStatement*/> {
+    pub fn get_function(&self, name: String) -> Option<i32 /*FunctionDefinitionStatement*/> {
         return match self.get_symbol(name) {
             Some(t) => {
                 if t.downcast_ref::<i32>().is_some() {
                     Option::Some(t.downcast_ref::<i32>().unwrap().clone())
+                } else {
+                    Option::None
                 }
-                else { Option::None }
             }
-            _ => Option::None
-        }
+            _ => Option::None,
+        };
     }
 
     pub fn push_scope(&mut self) {
-        self.symbol_stack.push(HashMap::<String, Box<dyn Any>>::new());
+        self.symbol_stack
+            .push(HashMap::<String, Box<dyn Any>>::new());
     }
     pub fn pop_scope(&mut self) {
         self.symbol_stack.pop();
@@ -154,7 +174,7 @@ enum ParserErrorType {
     UnterminatedList,
     BadOperator,
     MismatchedTypes,
-    SymbolDefinitionError
+    SymbolDefinitionError,
 }
 
 // The White-lang parser
@@ -250,8 +270,6 @@ impl Parser {
         unimplemented!();
     }
 
-
-
     // -------------------------------------------------------------------------- //
     /* Expression Parsing - all lexemes that can be evaluated to a specific value */
     // -------------------------------------------------------------------------- //
@@ -291,52 +309,48 @@ impl Parser {
         if self.match_token(Greater)                // If we match either >
             || self.match_token(GreaterEqual)       // >=,
             || self.match_token(Less)               // <,
-            || self.match_token(LessEqual)          // or <=
+            || self.match_token(LessEqual)
+        // or <=
         {
-            let operator = self.get_curr_tok().get_string_value();  // retrieve op sign
-            self.consume_token();       // consume op
-            let rhs = self.parse_function_call_expression();        // get the right hand side expression
+            let operator = self.get_curr_tok().get_string_value(); // retrieve op sign
+            self.consume_token(); // consume op
+            let rhs = self.parse_function_call_expression(); // get the right hand side expression
             let comparison_expr = ComparisonExpression::new(expr, operator.clone(), rhs); // create the expression
             return Box::new(comparison_expr); // return a box wrapper of the expression
         }
         expr // if we didn't parse a comparison expression, return whatever we parsed earlier
     }
 
-    fn parse_parenthesized_expression(&mut self) -> Box<dyn Expression> {
-        if self.match_token(LeftParen) {
-            let expr = self.parse_expression();
-            let pe = ParenthesizedExpression::new(expr);
-            return Box::new(pe);
-        }
-        self.parse_equality_expression()
-    }
-
     // <expr> (== | !=) <expr>
-    fn parse_equality_expression(&mut  self) -> Box<dyn Expression> {
-        let expr = self.parse_function_call_expression();            // first try to parse a lower level expr
-        if self.match_token(EqualEqual) || self.match_token(BangEqual) {      // if we match either != or ==
-            let operator = self.get_curr_tok().get_string_value();              // get the op
-            self.consume_token();       // consume the token
-            let rhs = self.parse_expression();          // parse some other expression
+    fn parse_equality_expression(&mut self) -> Box<dyn Expression> {
+        let expr = self.parse_function_call_expression(); // first try to parse a lower level expr
+        if self.match_token(EqualEqual) || self.match_token(BangEqual) {
+            // if we match either != or ==
+            let operator = self.get_curr_tok().get_string_value(); // get the op
+            self.consume_token(); // consume the token
+            let rhs = self.parse_expression(); // parse some other expression
             let equality_expr = EqualityExpression::new(expr, operator.clone(), rhs);
-            return Box::new(equality_expr);                           // return a box wrapper to the expr
+            return Box::new(equality_expr); // return a box wrapper to the expr
         }
         expr
     }
 
     fn parse_function_call_expression(&mut self) -> Box<dyn Expression> {
-        if self.match_token(Identifier) && self.peek_next_token(LeftParen) { // function_name(
+        if self.match_token(Identifier) && self.peek_next_token(LeftParen) {
+            // function_name(
             let mut expr = FunctionCallExpression::new(self.get_curr_tok().get_string_value());
-            self.require_token(Identifier);             // consume the name and paren
+            self.require_token(Identifier); // consume the name and paren
             self.require_token(LeftParen);
             loop {
-                if self.match_and_consume(RightParen) { // while the arg list hasn't terminated
+                if self.match_and_consume(RightParen) {
+                    // while the arg list hasn't terminated
                     break;
                 }
                 let arg = self.parse_expression(); // parse some expression
-                expr.add_arg(arg);                          // add the argument to the argument vector
-                self.match_and_consume(Comma);          // consume a comma if we have one
-                if !self.has_tokens() {                     // check to see if we've run out of tokens
+                expr.add_arg(arg); // add the argument to the argument vector
+                self.match_and_consume(Comma); // consume a comma if we have one
+                if !self.has_tokens() {
+                    // check to see if we've run out of tokens
                     self.errors.push(ParserErrorType::UnterminatedArgList); // add an error if we have
                     break;
                 }
@@ -347,34 +361,49 @@ impl Parser {
     }
 
     fn parse_list_literal_expression(&mut self) -> Box<dyn Expression> {
-        if self.match_and_consume(LeftBracket) {            // match some [
+        if self.match_and_consume(LeftBracket) {
+            // match some [
             let mut lle = ListLiteralExpression::new(); // create a new list literal
-            while !self.match_and_consume(RightBracket) {   // while the list hasn't been terminated
-                lle.add_expr(self.parse_expression());     // add some new expression to the list
-                self.match_and_consume(Comma);              // consume a comma if there is any
-                if !self.has_tokens() {                         // check to see if we have an unterminated list
+            while !self.match_and_consume(RightBracket) {
+                // while the list hasn't been terminated
+                lle.add_expr(self.parse_expression()); // add some new expression to the list
+                self.match_and_consume(Comma); // consume a comma if there is any
+                if !self.has_tokens() {
+                    // check to see if we have an unterminated list
                     self.errors.push(ParserErrorType::UnterminatedList); // if we do add an error
                     break;
                 }
             }
-            return Box::new(lle);                           // return a box wrapper of the lle
+            return Box::new(lle); // return a box wrapper of the lle
         }
-        self.parse_unary_expression()                           // try to parse a unary expression
+        self.parse_parenthesized_expression()
+    }
+
+    fn parse_parenthesized_expression(&mut self) -> Box<dyn Expression> {
+        if self.match_token(LeftParen) {
+            self.consume_token();
+            let expr = self.parse_expression();
+            let pe = ParenthesizedExpression::new(expr);
+            return Box::new(pe);
+        }
+        self.parse_unary_expression()
     }
 
     fn parse_unary_expression(&mut self) -> Box<dyn Expression> {
-        if self.match_token(Not) || self.match_token(Minus) {         // match either not or -
-            let operator = self.get_curr_tok().get_string_value();      // get the op sign
-            self.consume_token();                   // consume the token
+        if self.match_token(Not) || self.match_token(Minus) {
+            // match either not or -
+            let operator = self.get_curr_tok().get_string_value(); // get the op sign
+            self.consume_token(); // consume the token
             let expr = self.parse_integer_literal_expression(); // parse some lower level expression
             let unary_expr = UnaryExpression::new(operator, expr); // create the new expr
-            return Box::new(unary_expr);        // return a box wrapper
+            return Box::new(unary_expr); // return a box wrapper
         }
         self.parse_float_literal_expression()
     }
 
     fn parse_float_literal_expression(&mut self) -> Box<dyn Expression> {
-        if self.match_token(Float) {    // parse float
+        if self.match_token(Float) {
+            // parse float
             let expr = FloatLiteralExpression::new(
                 self.token_list[self.curr_idx]
                     .get_string_value()
@@ -389,7 +418,8 @@ impl Parser {
     }
 
     fn parse_string_literal_expression(&mut self) -> Box<dyn Expression> {
-        if self.match_token(Str) {      // parse string
+        if self.match_token(Str) {
+            // parse string
             let expr = StringLiteralExpression::new(self.get_curr_tok().get_string_value());
             self.consume_token();
             return Box::new(expr);
@@ -399,7 +429,8 @@ impl Parser {
     }
 
     fn parse_integer_literal_expression(&mut self) -> Box<dyn Expression> {
-        if self.match_token(Int) {      // parse integers
+        if self.match_token(Int) {
+            // parse integers
             let expr = IntegerLiteralExpression::new(
                 self.token_list[self.curr_idx]
                     .get_string_value()
@@ -423,7 +454,8 @@ impl Parser {
     }
 
     fn parse_boolean_literal_expression(&mut self) -> Box<dyn Expression> {
-        if self.match_token(True) || self.match_token(False) { // parse boolean literals
+        if self.match_token(True) || self.match_token(False) {
+            // parse boolean literals
             let expr = BooleanLiteralExpression::new(
                 self.get_curr_tok()
                     .get_string_value()
@@ -437,7 +469,8 @@ impl Parser {
     }
 
     fn parse_null_literal_expression(&mut self) -> Box<dyn Expression> {
-        if self.match_token(Null) {     // parse null literals
+        if self.match_token(Null) {
+            // parse null literals
             let expr = NullLiteralExpression::new();
             self.consume_token();
             return Box::new(expr);
@@ -595,10 +628,26 @@ mod test {
     }
 
     #[test]
+    fn test_parse_parenthesized_expression() {
+        let mut parser = init_parser("(1+1)".to_string());
+        let expr = parser.parse_expression();
+        assert_eq!(expr.get_expr_type(), "ParenthesizedExpression");
+        assert_eq!(expr.debug(), "(1 + 1)");
+    }
+
+    #[test]
     fn test_symbol_table() {
-        let mut st : SymbolTable = SymbolTable::new();
+        let mut st: SymbolTable = SymbolTable::new();
         st.register_symbol(String::from("x"), Type::Integer);
         assert!(st.has_symbol(String::from("x")));
-        assert_eq!(st.get_symbol_type(String::from("x")).unwrap(), Type::Integer);
+        assert_eq!(
+            st.get_symbol_type(String::from("x")).unwrap(),
+            Type::Integer
+        );
+    }
+
+    #[test]
+    fn test_st_get_as() {
+        let mut st: SymbolTable = SymbolTable::new();
     }
 }

@@ -1,6 +1,6 @@
+use crate::parser::whitetypes::Type;
 use crate::parser::{Expression, SymbolTable};
 use std::any::Any;
-use crate::parser::whitetypes::Type;
 
 pub(crate) struct StringLiteralExpression {
     string_value: String,
@@ -18,7 +18,7 @@ impl Expression for StringLiteralExpression {
         todo!()
     }
 
-    fn validate(&mut self, st: &SymbolTable) { }
+    fn validate(&mut self, st: &SymbolTable) {}
 
     fn debug(&self) -> String {
         self.string_value.clone()

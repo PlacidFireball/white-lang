@@ -1,12 +1,12 @@
+use crate::parser::whitetypes::Type;
 use crate::parser::{Expression, ParserErrorType, SymbolTable};
 use std::any::Any;
-use crate::parser::whitetypes::Type;
 
 pub(crate) struct ComparisonExpression {
     lhs: Box<dyn Expression>,
     operator: String,
     rhs: Box<dyn Expression>,
-    errors: Vec<ParserErrorType>
+    errors: Vec<ParserErrorType>,
 }
 impl Expression for ComparisonExpression {
     fn evaluate(&self) -> Box<dyn Any> {
@@ -59,6 +59,11 @@ impl ComparisonExpression {
         operator: String,
         rhs: Box<dyn Expression>,
     ) -> ComparisonExpression {
-        ComparisonExpression { lhs, operator, rhs, errors: vec![]}
+        ComparisonExpression {
+            lhs,
+            operator,
+            rhs,
+            errors: vec![],
+        }
     }
 }

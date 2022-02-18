@@ -1,11 +1,11 @@
+use crate::parser::whitetypes::Type;
 use crate::parser::{Expression, ParserErrorType, SymbolTable};
 use std::any::Any;
-use crate::parser::whitetypes::Type;
 
 pub(crate) struct UnaryExpression {
     operator: String,
     expr: Box<dyn Expression>,
-    errors: Vec<ParserErrorType>
+    errors: Vec<ParserErrorType>,
 }
 impl Expression for UnaryExpression {
     fn evaluate(&self) -> Box<dyn Any> {
@@ -60,7 +60,7 @@ impl UnaryExpression {
         UnaryExpression {
             operator,
             expr,
-            errors: vec![]
+            errors: vec![],
         }
     }
 }

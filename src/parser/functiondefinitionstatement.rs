@@ -3,7 +3,7 @@ use crate::parser::*;
 pub(crate) struct FunctionDefinitionStatement {
     name: String,
     return_type: Type,
-    statements: Vec<Box<dyn Statement>>
+    statements: Vec<Box<dyn Statement>>,
 }
 impl Statement for FunctionDefinitionStatement {
     fn execute(&self) -> String {
