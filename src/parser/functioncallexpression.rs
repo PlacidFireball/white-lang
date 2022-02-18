@@ -1,11 +1,18 @@
 use crate::parser::whitetypes::Type;
-use crate::parser::{Expression, SymbolTable};
+use crate::parser::{Expression, SymbolTable, ToAny};
 use std::any::Any;
 
 pub(crate) struct FunctionCallExpression {
     name: String,
     args: Vec<Box<dyn Expression>>,
 }
+
+impl ToAny for FunctionCallExpression {
+    fn to_any(&self) -> &dyn Any {
+        self
+    }
+}
+
 impl Expression for FunctionCallExpression {
     fn evaluate(&self) -> Box<dyn Any> {
         todo!()
@@ -44,14 +51,6 @@ impl Expression for FunctionCallExpression {
 
     fn get_expr_type(&self) -> String {
         String::from("FunctionCallExpression")
-    }
-
-    fn get_lhs(&self) -> &Box<dyn Expression> {
-        todo!()
-    }
-
-    fn get_rhs(&self) -> &Box<dyn Expression> {
-        todo!()
     }
 }
 impl FunctionCallExpression {

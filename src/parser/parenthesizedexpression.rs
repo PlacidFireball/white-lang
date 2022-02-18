@@ -1,10 +1,17 @@
 use crate::parser::whitetypes::Type;
-use crate::parser::{Expression, SymbolTable};
+use crate::parser::{Expression, SymbolTable, ToAny};
 use std::any::Any;
 
 pub(crate) struct ParenthesizedExpression {
     expr: Box<dyn Expression>,
 }
+
+impl ToAny for ParenthesizedExpression {
+    fn to_any(&self) -> &dyn Any {
+        self
+    }
+}
+
 impl Expression for ParenthesizedExpression {
     fn evaluate(&self) -> Box<dyn Any> {
         self.expr.evaluate()
@@ -36,14 +43,6 @@ impl Expression for ParenthesizedExpression {
 
     fn get_expr_type(&self) -> String {
         String::from("ParenthesizedExpression")
-    }
-
-    fn get_lhs(&self) -> &Box<dyn Expression> {
-        todo!()
-    }
-
-    fn get_rhs(&self) -> &Box<dyn Expression> {
-        todo!()
     }
 }
 impl ParenthesizedExpression {

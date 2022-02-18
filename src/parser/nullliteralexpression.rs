@@ -1,8 +1,15 @@
 use crate::parser::whitetypes::Type;
-use crate::parser::{Expression, SymbolTable};
+use crate::parser::{Expression, SymbolTable, ToAny};
 use std::any::Any;
 
 pub(crate) struct NullLiteralExpression {}
+
+impl ToAny for NullLiteralExpression {
+    fn to_any(&self) -> &dyn Any {
+        self
+    }
+}
+
 impl Expression for NullLiteralExpression {
     fn evaluate(&self) -> Box<dyn Any> {
         Box::new(String::from("null"))
@@ -32,14 +39,6 @@ impl Expression for NullLiteralExpression {
 
     fn get_expr_type(&self) -> String {
         String::from("NullLiteralExpression")
-    }
-
-    fn get_lhs(&self) -> &Box<dyn Expression> {
-        todo!()
-    }
-
-    fn get_rhs(&self) -> &Box<dyn Expression> {
-        todo!()
     }
 }
 impl NullLiteralExpression {

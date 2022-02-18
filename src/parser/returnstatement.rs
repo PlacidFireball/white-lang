@@ -1,11 +1,18 @@
 use crate::parser::FunctionDefinitionStatement;
 use crate::parser::*;
 
-struct ReturnStatement {
+pub(crate) struct ReturnStatement {
     expr: Box<dyn Expression>,
     return_type: Type,
     //function: &'static FunctionDefinitionStatement,
 }
+
+impl ToAny for ReturnStatement {
+    fn to_any(&self) -> &dyn Any {
+        self
+    }
+}
+
 impl Statement for ReturnStatement {
     fn execute(&self) -> String {
         todo!()
@@ -25,6 +32,10 @@ impl Statement for ReturnStatement {
 
     fn get_expr(&self) -> &Box<dyn Expression> {
         todo!()
+    }
+
+    fn get_statement_type(&self) -> String {
+        String::from("ReturnStatement")
     }
 }
 impl ReturnStatement {

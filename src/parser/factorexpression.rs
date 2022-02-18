@@ -1,5 +1,5 @@
 use crate::parser::whitetypes::Type;
-use crate::parser::{Expression, ParserErrorType, SymbolTable};
+use crate::parser::{Expression, ParserErrorType, SymbolTable, ToAny};
 use std::any::Any;
 
 pub(crate) struct FactorExpression {
@@ -8,6 +8,13 @@ pub(crate) struct FactorExpression {
     rhs: Box<dyn Expression>,
     errors: Vec<ParserErrorType>,
 }
+
+impl ToAny for FactorExpression {
+    fn to_any(&self) -> &dyn Any {
+        self
+    }
+}
+
 impl Expression for FactorExpression {
     fn evaluate(&self) -> Box<dyn Any> {
         todo!()
@@ -44,14 +51,6 @@ impl Expression for FactorExpression {
     fn get_expr_type(&self) -> String {
         String::from("FactorExpression")
     }
-
-    fn get_lhs(&self) -> &Box<dyn Expression> {
-        &self.lhs
-    }
-
-    fn get_rhs(&self) -> &Box<dyn Expression> {
-        &self.rhs
-    }
 }
 impl FactorExpression {
     pub(crate) fn new(
@@ -65,5 +64,11 @@ impl FactorExpression {
             rhs,
             errors: vec![],
         }
+    }
+
+    fn get_lhs(&self) -> &Box<dyn Expression> { &self.lhs }
+
+    fn get_rhs(&self) -> &Box<dyn Expression> {
+        &self.rhs
     }
 }

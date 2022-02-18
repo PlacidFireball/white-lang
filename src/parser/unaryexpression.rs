@@ -1,5 +1,5 @@
 use crate::parser::whitetypes::Type;
-use crate::parser::{Expression, ParserErrorType, SymbolTable};
+use crate::parser::{Expression, ParserErrorType, SymbolTable, ToAny};
 use std::any::Any;
 
 pub(crate) struct UnaryExpression {
@@ -7,6 +7,13 @@ pub(crate) struct UnaryExpression {
     expr: Box<dyn Expression>,
     errors: Vec<ParserErrorType>,
 }
+
+impl ToAny for UnaryExpression {
+    fn to_any(&self) -> &dyn Any {
+        self
+    }
+}
+
 impl Expression for UnaryExpression {
     fn evaluate(&self) -> Box<dyn Any> {
         todo!()
@@ -44,14 +51,6 @@ impl Expression for UnaryExpression {
     }
 
     fn get_expr_type(&self) -> String {
-        todo!()
-    }
-
-    fn get_lhs(&self) -> &Box<dyn Expression> {
-        todo!()
-    }
-
-    fn get_rhs(&self) -> &Box<dyn Expression> {
         todo!()
     }
 }

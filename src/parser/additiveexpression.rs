@@ -1,5 +1,5 @@
 use crate::parser::whitetypes::{ListType, Type};
-use crate::parser::{Expression, ParserErrorType, SymbolTable};
+use crate::parser::{Expression, ParserErrorType, SymbolTable, ToAny};
 
 use std::any::Any;
 
@@ -9,6 +9,13 @@ pub(crate) struct AdditiveExpression {
     rhs: Box<dyn Expression>,
     errors: Vec<ParserErrorType>,
 }
+
+impl ToAny for AdditiveExpression {
+    fn to_any(&self) -> &dyn Any {
+        self
+    }
+}
+
 impl Expression for AdditiveExpression {
     fn evaluate(&self) -> Box<dyn Any> {
         todo!()
@@ -25,7 +32,7 @@ impl Expression for AdditiveExpression {
     fn validate(&mut self, st: &SymbolTable) {
         self.lhs.validate(st);
         self.rhs.validate(st);
-        if self.lhs.get_expr_type() == "IntegerLiteralExpression" {}
+
     }
 
     fn debug(&self) -> String {
@@ -47,14 +54,6 @@ impl Expression for AdditiveExpression {
     fn get_expr_type(&self) -> String {
         String::from("AdditiveExpression")
     }
-
-    fn get_lhs(&self) -> &Box<dyn Expression> {
-        &self.lhs
-    }
-
-    fn get_rhs(&self) -> &Box<dyn Expression> {
-        &self.rhs
-    }
 }
 impl AdditiveExpression {
     pub fn new(
@@ -69,4 +68,7 @@ impl AdditiveExpression {
             errors: vec![],
         }
     }
+
+    pub fn get_lhs(&self) -> &Box<dyn Expression> { &self.lhs }
+    pub fn get_rhs(&self) -> &Box<dyn Expression> { &self.rhs }
 }

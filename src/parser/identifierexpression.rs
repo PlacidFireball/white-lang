@@ -1,10 +1,17 @@
 use crate::parser::whitetypes::Type;
-use crate::parser::{Expression, SymbolTable};
+use crate::parser::{Expression, SymbolTable, ToAny};
 use std::any::Any;
 
 pub(crate) struct IdentifierExpression {
     name: String,
 }
+
+impl ToAny for IdentifierExpression {
+    fn to_any(&self) -> &dyn Any {
+        self
+    }
+}
+
 impl Expression for IdentifierExpression {
     fn evaluate(&self) -> Box<dyn Any> {
         Box::new(self.name.clone())
@@ -36,14 +43,6 @@ impl Expression for IdentifierExpression {
 
     fn get_expr_type(&self) -> String {
         String::from("IdentifierExpression")
-    }
-
-    fn get_lhs(&self) -> &Box<dyn Expression> {
-        todo!()
-    }
-
-    fn get_rhs(&self) -> &Box<dyn Expression> {
-        todo!()
     }
 }
 impl IdentifierExpression {

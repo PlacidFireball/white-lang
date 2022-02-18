@@ -1,5 +1,5 @@
 use crate::parser::whitetypes::Type;
-use crate::parser::{Expression, ParserErrorType, SymbolTable};
+use crate::parser::{Expression, ParserErrorType, SymbolTable, ToAny};
 use std::any::Any;
 
 pub(crate) struct ListLiteralExpression {
@@ -7,6 +7,13 @@ pub(crate) struct ListLiteralExpression {
     inferred_type: Type,
     errors: Vec<ParserErrorType>,
 }
+
+impl ToAny for ListLiteralExpression {
+    fn to_any(&self) -> &dyn Any {
+        self
+    }
+}
+
 impl Expression for ListLiteralExpression {
     fn evaluate(&self) -> Box<dyn Any> {
         todo!()
@@ -55,14 +62,6 @@ impl Expression for ListLiteralExpression {
 
     fn get_expr_type(&self) -> String {
         String::from("ListLiteralExpression")
-    }
-
-    fn get_lhs(&self) -> &Box<dyn Expression> {
-        todo!()
-    }
-
-    fn get_rhs(&self) -> &Box<dyn Expression> {
-        todo!()
     }
 }
 impl ListLiteralExpression {

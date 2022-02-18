@@ -1,10 +1,18 @@
 use crate::parser::*;
+use crate::parser::returnstatement::ReturnStatement;
 
 pub(crate) struct FunctionDefinitionStatement {
     name: String,
     return_type: Type,
     statements: Vec<Box<dyn Statement>>,
 }
+
+impl ToAny for FunctionDefinitionStatement {
+    fn to_any(&self) -> &dyn Any {
+        self
+    }
+}
+
 impl Statement for FunctionDefinitionStatement {
     fn execute(&self) -> String {
         todo!()
@@ -19,11 +27,21 @@ impl Statement for FunctionDefinitionStatement {
     }
 
     fn validate(&self, st: &SymbolTable) -> String {
-        todo!()
+        for statement in &self.statements {
+            statement.validate(st);
+            if statement.to_any().downcast_ref::<ReturnStatement>().is_some() {
+
+            }
+        }
+        String::from("")
     }
 
     fn get_expr(&self) -> &Box<dyn Expression> {
         todo!()
+    }
+
+    fn get_statement_type(&self) -> String {
+        String::from("FunctionDefinitionStatement")
     }
 }
 impl FunctionDefinitionStatement {

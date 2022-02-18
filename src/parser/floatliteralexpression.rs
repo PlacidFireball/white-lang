@@ -1,10 +1,17 @@
 use crate::parser::whitetypes::Type;
-use crate::parser::{Expression, SymbolTable};
+use crate::parser::{Expression, SymbolTable, ToAny};
 use std::any::Any;
 
 pub(crate) struct FloatLiteralExpression {
     value: f64,
 }
+
+impl ToAny for FloatLiteralExpression {
+    fn to_any(&self) -> &dyn Any {
+        self
+    }
+}
+
 impl Expression for FloatLiteralExpression {
     fn evaluate(&self) -> Box<dyn Any> {
         Box::new(self.value)
@@ -34,14 +41,6 @@ impl Expression for FloatLiteralExpression {
 
     fn get_expr_type(&self) -> String {
         String::from("FloatLiteralExpression")
-    }
-
-    fn get_lhs(&self) -> &Box<dyn Expression> {
-        todo!()
-    }
-
-    fn get_rhs(&self) -> &Box<dyn Expression> {
-        todo!()
     }
 }
 impl FloatLiteralExpression {

@@ -1,8 +1,15 @@
 use crate::parser::whitetypes::Type;
-use crate::parser::{Expression, SymbolTable};
+use crate::parser::{Expression, SymbolTable, ToAny};
 use std::any::Any;
 
 pub(crate) struct SyntaxErrorExpression {}
+
+impl ToAny for SyntaxErrorExpression {
+    fn to_any(&self) -> &dyn Any {
+        self
+    }
+}
+
 impl Expression for SyntaxErrorExpression {
     fn evaluate(&self) -> Box<dyn Any> {
         todo!()
@@ -31,14 +38,6 @@ impl Expression for SyntaxErrorExpression {
     }
 
     fn get_expr_type(&self) -> String {
-        todo!()
-    }
-
-    fn get_lhs(&self) -> &Box<dyn Expression> {
-        todo!()
-    }
-
-    fn get_rhs(&self) -> &Box<dyn Expression> {
         todo!()
     }
 }
