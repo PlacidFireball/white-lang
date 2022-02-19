@@ -1,10 +1,15 @@
+use std::mem::{MaybeUninit, uninitialized};
 use crate::parser::FunctionDefinitionStatement;
 use crate::parser::*;
+use crate::parser_traits::ToAny;
+use crate::symbol_table::SymbolTable;
+
+// TODO: The FunctionDefinitionStatement lifetime really needs to not be static
 
 pub(crate) struct ReturnStatement {
     expr: Box<dyn Expression>,
     return_type: Type,
-    //function: &'static FunctionDefinitionStatement,
+    function: &'static FunctionDefinitionStatement,
 }
 
 impl ToAny for ReturnStatement {
@@ -26,7 +31,7 @@ impl Statement for ReturnStatement {
         todo!()
     }
 
-    fn validate(&self, st: &SymbolTable) -> String {
+    fn validate(&mut self, st: &SymbolTable) -> String {
         todo!()
     }
 
@@ -41,12 +46,15 @@ impl Statement for ReturnStatement {
 impl ReturnStatement {
     pub fn new(
         expr: Box<dyn Expression>,
-        function: &FunctionDefinitionStatement,
     ) -> ReturnStatement {
         ReturnStatement {
             expr,
             return_type: Type::Void,
-            //function
+            function: todo!()
         }
+    }
+
+    pub fn set_fds(&mut self, func: &'static FunctionDefinitionStatement) {
+        self.function = func;
     }
 }

@@ -1,6 +1,7 @@
 use crate::parser::whitetypes::Type;
-use crate::parser::{Expression, SymbolTable, ToAny};
+use crate::symbol_table::SymbolTable;
 use std::any::Any;
+use crate::parser_traits::{Expression, ToAny};
 
 pub(crate) struct ParenthesizedExpression {
     expr: Box<dyn Expression>,
@@ -48,5 +49,8 @@ impl Expression for ParenthesizedExpression {
 impl ParenthesizedExpression {
     pub fn new(expr: Box<dyn Expression>) -> ParenthesizedExpression {
         ParenthesizedExpression { expr }
+    }
+    pub fn get_expr(&self) -> &Box<dyn Expression> {
+        &self.expr
     }
 }

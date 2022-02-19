@@ -1,15 +1,29 @@
 use crate::parser::*;
 use crate::parser::returnstatement::ReturnStatement;
+use crate::parser_traits::ToAny;
+use crate::symbol_table::SymbolTable;
 
 pub(crate) struct FunctionDefinitionStatement {
     name: String,
     return_type: Type,
     statements: Vec<Box<dyn Statement>>,
+    errors: Vec<ParserErrorType>
 }
 
 impl ToAny for FunctionDefinitionStatement {
     fn to_any(&self) -> &dyn Any {
         self
+    }
+}
+
+impl Default for FunctionDefinitionStatement {
+    fn default() -> Self {
+        FunctionDefinitionStatement {
+            name: String::from(""),
+            return_type: Type::Void,
+            statements: vec![],
+            errors: vec![]
+        }
     }
 }
 
@@ -26,11 +40,15 @@ impl Statement for FunctionDefinitionStatement {
         todo!()
     }
 
-    fn validate(&self, st: &SymbolTable) -> String {
-        for statement in &self.statements {
+    fn validate(&mut self, st: &SymbolTable) -> String {
+        for statement in &mut self.statements {
             statement.validate(st);
-            if statement.to_any().downcast_ref::<ReturnStatement>().is_some() {
-
+            let ret_statement = statement.to_any().downcast_ref::<ReturnStatement>();
+            if ret_statement.is_some() {
+                let unwrapped = ret_statement.unwrap();
+                if unwrapped.get_expr().get_white_type() != self.return_type {
+                    self.errors.push(ParserErrorType::BadReturnType);
+                }
             }
         }
         String::from("")
@@ -50,6 +68,7 @@ impl FunctionDefinitionStatement {
             name,
             return_type: Type::Void,
             statements: vec![],
+            errors: vec![]
         }
     }
 

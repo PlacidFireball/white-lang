@@ -1,6 +1,7 @@
 use crate::parser::whitetypes::Type;
-use crate::parser::{Expression, SymbolTable, ToAny};
+use crate::symbol_table::SymbolTable;
 use std::any::Any;
+use crate::parser_traits::{Expression, ToAny};
 
 pub(crate) struct IntegerLiteralExpression {
     value: isize,

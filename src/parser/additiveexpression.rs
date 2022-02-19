@@ -1,7 +1,9 @@
 use crate::parser::whitetypes::{ListType, Type};
-use crate::parser::{Expression, ParserErrorType, SymbolTable, ToAny};
+use crate::parser::ParserErrorType;
 
 use std::any::Any;
+use crate::parser_traits::{Expression, ToAny};
+use crate::symbol_table::SymbolTable;
 
 pub(crate) struct AdditiveExpression {
     lhs: Box<dyn Expression>,

@@ -47,133 +47,13 @@ mod forstatement;
 mod functioncallstatement;
 mod functiondefinitionstatement;
 use crate::parser::functiondefinitionstatement::FunctionDefinitionStatement;
+use crate::parser_traits::{Expression, Statement};
 mod ifstatement;
 mod printstatement;
 mod returnstatement;
 mod syntaxerrorstatement;
 mod variablestatement;
 
-
-//pub(crate) fn cast<T>(obj: &T) -> Option<&T>
-//where T: ToAny {
-//    obj.as_any().downcast_ref::<T>()
-//}
-
-pub(crate) trait ToAny: 'static {
-    fn to_any(&self) -> &dyn Any;
-}
-
-/* Generic Expression type, implemented by all Expressions in white */
-#[allow(dead_code)]
-pub(crate) trait Expression : ToAny {
-    fn evaluate(&self) -> Box<dyn Any>; // evaluate the expression
-    fn compile(&self) -> String; // compile the expression to nasm
-    fn transpile(&self) -> String; // transpile the expression to javascript
-    fn validate(&mut self, st: &SymbolTable); // validate the expression via the symbol table
-    fn debug(&self) -> String; // for retrieving information about the expression
-    fn get_white_type(&self) -> Type; // getting the type of the expression
-    fn has_errors(&self) -> bool; // check if the expression has errors
-    fn get_expr_type(&self) -> String; // get the rust type of the expression
-}
-
-#[allow(dead_code)]
-pub(crate) trait Statement : ToAny {
-    fn execute(&self) -> String; // execute the statement
-    fn compile(&self) -> String; // compile the statement to nasm
-    fn transpile(&self) -> String; // transpile the statement to Javascript
-    fn validate(&self, st: &SymbolTable) -> String; // validate the statement via the symbol table
-    fn get_expr(&self) -> &Box<dyn Expression>; // retrieve the expression if the statement has one
-    fn get_statement_type(&self) -> String;
-}
-
-pub(crate) struct SymbolTable {
-    symbol_stack: Vec<HashMap<String, Box<dyn Any>>>,
-}
-#[allow(dead_code)]
-impl SymbolTable {
-    pub fn new() -> SymbolTable {
-        SymbolTable {
-            symbol_stack: vec![HashMap::<String, Box<dyn Any>>::new()], // <- the global scope
-        }
-    }
-
-    pub fn has_symbol(&self, name: String) -> bool {
-        self.get_symbol(name).is_some()
-    }
-
-    pub fn get_symbol(&self, name: String) -> Option<&Box<dyn Any>> {
-        for next in &self.symbol_stack {
-            match next.get(&name) {
-                Some(s) => {
-                    return Option::Some(s);
-                }
-                None => {
-                    continue;
-                }
-            }
-        }
-        Option::None
-    }
-
-    pub fn get_symbol_as<T: 'static>(&self, name: String) -> Option<T>
-    where
-        T: Clone,
-    {
-        let retrieve = self.get_symbol(name);
-        if retrieve.is_some() {
-            if retrieve.unwrap().downcast_ref::<T>().is_some() {
-                return Option::Some(retrieve.unwrap().downcast_ref::<T>().unwrap().clone());
-            }
-        }
-        Option::None
-    }
-
-    pub fn register_symbol(&mut self, name: String, typ: Type) {
-        self.symbol_stack[0].insert(name, Box::new(typ));
-    }
-
-    pub fn register_function(
-        &mut self,
-        name: String,
-        def: i32, /*FunctionDefinitionStatement*/
-    ) {
-        self.symbol_stack[0].insert(name, Box::new(def));
-    }
-
-    pub fn get_symbol_type(&self, name: String) -> Option<Type> {
-        return match self.get_symbol(name) {
-            Some(t) => {
-                if t.downcast_ref::<Type>().is_some() {
-                    return Option::Some(t.downcast_ref::<Type>().unwrap().clone());
-                } else {
-                    Option::None
-                }
-            }
-            _ => Option::None,
-        };
-    }
-
-    pub fn get_function(&self, name: String) -> Option<i32 /*FunctionDefinitionStatement*/> {
-        return match self.get_symbol(name) {
-            Some(t) => {
-                if t.downcast_ref::<i32>().is_some() {
-                    Option::Some(t.downcast_ref::<i32>().unwrap().clone())
-                } else {
-                    Option::None
-                }
-            }
-            _ => Option::None,
-        };
-    }
-
-    pub fn push_scope(&mut self) {
-        self.symbol_stack
-            .push(HashMap::<String, Box<dyn Any>>::new());
-    }
-    pub fn pop_scope(&mut self) {
-        self.symbol_stack.pop();
-    }
-}
 
 // Parsing Errors
 enum ParserErrorType {
@@ -183,6 +63,7 @@ enum ParserErrorType {
     BadOperator,
     MismatchedTypes,
     SymbolDefinitionError,
+    BadReturnType
 }
 
 // The White-lang parser
@@ -490,6 +371,8 @@ impl Parser {
 #[cfg(test)]
 mod test {
     use std::ops::Add;
+    use crate::parser_traits::{Expression, ToAny};
+    use crate::symbol_table::SymbolTable;
     use super::*;
 
     fn init_parser(src: String) -> Parser {
@@ -516,21 +399,21 @@ mod test {
     fn test_parse_integer_expression() {
         let mut parser = init_parser("1".to_string());
         let expr = parser.parse_expression();
-        assert_eq!(expr.get_expr_type(), "IntegerLiteralExpression");
+        assert!(expr.to_any().downcast_ref::<IntegerLiteralExpression>().is_some());
     }
 
     #[test]
     fn test_parse_string_expression() {
         let mut parser = init_parser("\"Hello World\"".to_string());
         let expr = parser.parse_expression();
-        assert_eq!(expr.get_expr_type(), "StringLiteralExpression");
+        assert!(expr.to_any().downcast_ref::<StringLiteralExpression>().is_some());
     }
 
     #[test]
     fn test_parse_float_expression() {
         let mut parser = init_parser("1.1".to_string());
         let expr = parser.parse_expression();
-        assert_eq!(expr.get_expr_type(), "FloatLiteralExpression");
+        assert!(expr.to_any().downcast_ref::<FloatLiteralExpression>().is_some());
         assert_eq!(expr.debug(), "1.1");
     }
 
@@ -646,13 +529,16 @@ mod test {
     fn test_parse_parenthesized_expression() {
         let mut parser = init_parser("(1+1)".to_string());
         let expr = parser.parse_expression();
-        assert_eq!(expr.get_expr_type(), "ParenthesizedExpression");
-        assert_eq!(expr.debug(), "(1 + 1)");
+        assert!(expr.to_any().downcast_ref::<ParenthesizedExpression>().is_some());
+        let typed_expr = expr.to_any().downcast_ref::<ParenthesizedExpression>().unwrap();
+        let interior = typed_expr.get_expr();
+        assert!(interior.to_any().downcast_ref::<AdditiveExpression>().is_some());
+        assert_eq!(interior.debug(), "1 + 1");
     }
 
     #[test]
     fn test_symbol_table() {
-        let mut st: SymbolTable = SymbolTable::new();
+        let mut st : SymbolTable = SymbolTable::new();
         st.register_symbol(String::from("x"), Type::Integer);
         assert!(st.has_symbol(String::from("x")));
         assert_eq!(
