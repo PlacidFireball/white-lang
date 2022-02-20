@@ -1,9 +1,14 @@
 use std::any::Any;
 use crate::symbol_table::SymbolTable;
 use crate::parser::whitetypes::Type;
+use crate::parser::syntaxerrorexpression::SyntaxErrorExpression;
 
 pub(crate) trait ToAny: 'static {
     fn to_any(&self) -> &dyn Any;
+}
+
+pub(crate) fn default_expr() -> Box<dyn Expression> {
+    Box::new(SyntaxErrorExpression::new())
 }
 
 #[allow(dead_code)]

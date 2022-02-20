@@ -4,6 +4,7 @@ use crate::tokenizer::*;
 use std::any::type_name;
 use std::any::{Any, TypeId};
 use std::collections::HashMap;
+use std::env::var;
 use std::iter::Map;
 use std::ops::Deref;
 use std::ptr::null;
@@ -36,7 +37,7 @@ mod parenthesizedexpression;
 use crate::parser::parenthesizedexpression::ParenthesizedExpression;
 mod stringliteralexpression;
 use crate::parser::stringliteralexpression::StringLiteralExpression;
-mod syntaxerrorexpression;
+pub(crate) mod syntaxerrorexpression;
 use crate::parser::syntaxerrorexpression::SyntaxErrorExpression;
 mod unaryexpression;
 use crate::parser::unaryexpression::UnaryExpression;
@@ -52,7 +53,9 @@ mod ifstatement;
 mod printstatement;
 mod returnstatement;
 mod syntaxerrorstatement;
+use crate::parser::syntaxerrorstatement::SyntaxErrorStatement;
 mod variablestatement;
+use crate::parser::variablestatement::VariableStatement;
 
 
 // Parsing Errors
@@ -63,7 +66,8 @@ enum ParserErrorType {
     BadOperator,
     MismatchedTypes,
     SymbolDefinitionError,
-    BadReturnType
+    BadReturnType,
+    BadVariableType,
 }
 
 // The White-lang parser
@@ -148,15 +152,55 @@ impl Parser {
         }
     }
 
+    fn require_one_of(&mut self, types: &Vec<&str>) -> isize {
+        let curr_tok = self.get_curr_tok().get_string_value();
+        for i in 0..types.len()-1 {
+            if types[i] == curr_tok {
+                self.consume_token();
+                return i as isize;
+            }
+        }
+        self.errors.push(ParserErrorType::BadVariableType);
+        -1
+    }
+
     // -------------------------------------------------------------------------- //
     /* Statement Parsing - all the statements that White-Lang accepts for now     */
     // -------------------------------------------------------------------------- //
     fn parse_statement(&mut self) -> Box<dyn Statement> {
-        unimplemented!();
+        let var_stmt = self.parse_variable_statement();
+        if var_stmt.is_some() {
+            return Box::new(var_stmt.unwrap());
+        }
+
+        Box::new(SyntaxErrorStatement::new())
     }
 
     fn parse_function_definition_statement(&mut self) -> Option<FunctionDefinitionStatement> {
         unimplemented!();
+    }
+
+    fn parse_variable_statement(&mut self) -> Option<VariableStatement> {
+        // let _id_ {: type_literal} = expr;
+        if self.match_and_consume(Let) {
+            let name = self.get_curr_tok().get_string_value();
+            self.require_token(Identifier);
+            let mut var_stat = VariableStatement::new(name);
+            if self.match_and_consume(Colon) {
+                let types = vec!["string", "bool", "float", "int",
+                                 "list<string>", "list<bool>", "list<float>", "list<int>"];
+                let idx = self.require_one_of(&types);
+                if idx != -1 {
+                    var_stat.set_type(Type::new(types[idx as usize]));
+                }
+            }
+            self.require_token(Equal);
+            var_stat.set_expr(self.parse_expression());
+            var_stat.set_type(var_stat.get_expr().get_white_type());
+            self.require_token(SemiColon);
+            return Option::Some(var_stat);
+        }
+        Option::None
     }
 
     // -------------------------------------------------------------------------- //
@@ -370,7 +414,6 @@ impl Parser {
 
 #[cfg(test)]
 mod test {
-    use std::ops::Add;
     use crate::parser_traits::{Expression, ToAny};
     use crate::symbol_table::SymbolTable;
     use super::*;
@@ -545,6 +588,37 @@ mod test {
             st.get_symbol_type(String::from("x")).unwrap(),
             Type::Integer
         );
+    }
+
+    #[test]
+    fn test_parse_variable_statement() {
+        let mut parser = init_parser("let x = 10;".to_string());
+        let stmt = parser.parse_statement();
+        assert!(!parser.has_errors());
+        let variable_statement = stmt.to_any().downcast_ref::<VariableStatement>().unwrap();
+        assert!(!variable_statement.has_errors());
+        assert!(variable_statement.get_expr().to_any().downcast_ref::<IntegerLiteralExpression>().is_some());
+        assert_eq!(variable_statement.get_type(), Type::Integer);
+    }
+
+    #[test]
+    fn test_parse_variable_statement_explicit_type() {
+        let mut parser = init_parser("let x : string = \"Hello World\";".to_string());
+        let stmt = parser.parse_statement();
+        assert!(!parser.has_errors());
+        let variable_statement = stmt.to_any().downcast_ref::<VariableStatement>().unwrap();
+        assert!(!variable_statement.has_errors());
+        assert!(variable_statement.get_expr().to_any().downcast_ref::<StringLiteralExpression>().is_some());
+        assert_eq!(variable_statement.get_type(), Type::String);
+    }
+
+    #[test]
+    fn test_parse_variable_statement_bad_assignment_type() {
+        let mut parser = init_parser("let x : string = 10;".to_string());
+        let stmt = parser.parse_statement();
+        assert!(!parser.has_errors());
+        let variable_statement = stmt.to_any().downcast_ref::<VariableStatement>().unwrap();
+        assert!(variable_statement.has_errors());
     }
 
 }

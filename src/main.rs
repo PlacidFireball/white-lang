@@ -3,7 +3,6 @@ use tokenizer::*;
 mod parser;
 mod parser_traits;
 mod symbol_table;
-
 use parser::Parser;
 
 #[allow(unused_variables)]
