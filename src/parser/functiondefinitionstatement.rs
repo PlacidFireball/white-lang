@@ -1,13 +1,14 @@
-use crate::parser::*;
 use crate::parser::returnstatement::ReturnStatement;
+use crate::parser::*;
 use crate::parser_traits::ToAny;
 use crate::symbol_table::SymbolTable;
 
+#[derive(Clone)]
 pub(crate) struct FunctionDefinitionStatement {
     name: String,
     return_type: Type,
     statements: Vec<Box<dyn Statement>>,
-    errors: Vec<ParserErrorType>
+    errors: Vec<ParserErrorType>,
 }
 
 impl ToAny for FunctionDefinitionStatement {
@@ -22,7 +23,7 @@ impl Default for FunctionDefinitionStatement {
             name: String::from(""),
             return_type: Type::Void,
             statements: vec![],
-            errors: vec![]
+            errors: vec![],
         }
     }
 }
@@ -40,7 +41,8 @@ impl Statement for FunctionDefinitionStatement {
         todo!()
     }
 
-    fn validate(&mut self, st: &SymbolTable) -> String {
+    fn validate(&mut self, st: &mut SymbolTable) -> String {
+        st.register_function(self.name.clone(), self.clone());
         for statement in &mut self.statements {
             statement.validate(st);
             let ret_statement = statement.to_any().downcast_ref::<ReturnStatement>();
@@ -68,7 +70,7 @@ impl FunctionDefinitionStatement {
             name,
             return_type: Type::Void,
             statements: vec![],
-            errors: vec![]
+            errors: vec![],
         }
     }
 

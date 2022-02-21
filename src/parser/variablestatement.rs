@@ -1,15 +1,15 @@
-use std::any::Any;
-use crate::parser::ParserErrorType;
 use crate::parser::whitetypes::Type;
-use crate::parser_traits::{Expression, Statement, ToAny};
+use crate::parser::ParserErrorType;
 use crate::parser_traits::default_expr;
+use crate::parser_traits::{Expression, Statement, ToAny};
 use crate::symbol_table::SymbolTable;
+use std::any::Any;
 
 pub(crate) struct VariableStatement {
     name: String,
     expr: Box<dyn Expression>,
     typ: Type,
-    errors: Vec<ParserErrorType>
+    errors: Vec<ParserErrorType>,
 }
 
 impl ToAny for VariableStatement {
@@ -31,7 +31,7 @@ impl Statement for VariableStatement {
         todo!()
     }
 
-    fn validate(&mut self, st: &SymbolTable) -> String {
+    fn validate(&mut self, st: &mut SymbolTable) -> String {
         todo!()
     }
 
@@ -50,17 +50,15 @@ impl VariableStatement {
             name,
             expr: default_expr(),
             typ: Type::Initialized,
-            errors: vec![]
+            errors: vec![],
         }
     }
     pub fn set_type(&mut self, typ: Type) {
         if self.typ == Type::Initialized {
             self.typ = typ;
-        }
-        else if self.typ != typ {
+        } else if self.typ != typ {
             self.errors.push(ParserErrorType::MismatchedTypes);
         }
-
     }
     pub fn get_type(&self) -> Type {
         self.typ.clone()

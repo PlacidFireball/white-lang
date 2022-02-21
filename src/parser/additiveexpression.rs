@@ -1,10 +1,11 @@
 use crate::parser::whitetypes::{ListType, Type};
 use crate::parser::ParserErrorType;
 
-use std::any::Any;
 use crate::parser_traits::{Expression, ToAny};
 use crate::symbol_table::SymbolTable;
+use std::any::Any;
 
+#[derive(Clone)]
 pub(crate) struct AdditiveExpression {
     lhs: Box<dyn Expression>,
     operator: String,
@@ -34,7 +35,6 @@ impl Expression for AdditiveExpression {
     fn validate(&mut self, st: &SymbolTable) {
         self.lhs.validate(st);
         self.rhs.validate(st);
-
     }
 
     fn debug(&self) -> String {
@@ -71,6 +71,10 @@ impl AdditiveExpression {
         }
     }
 
-    pub fn get_lhs(&self) -> &Box<dyn Expression> { &self.lhs }
-    pub fn get_rhs(&self) -> &Box<dyn Expression> { &self.rhs }
+    pub fn get_lhs(&self) -> &Box<dyn Expression> {
+        &self.lhs
+    }
+    pub fn get_rhs(&self) -> &Box<dyn Expression> {
+        &self.rhs
+    }
 }

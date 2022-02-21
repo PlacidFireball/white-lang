@@ -1,9 +1,10 @@
 use crate::parser::whitetypes::Type;
 use crate::parser::ParserErrorType;
-use std::any::Any;
 use crate::parser_traits::{Expression, ToAny};
 use crate::symbol_table::SymbolTable;
+use std::any::Any;
 
+#[derive(Clone)]
 pub(crate) struct ComparisonExpression {
     lhs: Box<dyn Expression>,
     operator: String,
@@ -53,8 +54,6 @@ impl Expression for ComparisonExpression {
     fn get_expr_type(&self) -> String {
         String::from("ComparisonExpression")
     }
-
-
 }
 impl ComparisonExpression {
     pub fn new(
@@ -70,7 +69,9 @@ impl ComparisonExpression {
         }
     }
 
-    fn get_lhs(&self) -> &Box<dyn Expression> { &self.lhs }
+    fn get_lhs(&self) -> &Box<dyn Expression> {
+        &self.lhs
+    }
 
     fn get_rhs(&self) -> &Box<dyn Expression> {
         &self.rhs

@@ -1,6 +1,7 @@
-use std::collections::HashMap;
-use std::any::Any;
+use crate::parser::functiondefinitionstatement::FunctionDefinitionStatement;
 use crate::parser::whitetypes::Type;
+use std::any::Any;
+use std::collections::HashMap;
 
 pub(crate) struct SymbolTable {
     symbol_stack: Vec<HashMap<String, Box<dyn Any>>>,
@@ -49,11 +50,7 @@ impl SymbolTable {
         self.symbol_stack[0].insert(name, Box::new(typ));
     }
 
-    pub fn register_function(
-        &mut self,
-        name: String,
-        def: i32, /*FunctionDefinitionStatement*/
-    ) {
+    pub fn register_function(&mut self, name: String, def: FunctionDefinitionStatement) {
         self.symbol_stack[0].insert(name, Box::new(def));
     }
 
@@ -70,11 +67,15 @@ impl SymbolTable {
         };
     }
 
-    pub fn get_function(&self, name: String) -> Option<i32 /*FunctionDefinitionStatement*/> {
+    pub fn get_function(&self, name: String) -> Option<FunctionDefinitionStatement> {
         return match self.get_symbol(name) {
             Some(t) => {
                 if t.downcast_ref::<i32>().is_some() {
-                    Option::Some(t.downcast_ref::<i32>().unwrap().clone())
+                    Option::Some(
+                        t.downcast_ref::<FunctionDefinitionStatement>()
+                            .unwrap()
+                            .clone(),
+                    )
                 } else {
                     Option::None
                 }

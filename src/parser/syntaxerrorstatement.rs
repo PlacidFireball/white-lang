@@ -1,10 +1,8 @@
-use std::any::Any;
 use crate::parser_traits::{Expression, Statement, ToAny};
 use crate::symbol_table::SymbolTable;
+use std::any::Any;
 
-pub(crate) struct SyntaxErrorStatement {
-    
-}
+pub(crate) struct SyntaxErrorStatement {}
 
 impl ToAny for SyntaxErrorStatement {
     fn to_any(&self) -> &dyn Any {
@@ -25,7 +23,7 @@ impl Statement for SyntaxErrorStatement {
         todo!()
     }
 
-    fn validate(&mut self, st: &SymbolTable) -> String {
+    fn validate(&mut self, st: &mut SymbolTable) -> String {
         todo!()
     }
 
@@ -39,6 +37,6 @@ impl Statement for SyntaxErrorStatement {
 }
 impl SyntaxErrorStatement {
     pub fn new() -> SyntaxErrorStatement {
-        SyntaxErrorStatement { }
+        SyntaxErrorStatement {}
     }
 }

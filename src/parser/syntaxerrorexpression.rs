@@ -1,8 +1,9 @@
 use crate::parser::whitetypes::Type;
+use crate::parser_traits::{Expression, ToAny};
 use crate::symbol_table::SymbolTable;
 use std::any::Any;
-use crate::parser_traits::{Expression, ToAny};
 
+#[derive(Clone)]
 pub(crate) struct SyntaxErrorExpression {}
 
 impl ToAny for SyntaxErrorExpression {

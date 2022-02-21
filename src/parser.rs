@@ -1,52 +1,46 @@
 use crate::parser::whitetypes::*;
 use crate::tokenizer::TokenType::*;
 use crate::tokenizer::*;
-use std::any::type_name;
-use std::any::{Any, TypeId};
-use std::collections::HashMap;
-use std::env::var;
-use std::iter::Map;
-use std::ops::Deref;
-use std::ptr::null;
+use std::any::{Any};
+
 // expressions
 pub(crate) mod whitetypes;
-use crate::parser::whitetypes::*;
-mod booleanliteralexpression;
+pub(crate) mod booleanliteralexpression;
 use crate::parser::booleanliteralexpression::BooleanLiteralExpression;
-mod integerliteralexpression;
+pub(crate) mod integerliteralexpression;
 use crate::parser::integerliteralexpression::IntegerLiteralExpression;
-mod floatliteralexpression;
+pub(crate) mod floatliteralexpression;
 use crate::parser::floatliteralexpression::FloatLiteralExpression;
-mod additiveexpression;
+pub(crate) mod additiveexpression;
 use crate::parser::additiveexpression::AdditiveExpression;
-mod comparisonexpression;
+pub(crate) mod comparisonexpression;
 use crate::parser::comparisonexpression::ComparisonExpression;
-mod equalityexpression;
+pub(crate) mod equalityexpression;
 use crate::parser::equalityexpression::EqualityExpression;
-mod factorexpression;
+pub(crate) mod factorexpression;
 use crate::parser::factorexpression::FactorExpression;
-mod functioncallexpression;
+pub(crate) mod functioncallexpression;
 use crate::parser::functioncallexpression::FunctionCallExpression;
-mod identifierexpression;
+pub(crate) mod identifierexpression;
 use crate::parser::identifierexpression::IdentifierExpression;
-mod listliteralexpression;
+pub(crate) mod listliteralexpression;
 use crate::parser::listliteralexpression::ListLiteralExpression;
-mod nullliteralexpression;
+pub(crate) mod nullliteralexpression;
 use crate::parser::nullliteralexpression::NullLiteralExpression;
-mod parenthesizedexpression;
+pub(crate) mod parenthesizedexpression;
 use crate::parser::parenthesizedexpression::ParenthesizedExpression;
-mod stringliteralexpression;
+pub(crate) mod stringliteralexpression;
 use crate::parser::stringliteralexpression::StringLiteralExpression;
 pub(crate) mod syntaxerrorexpression;
 use crate::parser::syntaxerrorexpression::SyntaxErrorExpression;
-mod unaryexpression;
+pub(crate) mod unaryexpression;
 use crate::parser::unaryexpression::UnaryExpression;
 mod typeliteral;
 // statements
 mod assignmentstatement;
 mod forstatement;
 mod functioncallstatement;
-mod functiondefinitionstatement;
+pub(crate) mod functiondefinitionstatement;
 use crate::parser::functiondefinitionstatement::FunctionDefinitionStatement;
 use crate::parser_traits::{Expression, Statement};
 mod ifstatement;
@@ -57,8 +51,8 @@ use crate::parser::syntaxerrorstatement::SyntaxErrorStatement;
 mod variablestatement;
 use crate::parser::variablestatement::VariableStatement;
 
-
 // Parsing Errors
+#[derive(Clone, Copy, Debug, PartialOrd, PartialEq)]
 enum ParserErrorType {
     UnexpectedToken,
     UnterminatedArgList,
@@ -154,7 +148,7 @@ impl Parser {
 
     fn require_one_of(&mut self, types: &Vec<&str>) -> isize {
         let curr_tok = self.get_curr_tok().get_string_value();
-        for i in 0..types.len()-1 {
+        for i in 0..types.len() - 1 {
             if types[i] == curr_tok {
                 self.consume_token();
                 return i as isize;
@@ -187,8 +181,16 @@ impl Parser {
             self.require_token(Identifier);
             let mut var_stat = VariableStatement::new(name);
             if self.match_and_consume(Colon) {
-                let types = vec!["string", "bool", "float", "int",
-                                 "list<string>", "list<bool>", "list<float>", "list<int>"];
+                let types = vec![
+                    "string",
+                    "bool",
+                    "float",
+                    "int",
+                    "list<string>",
+                    "list<bool>",
+                    "list<float>",
+                    "list<int>",
+                ];
                 let idx = self.require_one_of(&types);
                 if idx != -1 {
                     var_stat.set_type(Type::new(types[idx as usize]));
@@ -414,9 +416,9 @@ impl Parser {
 
 #[cfg(test)]
 mod test {
+    use super::*;
     use crate::parser_traits::{Expression, ToAny};
     use crate::symbol_table::SymbolTable;
-    use super::*;
 
     fn init_parser(src: String) -> Parser {
         let tokenizer: Tokenizer = Tokenizer::init(src);
@@ -442,21 +444,30 @@ mod test {
     fn test_parse_integer_expression() {
         let mut parser = init_parser("1".to_string());
         let expr = parser.parse_expression();
-        assert!(expr.to_any().downcast_ref::<IntegerLiteralExpression>().is_some());
+        assert!(expr
+            .to_any()
+            .downcast_ref::<IntegerLiteralExpression>()
+            .is_some());
     }
 
     #[test]
     fn test_parse_string_expression() {
         let mut parser = init_parser("\"Hello World\"".to_string());
         let expr = parser.parse_expression();
-        assert!(expr.to_any().downcast_ref::<StringLiteralExpression>().is_some());
+        assert!(expr
+            .to_any()
+            .downcast_ref::<StringLiteralExpression>()
+            .is_some());
     }
 
     #[test]
     fn test_parse_float_expression() {
         let mut parser = init_parser("1.1".to_string());
         let expr = parser.parse_expression();
-        assert!(expr.to_any().downcast_ref::<FloatLiteralExpression>().is_some());
+        assert!(expr
+            .to_any()
+            .downcast_ref::<FloatLiteralExpression>()
+            .is_some());
         assert_eq!(expr.debug(), "1.1");
     }
 
@@ -464,17 +475,26 @@ mod test {
     fn test_null_literal_expression() {
         let mut parser = init_parser("null".to_string());
         let expr = parser.parse_expression();
-        assert!(expr.to_any().downcast_ref::<NullLiteralExpression>().is_some());
+        assert!(expr
+            .to_any()
+            .downcast_ref::<NullLiteralExpression>()
+            .is_some());
     }
 
     #[test]
     fn test_boolean_literal_expression() {
         let mut parser = init_parser("true false".to_string());
         let mut expr = parser.parse_expression();
-        assert!(expr.to_any().downcast_ref::<BooleanLiteralExpression>().is_some());
+        assert!(expr
+            .to_any()
+            .downcast_ref::<BooleanLiteralExpression>()
+            .is_some());
         assert_eq!(expr.debug(), "true");
         expr = parser.parse_expression();
-        assert!(expr.to_any().downcast_ref::<BooleanLiteralExpression>().is_some());
+        assert!(expr
+            .to_any()
+            .downcast_ref::<BooleanLiteralExpression>()
+            .is_some());
         assert_eq!(expr.debug(), "false");
     }
 
@@ -482,7 +502,10 @@ mod test {
     fn test_function_call_expression() {
         let mut parser = init_parser("x()".to_string());
         let expr = parser.parse_expression();
-        assert!(expr.to_any().downcast_ref::<FunctionCallExpression>().is_some());
+        assert!(expr
+            .to_any()
+            .downcast_ref::<FunctionCallExpression>()
+            .is_some());
         assert_eq!(expr.debug(), "x: ");
     }
 
@@ -490,7 +513,10 @@ mod test {
     fn test_function_call_args_expression() {
         let mut parser = init_parser("x(1, 2)".to_string());
         let expr = parser.parse_expression();
-        assert!(expr.to_any().downcast_ref::<FunctionCallExpression>().is_some());
+        assert!(expr
+            .to_any()
+            .downcast_ref::<FunctionCallExpression>()
+            .is_some());
         assert_eq!(expr.debug(), "x: 1 2 ");
     }
 
@@ -498,7 +524,10 @@ mod test {
     fn test_fn_unterminated_args() {
         let mut parser = init_parser("x(".to_string());
         let expr = parser.parse_expression();
-        assert!(expr.to_any().downcast_ref::<FunctionCallExpression>().is_some());
+        assert!(expr
+            .to_any()
+            .downcast_ref::<FunctionCallExpression>()
+            .is_some());
         assert!(parser.has_errors()); // TODO: FunctionCallExpression has errors instead of the parser
     }
 
@@ -506,7 +535,10 @@ mod test {
     fn test_parse_comparison_expression() {
         let mut parser = init_parser("2 > 1".to_string());
         let expr = parser.parse_expression();
-        assert!(expr.to_any().downcast_ref::<ComparisonExpression>().is_some());
+        assert!(expr
+            .to_any()
+            .downcast_ref::<ComparisonExpression>()
+            .is_some());
         assert_eq!(expr.debug(), "2 > 1");
     }
 
@@ -526,10 +558,12 @@ mod test {
         let mut parser = init_parser("1 + 1 - 1".to_string());
         let expr = parser.parse_expression();
         let additive_expression = expr.to_any().downcast_ref::<AdditiveExpression>().unwrap();
-        let lhs = additive_expression.get_lhs()
+        let lhs = additive_expression
+            .get_lhs()
             .to_any()
             .downcast_ref::<AdditiveExpression>();
-        let rhs = additive_expression.get_rhs()
+        let rhs = additive_expression
+            .get_rhs()
             .to_any()
             .downcast_ref::<IntegerLiteralExpression>();
         assert!(lhs.is_some());
@@ -556,7 +590,10 @@ mod test {
     fn test_parse_list_expression() {
         let mut parser = init_parser("[1, 2, 3, 4]".to_string());
         let expr = parser.parse_expression();
-        assert!(expr.to_any().downcast_ref::<ListLiteralExpression>().is_some());
+        assert!(expr
+            .to_any()
+            .downcast_ref::<ListLiteralExpression>()
+            .is_some());
         assert_eq!(expr.debug(), "[1, 2, 3, 4]");
     }
 
@@ -564,7 +601,10 @@ mod test {
     fn test_parse_identifier_expression() {
         let mut parser = init_parser("x".to_string());
         let expr = parser.parse_expression();
-        assert!(expr.to_any().downcast_ref::<IdentifierExpression>().is_some());
+        assert!(expr
+            .to_any()
+            .downcast_ref::<IdentifierExpression>()
+            .is_some());
         assert_eq!(expr.debug(), "x");
     }
 
@@ -572,16 +612,25 @@ mod test {
     fn test_parse_parenthesized_expression() {
         let mut parser = init_parser("(1+1)".to_string());
         let expr = parser.parse_expression();
-        assert!(expr.to_any().downcast_ref::<ParenthesizedExpression>().is_some());
-        let typed_expr = expr.to_any().downcast_ref::<ParenthesizedExpression>().unwrap();
+        assert!(expr
+            .to_any()
+            .downcast_ref::<ParenthesizedExpression>()
+            .is_some());
+        let typed_expr = expr
+            .to_any()
+            .downcast_ref::<ParenthesizedExpression>()
+            .unwrap();
         let interior = typed_expr.get_expr();
-        assert!(interior.to_any().downcast_ref::<AdditiveExpression>().is_some());
+        assert!(interior
+            .to_any()
+            .downcast_ref::<AdditiveExpression>()
+            .is_some());
         assert_eq!(interior.debug(), "1 + 1");
     }
 
     #[test]
     fn test_symbol_table() {
-        let mut st : SymbolTable = SymbolTable::new();
+        let mut st: SymbolTable = SymbolTable::new();
         st.register_symbol(String::from("x"), Type::Integer);
         assert!(st.has_symbol(String::from("x")));
         assert_eq!(
@@ -597,7 +646,11 @@ mod test {
         assert!(!parser.has_errors());
         let variable_statement = stmt.to_any().downcast_ref::<VariableStatement>().unwrap();
         assert!(!variable_statement.has_errors());
-        assert!(variable_statement.get_expr().to_any().downcast_ref::<IntegerLiteralExpression>().is_some());
+        assert!(variable_statement
+            .get_expr()
+            .to_any()
+            .downcast_ref::<IntegerLiteralExpression>()
+            .is_some());
         assert_eq!(variable_statement.get_type(), Type::Integer);
     }
 
@@ -608,7 +661,11 @@ mod test {
         assert!(!parser.has_errors());
         let variable_statement = stmt.to_any().downcast_ref::<VariableStatement>().unwrap();
         assert!(!variable_statement.has_errors());
-        assert!(variable_statement.get_expr().to_any().downcast_ref::<StringLiteralExpression>().is_some());
+        assert!(variable_statement
+            .get_expr()
+            .to_any()
+            .downcast_ref::<StringLiteralExpression>()
+            .is_some());
         assert_eq!(variable_statement.get_type(), Type::String);
     }
 
@@ -620,5 +677,4 @@ mod test {
         let variable_statement = stmt.to_any().downcast_ref::<VariableStatement>().unwrap();
         assert!(variable_statement.has_errors());
     }
-
 }

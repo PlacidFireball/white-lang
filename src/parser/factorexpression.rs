@@ -1,9 +1,10 @@
 use crate::parser::whitetypes::Type;
 use crate::parser::ParserErrorType;
-use std::any::Any;
 use crate::parser_traits::{Expression, ToAny};
 use crate::symbol_table::SymbolTable;
+use std::any::Any;
 
+#[derive(Clone)]
 pub(crate) struct FactorExpression {
     lhs: Box<dyn Expression>,
     operator: String,
@@ -68,7 +69,9 @@ impl FactorExpression {
         }
     }
 
-    fn get_lhs(&self) -> &Box<dyn Expression> { &self.lhs }
+    fn get_lhs(&self) -> &Box<dyn Expression> {
+        &self.lhs
+    }
 
     fn get_rhs(&self) -> &Box<dyn Expression> {
         &self.rhs
