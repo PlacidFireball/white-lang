@@ -1,11 +1,11 @@
 use crate::parser::whitetypes::*;
 use crate::tokenizer::TokenType::*;
 use crate::tokenizer::*;
-use std::any::{Any};
+use std::any::Any;
 
 // expressions
-pub(crate) mod whitetypes;
 pub(crate) mod booleanliteralexpression;
+pub(crate) mod whitetypes;
 use crate::parser::booleanliteralexpression::BooleanLiteralExpression;
 pub(crate) mod integerliteralexpression;
 use crate::parser::integerliteralexpression::IntegerLiteralExpression;
@@ -76,7 +76,7 @@ pub struct Parser {
     statement_list: Vec<Box<dyn Statement>>,
     st: SymbolTable,
     expr: Box<dyn Expression>,
-    curr_idx: usize,              // what token it's on
+    curr_idx: usize, // what token it's on
     curr_fn_def: String,
     errors: Vec<ParserErrorType>, // and possible errors
 }
@@ -101,14 +101,18 @@ impl Parser {
     // main loop (eventually)
     pub fn parse(&mut self) {
         let expr = self.parse_expression();
-        if expr.to_any().downcast_ref::<SyntaxErrorExpression>().is_some() || self.has_tokens() {
+        if expr
+            .to_any()
+            .downcast_ref::<SyntaxErrorExpression>()
+            .is_some()
+            || self.has_tokens()
+        {
             self.curr_idx = 0;
             while self.has_tokens() {
                 let stmt = self.parse_statement();
                 self.statement_list.push(stmt);
             }
-        }
-        else {
+        } else {
             self.expr = expr;
         }
     }
@@ -173,12 +177,7 @@ impl Parser {
     }
 
     fn require_a_type(&mut self) -> Type {
-        let types = vec!["string",
-                         "bool",
-                         "float",
-                         "int",
-                         "void"
-        ];
+        let types = vec!["string", "bool", "float", "int", "void"];
         let curr_tok = self.get_curr_tok().get_string_value();
         for i in 0..types.len() - 1 {
             if types[i] == curr_tok {
@@ -768,7 +767,10 @@ mod test {
         let mut parser = init_parser("fn foo() {}".to_string());
         let stmt = parser.parse_statement();
         assert!(!parser.has_errors());
-        let fds = stmt.to_any().downcast_ref::<FunctionDefinitionStatement>().unwrap();
+        let fds = stmt
+            .to_any()
+            .downcast_ref::<FunctionDefinitionStatement>()
+            .unwrap();
         assert!(!fds.has_errors());
     }
 
@@ -777,7 +779,10 @@ mod test {
         let mut parser = init_parser("fn foo(x : int) {}".to_string());
         let stmt = parser.parse_statement();
         assert!(!parser.has_errors());
-        let fds = stmt.to_any().downcast_ref::<FunctionDefinitionStatement>().unwrap();
+        let fds = stmt
+            .to_any()
+            .downcast_ref::<FunctionDefinitionStatement>()
+            .unwrap();
         assert!(!fds.has_errors());
     }
     #[test]
@@ -785,7 +790,10 @@ mod test {
         let mut parser = init_parser("fn foo() : int { let x = 10; return x; }".to_string());
         let stmt = parser.parse_statement();
         assert!(!parser.has_errors());
-        let fds = stmt.to_any().downcast_ref::<FunctionDefinitionStatement>().unwrap();
+        let fds = stmt
+            .to_any()
+            .downcast_ref::<FunctionDefinitionStatement>()
+            .unwrap();
         assert!(!fds.has_errors());
     }
 
@@ -795,7 +803,10 @@ mod test {
         let mut stmt = parser.parse_statement();
         stmt.validate(&mut SymbolTable::new());
         assert!(!parser.has_errors());
-        let fds = stmt.to_any().downcast_ref::<FunctionDefinitionStatement>().unwrap();
+        let fds = stmt
+            .to_any()
+            .downcast_ref::<FunctionDefinitionStatement>()
+            .unwrap();
         assert!(fds.has_errors());
     }
 
@@ -805,8 +816,10 @@ mod test {
         let mut stmt = parser.parse_statement();
         assert!(!parser.has_errors());
         stmt.validate(&mut SymbolTable::new());
-        let fds = stmt.to_any().downcast_ref::<FunctionDefinitionStatement>().unwrap();
+        let fds = stmt
+            .to_any()
+            .downcast_ref::<FunctionDefinitionStatement>()
+            .unwrap();
         assert!(!fds.has_errors());
     }
-
 }

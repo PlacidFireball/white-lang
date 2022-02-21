@@ -63,9 +63,9 @@ pub enum TokenType {
     True,       // true
     False,      // false
     /* Future Tokens */
-    Struct,     // struct
-    As,         // as
-    Arrow,      // ->
+    Struct, // struct
+    As,     // as
+    Arrow,  // ->
 }
 #[allow(dead_code)]
 #[derive(PartialEq, Debug, Clone, Copy)]

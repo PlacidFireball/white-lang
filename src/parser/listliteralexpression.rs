@@ -55,7 +55,9 @@ impl Expression for ListLiteralExpression {
         builder
     }
 
-    fn get_white_type(&self) -> Type { self.inferred_type.get_list_type() }
+    fn get_white_type(&self) -> Type {
+        self.inferred_type.get_list_type()
+    }
 
     fn has_errors(&self) -> bool {
         !self.errors.is_empty()

@@ -1,4 +1,4 @@
-use crate::parser::whitetypes::{Type};
+use crate::parser::whitetypes::Type;
 use crate::parser::ParserErrorType;
 
 use crate::parser_traits::{Expression, ToAny};

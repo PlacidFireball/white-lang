@@ -1,8 +1,8 @@
-use std::borrow::BorrowMut;
 use crate::parser::returnstatement::ReturnStatement;
 use crate::parser::*;
 use crate::parser_traits::ToAny;
 use crate::symbol_table::SymbolTable;
+use std::borrow::BorrowMut;
 
 #[feature(option_get_or_insert_default)]
 #[derive(Clone)]
@@ -47,7 +47,6 @@ impl Statement for FunctionDefinitionStatement {
         todo!()
     }
 
-
     fn validate(&mut self, st: &mut SymbolTable) {
         st.register_function(self.name.clone(), self.clone());
         for statement in &mut self.statements {
@@ -89,8 +88,9 @@ impl FunctionDefinitionStatement {
         }
     }
 
-    
-    pub fn get_return_type(&self) -> Type { self.return_type }
+    pub fn get_return_type(&self) -> Type {
+        self.return_type
+    }
     pub fn set_return_type(&mut self, return_type: Type) {
         self.return_type = return_type;
     }
@@ -107,5 +107,4 @@ impl FunctionDefinitionStatement {
     pub fn add_arg_type(&mut self, typ: Type) {
         self.arg_types.push(typ);
     }
-
 }

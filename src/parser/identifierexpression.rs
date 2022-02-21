@@ -1,15 +1,15 @@
 use crate::parser::whitetypes::Type;
+use crate::parser::ParserErrorType;
+use crate::parser::ParserErrorType::{UnexpectedToken, UnknownName};
 use crate::parser_traits::{Expression, ToAny};
 use crate::symbol_table::SymbolTable;
 use std::any::Any;
-use crate::parser::ParserErrorType;
-use crate::parser::ParserErrorType::{UnexpectedToken, UnknownName};
 
 #[derive(Clone)]
 pub(crate) struct IdentifierExpression {
     name: String,
     typ: Type,
-    errors: Vec<ParserErrorType>
+    errors: Vec<ParserErrorType>,
 }
 
 impl ToAny for IdentifierExpression {
@@ -63,7 +63,7 @@ impl IdentifierExpression {
         IdentifierExpression {
             name,
             typ: Type::Initialized,
-            errors: vec![]
+            errors: vec![],
         }
     }
 }

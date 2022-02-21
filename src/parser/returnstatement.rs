@@ -55,9 +55,7 @@ impl ReturnStatement {
             expr,
             return_type,
             function,
-            errors: vec![]
+            errors: vec![],
         }
     }
 }
-
-

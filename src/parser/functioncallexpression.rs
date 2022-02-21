@@ -1,17 +1,16 @@
 use crate::parser::whitetypes::Type;
+use crate::parser::ParserErrorType;
+use crate::parser::ParserErrorType::{ArgMismatch, UnknownName};
 use crate::parser_traits::{Expression, ToAny};
 use crate::symbol_table::SymbolTable;
 use std::any::Any;
-use crate::parser::functiondefinitionstatement::FunctionDefinitionStatement;
-use crate::parser::ParserErrorType;
-use crate::parser::ParserErrorType::{ArgMismatch, UnknownName};
 
 #[derive(Clone)]
 pub(crate) struct FunctionCallExpression {
     name: String,
     args: Vec<Box<dyn Expression>>,
     typ: Type,
-    errors: Vec<ParserErrorType>
+    errors: Vec<ParserErrorType>,
 }
 
 impl ToAny for FunctionCallExpression {
@@ -38,14 +37,12 @@ impl Expression for FunctionCallExpression {
         if fds_opt.is_none() {
             self.errors.push(UnknownName);
             self.typ = Type::Null; // TODO: default typing (maybe Object)
-        }
-        else {
+        } else {
             let mut fds = fds_opt.unwrap();
             let args = fds.get_args();
             if self.args.len() != args.len() {
                 self.errors.push(ArgMismatch);
-            }
-            else {
+            } else {
                 for i in 0..args.len() {
                     let arg = &mut args[i];
                     arg.validate(st);
@@ -56,7 +53,6 @@ impl Expression for FunctionCallExpression {
                 }
             }
         }
-
     }
 
     fn debug(&self) -> String {
@@ -84,7 +80,12 @@ impl Expression for FunctionCallExpression {
 }
 impl FunctionCallExpression {
     pub fn new(name: String) -> FunctionCallExpression {
-        FunctionCallExpression { name, args: vec![], typ: Type::Initialized, errors: vec![] }
+        FunctionCallExpression {
+            name,
+            args: vec![],
+            typ: Type::Initialized,
+            errors: vec![],
+        }
     }
     pub fn add_arg(&mut self, arg: Box<dyn Expression>) {
         self.args.push(arg);

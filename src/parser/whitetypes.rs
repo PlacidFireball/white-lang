@@ -1,4 +1,6 @@
-use crate::parser::whitetypes::Type::{ListBoolean, ListChar, ListFloat, ListInteger, ListString, Null, Void};
+use crate::parser::whitetypes::Type::{
+    ListBoolean, ListChar, ListFloat, ListInteger, ListString, Null, Void,
+};
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub(crate) enum Type {
@@ -19,7 +21,7 @@ pub(crate) enum Type {
 }
 impl Type {
     pub fn new(typ: &str) -> Type {
-        let toks : Vec<&str> = typ.split('<').collect();
+        let toks: Vec<&str> = typ.split('<').collect();
         match toks[0] {
             "char" => Type::Char,
             "string" => Type::String,
@@ -32,7 +34,7 @@ impl Type {
                 "int>" => Type::ListInteger,
                 "float>" => Type::ListFloat,
                 "bool>" => Type::ListBoolean,
-                _ => Type::Error
+                _ => Type::Error,
             },
             "void" => Type::Void,
             _ => Type::Error,
@@ -46,17 +48,15 @@ impl Type {
             Integer => ListInteger,
             Float => ListFloat,
             Boolean => ListBoolean,
-            _ => Type::Error
+            _ => Type::Error,
         }
     }
     pub fn is_assignable_from(&self, other: Type) -> bool {
         if other == Void {
             return false;
-        }
-        else if other == Null {
+        } else if other == Null {
             return true;
-        }
-        else if *self == other {
+        } else if *self == other {
             return true;
         }
         false

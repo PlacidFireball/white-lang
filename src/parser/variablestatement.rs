@@ -1,10 +1,10 @@
 use crate::parser::whitetypes::Type;
 use crate::parser::ParserErrorType;
+use crate::parser::ParserErrorType::SymbolDefinitionError;
 use crate::parser_traits::default_expr;
 use crate::parser_traits::{Expression, Statement, ToAny};
 use crate::symbol_table::SymbolTable;
 use std::any::Any;
-use crate::parser::ParserErrorType::SymbolDefinitionError;
 
 #[derive(Clone)]
 pub(crate) struct VariableStatement {

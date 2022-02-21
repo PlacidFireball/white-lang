@@ -2,8 +2,8 @@ mod tokenizer;
 use tokenizer::*;
 mod parser;
 mod parser_traits;
-mod symbol_table;
 mod program;
+mod symbol_table;
 
 use parser::Parser;
 
