@@ -23,7 +23,7 @@ impl Statement for SyntaxErrorStatement {
         todo!()
     }
 
-    fn validate(&mut self, st: &mut SymbolTable) -> String {
+    fn validate(&mut self, st: &mut SymbolTable) {
         todo!()
     }
 

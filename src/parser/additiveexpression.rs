@@ -37,6 +37,7 @@ impl Expression for AdditiveExpression {
         self.rhs.validate(st);
     }
 
+    // gives debug information of the expression without having to downcast it
     fn debug(&self) -> String {
         let mut builder = String::new();
         builder = builder + &*self.lhs.debug() + " ";

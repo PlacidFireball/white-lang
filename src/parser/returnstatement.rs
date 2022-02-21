@@ -10,7 +10,8 @@ use std::mem::{uninitialized, MaybeUninit};
 pub(crate) struct ReturnStatement {
     expr: Box<dyn Expression>,
     return_type: Type,
-    function: &'static FunctionDefinitionStatement,
+    function: String,
+    errors: Vec<ParserErrorType>,
 }
 
 impl ToAny for ReturnStatement {
@@ -32,12 +33,15 @@ impl Statement for ReturnStatement {
         todo!()
     }
 
-    fn validate(&mut self, st: &mut SymbolTable) -> String {
-        todo!()
+    fn validate(&mut self, st: &mut SymbolTable) {
+        let fds = st.get_function(self.function.clone()).unwrap();
+        if self.return_type != fds.get_return_type() {
+            self.errors.push(ParserErrorType::BadReturnType);
+        }
     }
 
     fn get_expr(&self) -> &Box<dyn Expression> {
-        todo!()
+        &self.expr
     }
 
     fn get_statement_type(&self) -> String {
@@ -45,15 +49,26 @@ impl Statement for ReturnStatement {
     }
 }
 impl ReturnStatement {
-    pub fn new(expr: Box<dyn Expression>) -> ReturnStatement {
+    pub fn new(expr: Box<dyn Expression>, function: String) -> ReturnStatement {
+        let return_type = expr.get_white_type();
         ReturnStatement {
             expr,
-            return_type: Type::Void,
-            function: todo!(),
+            return_type,
+            function,
+            errors: vec![]
+        }
+    }
+    pub fn new_no_fn(expr: Box<dyn Expression>) -> ReturnStatement {
+        let return_type = expr.get_white_type();
+        ReturnStatement {
+            expr,
+            return_type,
+            function: String::new(),
+            errors: vec![]
         }
     }
 
-    pub fn set_fds(&mut self, func: &'static FunctionDefinitionStatement) {
+    pub fn set_fds(&mut self, func: String) {
         self.function = func;
     }
 }

@@ -96,7 +96,7 @@ pub(crate) trait Statement: ToAny {
     fn execute(&self) -> String; // execute the statement
     fn compile(&self) -> String; // compile the statement to nasm
     fn transpile(&self) -> String; // transpile the statement to Javascript
-    fn validate(&mut self, st: &mut SymbolTable) -> String; // validate the statement via the symbol table
+    fn validate(&mut self, st: &mut SymbolTable); // validate the statement via the symbol table
     fn get_expr(&self) -> &Box<dyn Expression>; // retrieve the expression if the statement has one
     fn get_statement_type(&self) -> String;
 }

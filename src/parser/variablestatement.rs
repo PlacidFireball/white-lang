@@ -4,6 +4,7 @@ use crate::parser_traits::default_expr;
 use crate::parser_traits::{Expression, Statement, ToAny};
 use crate::symbol_table::SymbolTable;
 use std::any::Any;
+use crate::parser::ParserErrorType::SymbolDefinitionError;
 
 pub(crate) struct VariableStatement {
     name: String,
@@ -31,8 +32,12 @@ impl Statement for VariableStatement {
         todo!()
     }
 
-    fn validate(&mut self, st: &mut SymbolTable) -> String {
-        todo!()
+    fn validate(&mut self, st: &mut SymbolTable) {
+        self.expr.validate(st);
+        if st.has_symbol(self.name.clone()) {
+            self.errors.push(SymbolDefinitionError);
+        }
+        // type checking is done in parsing so I don't think it needs to be done here
     }
 
     fn get_expr(&self) -> &Box<dyn Expression> {

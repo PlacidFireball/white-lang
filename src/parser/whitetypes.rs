@@ -7,7 +7,7 @@ pub(crate) enum ListType {
     Error,
 }
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub(crate) enum Type {
     Char,
     String,

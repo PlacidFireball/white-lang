@@ -5,23 +5,6 @@ use std::fmt::Display;
 
 #[allow(dead_code)]
 #[derive(PartialEq, Debug, Clone, Copy)]
-enum ErrorType {
-    // Errors, will probably add more
-    UnterminatedString,
-    UnexpectedToken,
-}
-impl Display for ErrorType {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let s: String = match self {
-            ErrorType::UnterminatedString => String::from("Unterminated String"),
-            ErrorType::UnexpectedToken => String::from("Unexpected Token"),
-        };
-        write!(f, "{}", s)
-    }
-}
-
-#[allow(dead_code)]
-#[derive(PartialEq, Debug, Clone, Copy)]
 pub enum TokenType {
     // all token types that White-Lang implements
     // Types
@@ -79,6 +62,27 @@ pub enum TokenType {
     Function,   // fn
     True,       // true
     False,      // false
+    /* Future Tokens */
+    Struct,     // struct
+    As,         // as
+    Arrow,      // ->
+}
+#[allow(dead_code)]
+#[derive(PartialEq, Debug, Clone, Copy)]
+enum ErrorType {
+    // Errors, will probably add more
+    UnterminatedString,
+    UnexpectedToken,
+}
+
+impl Display for ErrorType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let s: String = match self {
+            ErrorType::UnterminatedString => String::from("Unterminated String"),
+            ErrorType::UnexpectedToken => String::from("Unexpected Token"),
+        };
+        write!(f, "{}", s)
+    }
 }
 impl Display for TokenType {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -148,6 +152,7 @@ fn init_keywords() -> HashMap<String, TokenType> {
     keywords.insert("print".to_string(), TokenType::Print);
     keywords.insert("else".to_string(), TokenType::Else);
     keywords.insert("in".to_string(), TokenType::In);
+    keywords.insert("struct".to_string(), TokenType::Struct);
     keywords
 }
 

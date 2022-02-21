@@ -41,7 +41,7 @@ impl Statement for FunctionDefinitionStatement {
         todo!()
     }
 
-    fn validate(&mut self, st: &mut SymbolTable) -> String {
+    fn validate(&mut self, st: &mut SymbolTable) {
         st.register_function(self.name.clone(), self.clone());
         for statement in &mut self.statements {
             statement.validate(st);
@@ -53,7 +53,6 @@ impl Statement for FunctionDefinitionStatement {
                 }
             }
         }
-        String::from("")
     }
 
     fn get_expr(&self) -> &Box<dyn Expression> {
@@ -74,6 +73,8 @@ impl FunctionDefinitionStatement {
         }
     }
 
+    
+    pub fn get_return_type(&self) -> Type { self.return_type }
     pub fn set_return_type(&mut self, return_type: Type) {
         self.return_type = return_type;
     }
