@@ -3,7 +3,7 @@ use crate::parser_traits::{Expression, ToAny};
 use crate::symbol_table::SymbolTable;
 use std::any::Any;
 use crate::parser::ParserErrorType;
-use crate::parser::ParserErrorType::UnexpectedToken;
+use crate::parser::ParserErrorType::{UnexpectedToken, UnknownName};
 
 #[derive(Clone)]
 pub(crate) struct IdentifierExpression {
@@ -38,7 +38,7 @@ impl Expression for IdentifierExpression {
         }
         if opt_typ.is_none() {
             self.typ = Type::Error;
-            self.errors.push(UnexpectedToken);
+            self.errors.push(UnknownName);
         }
     }
 

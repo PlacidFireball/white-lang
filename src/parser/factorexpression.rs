@@ -32,7 +32,8 @@ impl Expression for FactorExpression {
     }
 
     fn validate(&mut self, st: &SymbolTable) {
-        todo!()
+        self.lhs.validate(st);
+        self.rhs.validate(st);
     }
 
     fn debug(&self) -> String {

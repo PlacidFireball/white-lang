@@ -51,6 +51,7 @@ pub(crate) mod syntaxerrorstatement;
 use crate::parser::syntaxerrorstatement::SyntaxErrorStatement;
 pub(crate) mod variablestatement;
 use crate::parser::variablestatement::VariableStatement;
+use crate::symbol_table::SymbolTable;
 
 // Parsing Errors
 #[derive(Clone, Copy, Debug, PartialOrd, PartialEq)]
@@ -63,6 +64,9 @@ enum ParserErrorType {
     SymbolDefinitionError,
     BadReturnType,
     BadVariableType,
+    UnknownName,
+    ArgMismatch,
+    IncompatibleTypes,
 }
 
 // The White-lang parser
@@ -70,6 +74,8 @@ enum ParserErrorType {
 pub struct Parser {
     token_list: Vec<Token>, // gets the token list
     statement_list: Vec<Box<dyn Statement>>,
+    st: SymbolTable,
+    expr: Box<dyn Expression>,
     curr_idx: usize,              // what token it's on
     curr_fn_def: String,
     errors: Vec<ParserErrorType>, // and possible errors
@@ -84,7 +90,8 @@ impl Parser {
         Parser {
             token_list: tokenizer.get_token_list().to_vec(),
             statement_list: vec![],
-            //expression: null(),
+            st: SymbolTable::new(),
+            expr: Box::new(SyntaxErrorExpression::new()),
             curr_idx: 0,
             curr_fn_def: String::new(),
             errors: vec![],
@@ -92,9 +99,17 @@ impl Parser {
     }
 
     // main loop (eventually)
-    pub fn parse(&self) {
-        while self.has_tokens() {
-            break;
+    pub fn parse(&mut self) {
+        let expr = self.parse_expression();
+        if expr.to_any().downcast_ref::<SyntaxErrorExpression>().is_some() || self.has_tokens() {
+            self.curr_idx = 0;
+            while self.has_tokens() {
+                let stmt = self.parse_statement();
+                self.statement_list.push(stmt);
+            }
+        }
+        else {
+            self.expr = expr;
         }
     }
 
@@ -144,9 +159,17 @@ impl Parser {
     // otherwise pushes an error onto errors
     fn require_token(&mut self, typ: TokenType) {
         use self::ParserErrorType::*;
-        if !self.match_and_consume(typ) {
+        if !self.match_token(typ) {
             self.errors.push(UnexpectedToken);
         }
+        self.consume_token();
+    }
+
+    fn match_str_val(&mut self, strval: String) -> bool {
+        if self.get_curr_tok().get_string_value() == strval {
+            return true;
+        }
+        false
     }
 
     fn require_a_type(&mut self) -> Type {
@@ -154,10 +177,8 @@ impl Parser {
                          "bool",
                          "float",
                          "int",
-                         "list<string>",
-                         "list<bool>",
-                         "list<float>",
-                         "list<int>",];
+                         "void"
+        ];
         let curr_tok = self.get_curr_tok().get_string_value();
         for i in 0..types.len() - 1 {
             if types[i] == curr_tok {
@@ -165,8 +186,25 @@ impl Parser {
                 return Type::new(types[i]);
             }
         }
+        let opt_typ = self.try_parse_list_type();
+        if opt_typ.is_some() {
+            return opt_typ.unwrap();
+        }
         self.errors.push(ParserErrorType::BadVariableType);
         Type::Error
+    }
+
+    fn try_parse_list_type(&mut self) -> Option<Type> {
+        if self.match_str_val(String::from("list")) {
+            self.consume_token();
+            self.match_and_consume(Less);
+            let mut typ = self.require_a_type().get_list_type();
+            self.match_and_consume(Greater);
+            if typ != Type::Error {
+                return Option::Some(typ);
+            }
+        }
+        Option::None
     }
 
     // -------------------------------------------------------------------------- //
@@ -254,7 +292,9 @@ impl Parser {
     /* Expression Parsing - all lexemes that can be evaluated to a specific value */
     // -------------------------------------------------------------------------- //
     fn parse_expression(&mut self) -> Box<dyn Expression> {
-        self.parse_additive_expression()
+        let mut expr = self.parse_additive_expression();
+        expr.validate(&self.st);
+        expr
     }
 
     // <expr> + <expr>
@@ -759,5 +799,14 @@ mod test {
         assert!(fds.has_errors());
     }
 
+    #[test]
+    fn test_fn_returns_list() {
+        let mut parser = init_parser("fn foo() : list<int> { return [1, 2, 3]; }".to_string());
+        let mut stmt = parser.parse_statement();
+        assert!(!parser.has_errors());
+        stmt.validate(&mut SymbolTable::new());
+        let fds = stmt.to_any().downcast_ref::<FunctionDefinitionStatement>().unwrap();
+        assert!(!fds.has_errors());
+    }
 
 }

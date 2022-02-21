@@ -98,6 +98,9 @@ impl FunctionDefinitionStatement {
     pub fn add_statement(&mut self, statement: Box<dyn Statement>) {
         self.statements.push(statement);
     }
+    pub fn get_args(&mut self) -> &mut Vec<Box<dyn Expression>> {
+        &mut self.args
+    }
     pub fn add_arg(&mut self, expr: Box<dyn Expression>) {
         self.args.push(expr);
     }
