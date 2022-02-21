@@ -32,7 +32,8 @@ impl Expression for EqualityExpression {
     }
 
     fn validate(&mut self, st: &SymbolTable) {
-        todo!()
+        self.lhs.validate(st);
+        self.rhs.validate(st);
     }
 
     fn debug(&self) -> String {
@@ -48,7 +49,7 @@ impl Expression for EqualityExpression {
     }
 
     fn has_errors(&self) -> bool {
-        todo!()
+        !self.errors.is_empty()
     }
 
     fn get_expr_type(&self) -> String {

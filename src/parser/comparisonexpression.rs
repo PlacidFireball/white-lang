@@ -32,7 +32,12 @@ impl Expression for ComparisonExpression {
     }
 
     fn validate(&mut self, st: &SymbolTable) {
-        todo!()
+        self.lhs.validate(st);
+        self.rhs.validate(st);
+        if self.lhs.get_white_type() != self.rhs.get_white_type() {
+            self.errors.push(ParserErrorType::MismatchedTypes);
+        }
+        // TODO: When developing std, comparable might be a cool thing to implement
     }
 
     fn debug(&self) -> String {
