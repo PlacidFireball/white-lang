@@ -2,6 +2,7 @@ use crate::parser_traits::{Expression, Statement, ToAny};
 use crate::symbol_table::SymbolTable;
 use std::any::Any;
 
+#[derive(Clone)]
 pub(crate) struct SyntaxErrorStatement {}
 
 impl ToAny for SyntaxErrorStatement {
@@ -33,6 +34,10 @@ impl Statement for SyntaxErrorStatement {
 
     fn get_statement_type(&self) -> String {
         todo!()
+    }
+
+    fn has_errors(&self) -> bool {
+        true
     }
 }
 impl SyntaxErrorStatement {

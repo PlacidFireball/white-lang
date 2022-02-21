@@ -1,10 +1,6 @@
-use crate::parser::FunctionDefinitionStatement;
 use crate::parser::*;
 use crate::parser_traits::ToAny;
 use crate::symbol_table::SymbolTable;
-use std::mem::{uninitialized, MaybeUninit};
-
-// TODO: The FunctionDefinitionStatement lifetime really needs to not be static
 
 #[derive(Clone)]
 pub(crate) struct ReturnStatement {
@@ -47,6 +43,10 @@ impl Statement for ReturnStatement {
     fn get_statement_type(&self) -> String {
         String::from("ReturnStatement")
     }
+
+    fn has_errors(&self) -> bool {
+        !self.errors.is_empty()
+    }
 }
 impl ReturnStatement {
     pub fn new(expr: Box<dyn Expression>, function: String) -> ReturnStatement {
@@ -58,17 +58,6 @@ impl ReturnStatement {
             errors: vec![]
         }
     }
-    pub fn new_no_fn(expr: Box<dyn Expression>) -> ReturnStatement {
-        let return_type = expr.get_white_type();
-        ReturnStatement {
-            expr,
-            return_type,
-            function: String::new(),
-            errors: vec![]
-        }
-    }
-
-    pub fn set_fds(&mut self, func: String) {
-        self.function = func;
-    }
 }
+
+

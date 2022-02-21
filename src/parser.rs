@@ -42,13 +42,14 @@ mod forstatement;
 mod functioncallstatement;
 pub(crate) mod functiondefinitionstatement;
 use crate::parser::functiondefinitionstatement::FunctionDefinitionStatement;
+use crate::parser::returnstatement::ReturnStatement;
 use crate::parser_traits::{Expression, Statement};
 mod ifstatement;
 mod printstatement;
-mod returnstatement;
-mod syntaxerrorstatement;
+pub(crate) mod returnstatement;
+pub(crate) mod syntaxerrorstatement;
 use crate::parser::syntaxerrorstatement::SyntaxErrorStatement;
-mod variablestatement;
+pub(crate) mod variablestatement;
 use crate::parser::variablestatement::VariableStatement;
 
 // Parsing Errors
@@ -70,6 +71,7 @@ pub struct Parser {
     token_list: Vec<Token>, // gets the token list
     statement_list: Vec<Box<dyn Statement>>,
     curr_idx: usize,              // what token it's on
+    curr_fn_def: String,
     errors: Vec<ParserErrorType>, // and possible errors
 }
 #[allow(dead_code)]
@@ -84,6 +86,7 @@ impl Parser {
             statement_list: vec![],
             //expression: null(),
             curr_idx: 0,
+            curr_fn_def: String::new(),
             errors: vec![],
         }
     }
@@ -146,16 +149,24 @@ impl Parser {
         }
     }
 
-    fn require_one_of(&mut self, types: &Vec<&str>) -> isize {
+    fn require_a_type(&mut self) -> Type {
+        let types = vec!["string",
+                         "bool",
+                         "float",
+                         "int",
+                         "list<string>",
+                         "list<bool>",
+                         "list<float>",
+                         "list<int>",];
         let curr_tok = self.get_curr_tok().get_string_value();
         for i in 0..types.len() - 1 {
             if types[i] == curr_tok {
                 self.consume_token();
-                return i as isize;
+                return Type::new(types[i]);
             }
         }
         self.errors.push(ParserErrorType::BadVariableType);
-        -1
+        Type::Error
     }
 
     // -------------------------------------------------------------------------- //
@@ -166,12 +177,49 @@ impl Parser {
         if var_stmt.is_some() {
             return Box::new(var_stmt.unwrap());
         }
-
+        let fds = self.parse_function_definition_statement();
+        if fds.is_some() {
+            return Box::new(fds.unwrap());
+        }
+        let ret = self.parse_return_statement();
+        if ret.is_some() {
+            return Box::new(ret.unwrap());
+        }
         Box::new(SyntaxErrorStatement::new())
     }
 
     fn parse_function_definition_statement(&mut self) -> Option<FunctionDefinitionStatement> {
-        unimplemented!();
+        if self.match_and_consume(Function) {
+            let name = self.get_curr_tok().get_string_value();
+            let mut fds = FunctionDefinitionStatement::new(name.clone());
+            self.consume_token();
+            self.require_token(LeftParen);
+            while !self.match_and_consume(RightParen) {
+                let expr = self.parse_expression();
+                fds.add_arg(expr);
+                self.require_token(Colon);
+                let typ = self.require_a_type();
+                fds.add_arg_type(typ);
+                if !self.has_tokens() {
+                    self.errors.push(ParserErrorType::UnterminatedArgList);
+                    break;
+                }
+            }
+
+            if self.match_and_consume(Colon) {
+                fds.set_return_type(self.require_a_type());
+            }
+
+            self.require_token(LeftBrace);
+            self.curr_fn_def = name;
+            while !self.match_and_consume(RightBrace) {
+                let stmt = self.parse_statement();
+                fds.add_statement(stmt);
+            }
+            self.curr_fn_def = String::new();
+            return Option::Some(fds);
+        }
+        Option::None
     }
 
     fn parse_variable_statement(&mut self) -> Option<VariableStatement> {
@@ -181,26 +229,23 @@ impl Parser {
             self.require_token(Identifier);
             let mut var_stat = VariableStatement::new(name);
             if self.match_and_consume(Colon) {
-                let types = vec![
-                    "string",
-                    "bool",
-                    "float",
-                    "int",
-                    "list<string>",
-                    "list<bool>",
-                    "list<float>",
-                    "list<int>",
-                ];
-                let idx = self.require_one_of(&types);
-                if idx != -1 {
-                    var_stat.set_type(Type::new(types[idx as usize]));
-                }
+                var_stat.set_type(self.require_a_type());
             }
             self.require_token(Equal);
             var_stat.set_expr(self.parse_expression());
             var_stat.set_type(var_stat.get_expr().get_white_type());
             self.require_token(SemiColon);
             return Option::Some(var_stat);
+        }
+        Option::None
+    }
+
+    fn parse_return_statement(&mut self) -> Option<ReturnStatement> {
+        if self.match_token(Return) {
+            self.consume_token();
+            let rs = ReturnStatement::new(self.parse_expression(), self.curr_fn_def.clone());
+            self.require_token(SemiColon);
+            return Option::Some(rs);
         }
         Option::None
     }
@@ -677,4 +722,42 @@ mod test {
         let variable_statement = stmt.to_any().downcast_ref::<VariableStatement>().unwrap();
         assert!(variable_statement.has_errors());
     }
+
+    #[test]
+    fn test_parse_function_definition() {
+        let mut parser = init_parser("fn foo() {}".to_string());
+        let stmt = parser.parse_statement();
+        assert!(!parser.has_errors());
+        let fds = stmt.to_any().downcast_ref::<FunctionDefinitionStatement>().unwrap();
+        assert!(!fds.has_errors());
+    }
+
+    #[test]
+    fn test_parse_function_definition_with_args() {
+        let mut parser = init_parser("fn foo(x : int) {}".to_string());
+        let stmt = parser.parse_statement();
+        assert!(!parser.has_errors());
+        let fds = stmt.to_any().downcast_ref::<FunctionDefinitionStatement>().unwrap();
+        assert!(!fds.has_errors());
+    }
+    #[test]
+    fn test_parse_function_definition_with_stmts() {
+        let mut parser = init_parser("fn foo() : int { let x = 10; return x; }".to_string());
+        let stmt = parser.parse_statement();
+        assert!(!parser.has_errors());
+        let fds = stmt.to_any().downcast_ref::<FunctionDefinitionStatement>().unwrap();
+        assert!(!fds.has_errors());
+    }
+
+    #[test]
+    fn test_parse_function_definition_mismatched_return() {
+        let mut parser = init_parser("fn foo() : string { let x = 10; return x; }".to_string());
+        let mut stmt = parser.parse_statement();
+        stmt.validate(&mut SymbolTable::new());
+        assert!(!parser.has_errors());
+        let fds = stmt.to_any().downcast_ref::<FunctionDefinitionStatement>().unwrap();
+        assert!(fds.has_errors());
+    }
+
+
 }

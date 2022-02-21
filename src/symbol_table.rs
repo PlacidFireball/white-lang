@@ -70,7 +70,7 @@ impl SymbolTable {
     pub fn get_function(&self, name: String) -> Option<FunctionDefinitionStatement> {
         return match self.get_symbol(name) {
             Some(t) => {
-                if t.downcast_ref::<i32>().is_some() {
+                if t.downcast_ref::<FunctionDefinitionStatement>().is_some() {
                     Option::Some(
                         t.downcast_ref::<FunctionDefinitionStatement>()
                             .unwrap()

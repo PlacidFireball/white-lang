@@ -6,6 +6,7 @@ use crate::symbol_table::SymbolTable;
 use std::any::Any;
 use crate::parser::ParserErrorType::SymbolDefinitionError;
 
+#[derive(Clone)]
 pub(crate) struct VariableStatement {
     name: String,
     expr: Box<dyn Expression>,
@@ -37,7 +38,9 @@ impl Statement for VariableStatement {
         if st.has_symbol(self.name.clone()) {
             self.errors.push(SymbolDefinitionError);
         }
-        // type checking is done in parsing so I don't think it needs to be done here
+        if self.typ == Type::Error {
+            self.errors.push(ParserErrorType::UnexpectedToken);
+        }
     }
 
     fn get_expr(&self) -> &Box<dyn Expression> {
@@ -46,6 +49,10 @@ impl Statement for VariableStatement {
 
     fn get_statement_type(&self) -> String {
         todo!()
+    }
+
+    fn has_errors(&self) -> bool {
+        !self.errors.is_empty()
     }
 }
 

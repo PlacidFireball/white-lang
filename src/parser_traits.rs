@@ -1,14 +1,13 @@
 use std::any::Any;
+use crate::parser::whitetypes::Type;
+use crate::symbol_table::SymbolTable;
 use crate::parser::syntaxerrorexpression::SyntaxErrorExpression;
 use crate::parser::additiveexpression::AdditiveExpression;
 use crate::parser::booleanliteralexpression::BooleanLiteralExpression;
-use crate::parser::whitetypes::Type;
-use crate::symbol_table::SymbolTable;
 use crate::parser::comparisonexpression::ComparisonExpression;
 use crate::parser::equalityexpression::EqualityExpression;
 use crate::parser::factorexpression::FactorExpression;
 use crate::parser::floatliteralexpression::FloatLiteralExpression;
-use crate::parser::functioncallexpression::FunctionCallExpression;
 use crate::parser::identifierexpression::IdentifierExpression;
 use crate::parser::listliteralexpression::ListLiteralExpression;
 use crate::parser::nullliteralexpression::NullLiteralExpression;
@@ -16,6 +15,12 @@ use crate::parser::parenthesizedexpression::ParenthesizedExpression;
 use crate::parser::integerliteralexpression::IntegerLiteralExpression;
 use crate::parser::stringliteralexpression::StringLiteralExpression;
 use crate::parser::unaryexpression::UnaryExpression;
+use crate::parser::functioncallexpression::FunctionCallExpression;
+
+use crate::parser::functiondefinitionstatement::FunctionDefinitionStatement;
+use crate::parser::returnstatement::ReturnStatement;
+use crate::parser::variablestatement::VariableStatement;
+use crate::parser::syntaxerrorstatement::SyntaxErrorStatement;
 
 pub(crate) trait ToAny: 'static {
     fn to_any(&self) -> &dyn Any;
@@ -99,10 +104,24 @@ pub(crate) trait Statement: ToAny {
     fn validate(&mut self, st: &mut SymbolTable); // validate the statement via the symbol table
     fn get_expr(&self) -> &Box<dyn Expression>; // retrieve the expression if the statement has one
     fn get_statement_type(&self) -> String;
+    fn has_errors(&self) -> bool;
 }
 
 impl Clone for Box<dyn Statement> {
     fn clone(&self) -> Self {
-        panic!("Didn't cover statements exhaustively")
+        if self.to_any().downcast_ref::<FunctionDefinitionStatement>().is_some() {
+            let stmt = self.to_any().downcast_ref::<FunctionDefinitionStatement>().unwrap();
+            return Box::new(stmt.clone());
+        } else if self.to_any().downcast_ref::<ReturnStatement>().is_some() {
+            let stmt = self.to_any().downcast_ref::<ReturnStatement>().unwrap();
+            return Box::new(stmt.clone());
+        } else if self.to_any().downcast_ref::<VariableStatement>().is_some() {
+            let stmt = self.to_any().downcast_ref::<VariableStatement>().unwrap();
+            return Box::new(stmt.clone());
+        } else if self.to_any().downcast_ref::<SyntaxErrorStatement>().is_some() {
+            let stmt = self.to_any().downcast_ref::<SyntaxErrorStatement>().unwrap();
+            return Box::new(stmt.clone());
+        }
+        panic!("Didn't cover statements exhaustively");
     }
 }
