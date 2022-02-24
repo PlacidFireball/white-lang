@@ -51,6 +51,17 @@ impl Type {
             _ => Type::Error,
         }
     }
+    pub fn get_type_from_list(&self) -> Type {
+        use Type::*;
+        match self {
+            ListChar => Char,
+            ListString => String,
+            ListInteger => Integer,
+            ListFloat => Float,
+            ListBoolean => Boolean,
+            _ => Type::Error,
+        }
+    }
     pub fn is_assignable_from(&self, other: Type) -> bool {
         if other == Void {
             return false;

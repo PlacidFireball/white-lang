@@ -38,7 +38,8 @@ use crate::parser::unaryexpression::UnaryExpression;
 mod typeliteral;
 // statements
 mod assignmentstatement;
-mod forstatement;
+pub(crate) mod forstatement;
+use crate::parser::forstatement::ForStatement;
 mod functioncallstatement;
 pub(crate) mod functiondefinitionstatement;
 use crate::parser::functiondefinitionstatement::FunctionDefinitionStatement;
@@ -62,6 +63,7 @@ enum ParserErrorType {
     BadOperator,
     MismatchedTypes,
     SymbolDefinitionError,
+    DuplicateName,
     BadReturnType,
     BadVariableType,
     UnknownName,
@@ -212,6 +214,7 @@ impl Parser {
     fn parse_statement(&mut self) -> Box<dyn Statement> {
         let var_stmt = self.parse_variable_statement();
         if var_stmt.is_some() {
+
             return Box::new(var_stmt.unwrap());
         }
         let fds = self.parse_function_definition_statement();
@@ -221,6 +224,10 @@ impl Parser {
         let ret = self.parse_return_statement();
         if ret.is_some() {
             return Box::new(ret.unwrap());
+        }
+        let for_stmt = self.parse_for_statement();
+        if for_stmt.is_some() {
+            return Box::new(for_stmt.unwrap());
         }
         Box::new(SyntaxErrorStatement::new())
     }
@@ -283,6 +290,23 @@ impl Parser {
             let rs = ReturnStatement::new(self.parse_expression(), self.curr_fn_def.clone());
             self.require_token(SemiColon);
             return Option::Some(rs);
+        }
+        Option::None
+    }
+
+    fn parse_for_statement(&mut self) -> Option<ForStatement> {
+        if self.match_and_consume(For) {
+            let mut fs = ForStatement::new();
+            self.require_token(LeftParen);
+            fs.set_iter_var(self.parse_identifier_expression());
+            self.require_token(In);
+            fs.set_iter(self.parse_list_literal_expression());
+            self.require_token(RightParen);
+            self.require_token(LeftBrace);
+            while !self.match_and_consume(RightBrace) {
+                fs.add_statement(self.parse_statement());
+            }
+            return Option::Some(fs);
         }
         Option::None
     }
@@ -821,5 +845,18 @@ mod test {
             .downcast_ref::<FunctionDefinitionStatement>()
             .unwrap();
         assert!(!fds.has_errors());
+    }
+
+    #[test]
+    fn test_for_statement_parses() {
+        let mut parser = init_parser("for (x in [1, 2, 3]) { let y = x; }".to_string());
+        let mut stmt = parser.parse_statement();
+        assert!(!parser.has_errors());
+        stmt.validate(&mut SymbolTable::new());
+        let for_stmt = stmt
+            .to_any()
+            .downcast_ref::<ForStatement>()
+            .unwrap();
+        assert!(!for_stmt.has_errors());
     }
 }
