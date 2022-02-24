@@ -1,6 +1,3 @@
-use crate::parser::whitetypes::Type::{
-    ListBoolean, ListChar, ListFloat, ListInteger, ListString, Null, Void,
-};
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub(crate) enum Type {
@@ -63,9 +60,9 @@ impl Type {
         }
     }
     pub fn is_assignable_from(&self, other: Type) -> bool {
-        if other == Void {
+        if other == Type::Void {
             return false;
-        } else if other == Null {
+        } else if other == Type::Null {
             return true;
         } else if *self == other {
             return true;

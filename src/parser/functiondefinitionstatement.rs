@@ -2,9 +2,7 @@ use crate::parser::returnstatement::ReturnStatement;
 use crate::parser::*;
 use crate::parser_traits::ToAny;
 use crate::symbol_table::SymbolTable;
-use std::borrow::BorrowMut;
 
-#[feature(option_get_or_insert_default)]
 #[derive(Clone)]
 pub(crate) struct FunctionDefinitionStatement {
     name: String,

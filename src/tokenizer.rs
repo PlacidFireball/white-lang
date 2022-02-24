@@ -191,10 +191,7 @@ impl Tokenizer {
             line_offset: 0,
         }
     }
-    // for the parser, to let us know when we are done with parsing
-    fn has_tokens(&self) -> bool {
-        !self.token_list.is_empty()
-    }
+
     // returns a reference to the token list
     pub fn get_token_list(&self) -> &Vec<Token> {
         &self.token_list
@@ -242,14 +239,14 @@ impl Tokenizer {
         chr
     }
     // returns the character at src[position] without consuming it
-    fn peek(&mut self) -> char {
+    fn peek(&self) -> char {
         if self.tokenization_end() {
             return '\0';
         }
         self.char_vec[self.position]
     }
     // for cases when you want to look at the character at src[position + 1]
-    fn peek_next(&mut self) -> char {
+    fn peek_next(&self) -> char {
         if self.tokenization_end() {
             return '\0';
         }
@@ -416,11 +413,17 @@ impl Tokenizer {
                         // check for the end
                         break;
                     }
-                    if self.peek() == '.' && self.peek_next().is_numeric() {
-                        // for dealing with decimals, not sure if this is correct: ex. 9.
-                        self.consume_char();
-                        float_flag = true;
+                    if self.peek() == '.' {
+                        if self.peek_next().is_numeric() {
+                            float_flag = true;
+                            self.consume_char();
+                        } else {
+                            // TODO: make test_tokenize_bad_float pass
+                            self.src = self.src.replacen(".", "", 1);
+
+                        }
                     }
+
                 }
                 let substr: String = self.src.as_mut_str()[start..self.position].to_string(); // retrieve the substring
                 if float_flag {

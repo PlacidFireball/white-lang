@@ -35,7 +35,6 @@ pub(crate) mod syntaxerrorexpression;
 use crate::parser::syntaxerrorexpression::SyntaxErrorExpression;
 pub(crate) mod unaryexpression;
 use crate::parser::unaryexpression::UnaryExpression;
-mod typeliteral;
 // statements
 mod assignmentstatement;
 pub(crate) mod forstatement;

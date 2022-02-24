@@ -1,5 +1,4 @@
 use std::any::Any;
-use std::borrow::BorrowMut;
 use crate::parser::identifierexpression::IdentifierExpression;
 use crate::parser::listliteralexpression::ListLiteralExpression;
 use crate::parser::ParserErrorType;
@@ -14,7 +13,6 @@ pub(crate) struct ForStatement {
     statements: Vec<Box<dyn Statement>>,
     iter_var: Box<dyn Expression>,  // list literal expression
     iter: Box<dyn Expression>, // identifier expression
-    iter_type: Type
 }
 
 impl ToAny for ForStatement {
@@ -81,8 +79,7 @@ impl ForStatement {
             errors: vec![],
             statements: vec![],
             iter_var: Box::new(SyntaxErrorExpression::new()),
-            iter: Box::new(SyntaxErrorExpression::new()),
-            iter_type: Type::Initialized
+            iter: Box::new(SyntaxErrorExpression::new())
         }
     }
 
@@ -102,8 +99,5 @@ impl ForStatement {
         } else {
             self.iter = iter.clone();
         }
-    }
-    pub fn set_iter_type(&mut self, typ: Type) {
-        self.iter_type = typ;
     }
 }
