@@ -1,18 +1,18 @@
-use std::any::Any;
 use crate::parser::identifierexpression::IdentifierExpression;
 use crate::parser::listliteralexpression::ListLiteralExpression;
-use crate::parser::ParserErrorType;
 use crate::parser::syntaxerrorexpression::SyntaxErrorExpression;
+use crate::parser::whitetypes::Type;
+use crate::parser::ParserErrorType;
 use crate::parser_traits::{Expression, Statement, ToAny};
 use crate::symbol_table::SymbolTable;
-use crate::parser::whitetypes::Type;
+use std::any::Any;
 
 #[derive(Clone)]
 pub(crate) struct ForStatement {
     errors: Vec<ParserErrorType>,
     statements: Vec<Box<dyn Statement>>,
-    iter_var: Box<dyn Expression>,  // list literal expression
-    iter: Box<dyn Expression>, // identifier expression
+    iter_var: Box<dyn Expression>, // list literal expression
+    iter: Box<dyn Expression>,     // identifier expression
 }
 
 impl ToAny for ForStatement {
@@ -36,12 +36,15 @@ impl Statement for ForStatement {
 
     fn validate(&mut self, st: &mut SymbolTable) {
         st.push_scope();
-        if let Some(id_expr) = self.iter_var.to_any().downcast_ref::<IdentifierExpression>() {
+        if let Some(id_expr) = self
+            .iter_var
+            .to_any()
+            .downcast_ref::<IdentifierExpression>()
+        {
             let name = id_expr.debug();
             if st.has_symbol(name.clone()) {
                 self.errors.push(ParserErrorType::DuplicateName);
-            }
-            else if let Some(lle) = self.iter.to_any().downcast_ref::<ListLiteralExpression>() {
+            } else if let Some(lle) = self.iter.to_any().downcast_ref::<ListLiteralExpression>() {
                 let mut lle_cln = lle.clone();
                 lle_cln.validate(st);
                 let typ = lle_cln.get_white_type().get_type_from_list();
@@ -79,7 +82,7 @@ impl ForStatement {
             errors: vec![],
             statements: vec![],
             iter_var: Box::new(SyntaxErrorExpression::new()),
-            iter: Box::new(SyntaxErrorExpression::new())
+            iter: Box::new(SyntaxErrorExpression::new()),
         }
     }
 
@@ -87,14 +90,22 @@ impl ForStatement {
         self.statements.push(stmt);
     }
     pub fn set_iter_var(&mut self, iter_var: Box<dyn Expression>) {
-        if iter_var.to_any().downcast_ref::<IdentifierExpression>().is_none() {
+        if iter_var
+            .to_any()
+            .downcast_ref::<IdentifierExpression>()
+            .is_none()
+        {
             self.errors.push(ParserErrorType::UnexpectedToken);
         } else {
             self.iter_var = iter_var.clone();
         }
     }
     pub fn set_iter(&mut self, iter: Box<dyn Expression>) {
-        if iter.to_any().downcast_ref::<ListLiteralExpression>().is_none() {
+        if iter
+            .to_any()
+            .downcast_ref::<ListLiteralExpression>()
+            .is_none()
+        {
             self.errors.push(ParserErrorType::UnexpectedToken);
         } else {
             self.iter = iter.clone();

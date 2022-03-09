@@ -41,6 +41,9 @@ impl Statement for VariableStatement {
         if self.typ == Type::Error {
             self.errors.push(ParserErrorType::UnexpectedToken);
         }
+        if !self.has_errors() {
+            st.register_symbol(self.name.clone(), self.typ);
+        }
     }
 
     fn get_expr(&self) -> &Box<dyn Expression> {

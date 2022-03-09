@@ -36,7 +36,6 @@ use crate::parser::syntaxerrorexpression::SyntaxErrorExpression;
 pub(crate) mod unaryexpression;
 use crate::parser::unaryexpression::UnaryExpression;
 // statements
-mod assignmentstatement;
 pub(crate) mod forstatement;
 use crate::parser::forstatement::ForStatement;
 mod functioncallstatement;
@@ -44,8 +43,10 @@ pub(crate) mod functiondefinitionstatement;
 use crate::parser::functiondefinitionstatement::FunctionDefinitionStatement;
 use crate::parser::returnstatement::ReturnStatement;
 use crate::parser_traits::{Expression, Statement};
+pub(crate) mod assignmentstatement;
 mod ifstatement;
 mod printstatement;
+use crate::parser::assignmentstatement::AssignmentStatement;
 pub(crate) mod returnstatement;
 pub(crate) mod syntaxerrorstatement;
 use crate::parser::syntaxerrorstatement::SyntaxErrorStatement;
@@ -213,7 +214,6 @@ impl Parser {
     fn parse_statement(&mut self) -> Box<dyn Statement> {
         let var_stmt = self.parse_variable_statement();
         if var_stmt.is_some() {
-
             return Box::new(var_stmt.unwrap());
         }
         let fds = self.parse_function_definition_statement();
@@ -227,6 +227,10 @@ impl Parser {
         let for_stmt = self.parse_for_statement();
         if for_stmt.is_some() {
             return Box::new(for_stmt.unwrap());
+        }
+        let assign_stmt = self.parse_assignment_statement();
+        if assign_stmt.is_some() {
+            return Box::new(assign_stmt.unwrap());
         }
         Box::new(SyntaxErrorStatement::new())
     }
@@ -306,6 +310,18 @@ impl Parser {
                 fs.add_statement(self.parse_statement());
             }
             return Option::Some(fs);
+        }
+        Option::None
+    }
+
+    fn parse_assignment_statement(&mut self) -> Option<AssignmentStatement> {
+        if self.match_token(Identifier) && self.peek_next_token(Equal) {
+            let mut assignmentstatement = AssignmentStatement::new();
+            assignmentstatement.set_variable(self.parse_expression());
+            self.require_token(Equal);
+            assignmentstatement.set_expr(self.parse_expression());
+            self.require_token(SemiColon);
+            return Option::Some(assignmentstatement);
         }
         Option::None
     }
@@ -852,10 +868,20 @@ mod test {
         let mut stmt = parser.parse_statement();
         assert!(!parser.has_errors());
         stmt.validate(&mut SymbolTable::new());
-        let for_stmt = stmt
-            .to_any()
-            .downcast_ref::<ForStatement>()
-            .unwrap();
+        let for_stmt = stmt.to_any().downcast_ref::<ForStatement>().unwrap();
         assert!(!for_stmt.has_errors());
+    }
+
+    #[test]
+    fn test_assign_statement_parses() {
+        let mut parser = init_parser("let x : int = 10; x = 5;".to_string());
+        let mut st = SymbolTable::new();
+        let mut var_stmt = parser.parse_statement();
+        var_stmt.validate(&mut st);
+        let mut stmt = parser.parse_statement();
+        assert!(!parser.has_errors());
+        stmt.validate(&mut st);
+        let a_stmt = stmt.to_any().downcast_ref::<AssignmentStatement>().unwrap();
+        assert!(!a_stmt.has_errors());
     }
 }

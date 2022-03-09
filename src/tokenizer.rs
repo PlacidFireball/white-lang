@@ -420,10 +420,8 @@ impl Tokenizer {
                         } else {
                             // TODO: make test_tokenize_bad_float pass
                             self.src = self.src.replacen(".", "", 1);
-
                         }
                     }
-
                 }
                 let substr: String = self.src.as_mut_str()[start..self.position].to_string(); // retrieve the substring
                 if float_flag {

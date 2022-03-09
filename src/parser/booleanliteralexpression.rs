@@ -27,9 +27,7 @@ impl Expression for BooleanLiteralExpression {
         todo!()
     }
 
-    fn validate(&mut self, st: &SymbolTable) {
-        
-    }
+    fn validate(&mut self, st: &SymbolTable) {}
 
     fn debug(&self) -> String {
         String::from(self.boolean.to_string())

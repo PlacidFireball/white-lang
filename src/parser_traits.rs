@@ -1,9 +1,11 @@
 use crate::parser::additiveexpression::AdditiveExpression;
+use crate::parser::assignmentstatement::AssignmentStatement;
 use crate::parser::booleanliteralexpression::BooleanLiteralExpression;
 use crate::parser::comparisonexpression::ComparisonExpression;
 use crate::parser::equalityexpression::EqualityExpression;
 use crate::parser::factorexpression::FactorExpression;
 use crate::parser::floatliteralexpression::FloatLiteralExpression;
+use crate::parser::forstatement::ForStatement;
 use crate::parser::functioncallexpression::FunctionCallExpression;
 use crate::parser::identifierexpression::IdentifierExpression;
 use crate::parser::integerliteralexpression::IntegerLiteralExpression;
@@ -46,127 +48,35 @@ pub(crate) trait Expression: ToAny {
 // and then cloning the concrete class and returning a box of it
 impl Clone for Box<dyn Expression> {
     fn clone(&self) -> Self {
-        if self.to_any().downcast_ref::<AdditiveExpression>().is_some() {
-            let expr = self.to_any().downcast_ref::<AdditiveExpression>().unwrap();
+        if let Some(expr) = self.to_any().downcast_ref::<AdditiveExpression>() {
             return Box::new(expr.clone());
-        } else if self
-            .to_any()
-            .downcast_ref::<BooleanLiteralExpression>()
-            .is_some()
-        {
-            let expr = self
-                .to_any()
-                .downcast_ref::<BooleanLiteralExpression>()
-                .unwrap();
+        } else if let Some(expr) = self.to_any().downcast_ref::<BooleanLiteralExpression>() {
             return Box::new(expr.clone());
-        } else if self
-            .to_any()
-            .downcast_ref::<ComparisonExpression>()
-            .is_some()
-        {
-            let expr = self
-                .to_any()
-                .downcast_ref::<ComparisonExpression>()
-                .unwrap();
+        } else if let Some(expr) = self.to_any().downcast_ref::<ComparisonExpression>() {
             return Box::new(expr.clone());
-        } else if self.to_any().downcast_ref::<EqualityExpression>().is_some() {
-            let expr = self.to_any().downcast_ref::<EqualityExpression>().unwrap();
+        } else if let Some(expr) = self.to_any().downcast_ref::<EqualityExpression>() {
             return Box::new(expr.clone());
-        } else if self.to_any().downcast_ref::<FactorExpression>().is_some() {
-            let expr = self.to_any().downcast_ref::<FactorExpression>().unwrap();
+        } else if let Some(expr) = self.to_any().downcast_ref::<FactorExpression>() {
             return Box::new(expr.clone());
-        } else if self
-            .to_any()
-            .downcast_ref::<FloatLiteralExpression>()
-            .is_some()
-        {
-            let expr = self
-                .to_any()
-                .downcast_ref::<FloatLiteralExpression>()
-                .unwrap();
+        } else if let Some(expr) = self.to_any().downcast_ref::<FloatLiteralExpression>() {
             return Box::new(expr.clone());
-        } else if self
-            .to_any()
-            .downcast_ref::<FunctionCallExpression>()
-            .is_some()
-        {
-            let expr = self
-                .to_any()
-                .downcast_ref::<FunctionCallExpression>()
-                .unwrap();
+        } else if let Some(expr) = self.to_any().downcast_ref::<FunctionCallExpression>() {
             return Box::new(expr.clone());
-        } else if self
-            .to_any()
-            .downcast_ref::<IdentifierExpression>()
-            .is_some()
-        {
-            let expr = self
-                .to_any()
-                .downcast_ref::<IdentifierExpression>()
-                .unwrap();
+        } else if let Some(expr) = self.to_any().downcast_ref::<IdentifierExpression>() {
             return Box::new(expr.clone());
-        } else if self
-            .to_any()
-            .downcast_ref::<NullLiteralExpression>()
-            .is_some()
-        {
-            let expr = self
-                .to_any()
-                .downcast_ref::<NullLiteralExpression>()
-                .unwrap();
+        } else if let Some(expr) = self.to_any().downcast_ref::<NullLiteralExpression>() {
             return Box::new(expr.clone());
-        } else if self
-            .to_any()
-            .downcast_ref::<ParenthesizedExpression>()
-            .is_some()
-        {
-            let expr = self
-                .to_any()
-                .downcast_ref::<ParenthesizedExpression>()
-                .unwrap();
+        } else if let Some(expr) = self.to_any().downcast_ref::<ParenthesizedExpression>() {
             return Box::new(expr.clone());
-        } else if self
-            .to_any()
-            .downcast_ref::<ListLiteralExpression>()
-            .is_some()
-        {
-            let expr = self
-                .to_any()
-                .downcast_ref::<ListLiteralExpression>()
-                .unwrap();
+        } else if let Some(expr) = self.to_any().downcast_ref::<ListLiteralExpression>() {
             return Box::new(expr.clone());
-        } else if self
-            .to_any()
-            .downcast_ref::<IntegerLiteralExpression>()
-            .is_some()
-        {
-            let expr = self
-                .to_any()
-                .downcast_ref::<IntegerLiteralExpression>()
-                .unwrap();
+        } else if let Some(expr) = self.to_any().downcast_ref::<IntegerLiteralExpression>() {
             return Box::new(expr.clone());
-        } else if self
-            .to_any()
-            .downcast_ref::<StringLiteralExpression>()
-            .is_some()
-        {
-            let expr = self
-                .to_any()
-                .downcast_ref::<StringLiteralExpression>()
-                .unwrap();
+        } else if let Some(expr) = self.to_any().downcast_ref::<StringLiteralExpression>() {
             return Box::new(expr.clone());
-        } else if self
-            .to_any()
-            .downcast_ref::<SyntaxErrorExpression>()
-            .is_some()
-        {
-            let expr = self
-                .to_any()
-                .downcast_ref::<SyntaxErrorExpression>()
-                .unwrap();
+        } else if let Some(expr) = self.to_any().downcast_ref::<SyntaxErrorExpression>() {
             return Box::new(expr.clone());
-        } else if self.to_any().downcast_ref::<UnaryExpression>().is_some() {
-            let expr = self.to_any().downcast_ref::<UnaryExpression>().unwrap();
+        } else if let Some(expr) = self.to_any().downcast_ref::<UnaryExpression>() {
             return Box::new(expr.clone());
         }
         panic!("Didn't cover expressions exhaustively")
@@ -186,31 +96,17 @@ pub(crate) trait Statement: ToAny {
 
 impl Clone for Box<dyn Statement> {
     fn clone(&self) -> Self {
-        if self
-            .to_any()
-            .downcast_ref::<FunctionDefinitionStatement>()
-            .is_some()
-        {
-            let stmt = self
-                .to_any()
-                .downcast_ref::<FunctionDefinitionStatement>()
-                .unwrap();
+        if let Some(stmt) = self.to_any().downcast_ref::<FunctionDefinitionStatement>() {
             return Box::new(stmt.clone());
-        } else if self.to_any().downcast_ref::<ReturnStatement>().is_some() {
-            let stmt = self.to_any().downcast_ref::<ReturnStatement>().unwrap();
+        } else if let Some(stmt) = self.to_any().downcast_ref::<ReturnStatement>() {
             return Box::new(stmt.clone());
-        } else if self.to_any().downcast_ref::<VariableStatement>().is_some() {
-            let stmt = self.to_any().downcast_ref::<VariableStatement>().unwrap();
+        } else if let Some(stmt) = self.to_any().downcast_ref::<VariableStatement>() {
             return Box::new(stmt.clone());
-        } else if self
-            .to_any()
-            .downcast_ref::<SyntaxErrorStatement>()
-            .is_some()
-        {
-            let stmt = self
-                .to_any()
-                .downcast_ref::<SyntaxErrorStatement>()
-                .unwrap();
+        } else if let Some(stmt) = self.to_any().downcast_ref::<SyntaxErrorStatement>() {
+            return Box::new(stmt.clone());
+        } else if let Some(stmt) = self.to_any().downcast_ref::<AssignmentStatement>() {
+            return Box::new(stmt.clone());
+        } else if let Some(stmt) = self.to_any().downcast_ref::<ForStatement>() {
             return Box::new(stmt.clone());
         }
         panic!("Didn't cover statements exhaustively");
