@@ -2,6 +2,7 @@ use crate::parser::whitetypes::*;
 use crate::tokenizer::TokenType::*;
 use crate::tokenizer::*;
 use std::any::Any;
+use std::fmt::Alignment::Right;
 
 // expressions
 pub(crate) mod booleanliteralexpression;
@@ -38,14 +39,15 @@ use crate::parser::unaryexpression::UnaryExpression;
 // statements
 pub(crate) mod forstatement;
 use crate::parser::forstatement::ForStatement;
-mod functioncallstatement;
+pub(crate) mod functioncallstatement;
 pub(crate) mod functiondefinitionstatement;
 use crate::parser::functiondefinitionstatement::FunctionDefinitionStatement;
 use crate::parser::returnstatement::ReturnStatement;
 use crate::parser_traits::{Expression, Statement};
 pub(crate) mod assignmentstatement;
 mod ifstatement;
-mod printstatement;
+pub(crate) mod printstatement;
+use crate::parser::printstatement::PrintStatement;
 use crate::parser::assignmentstatement::AssignmentStatement;
 pub(crate) mod returnstatement;
 pub(crate) mod syntaxerrorstatement;
@@ -56,7 +58,7 @@ use crate::symbol_table::SymbolTable;
 
 // Parsing Errors
 #[derive(Clone, Copy, Debug, PartialOrd, PartialEq)]
-enum ParserErrorType {
+pub(crate) enum ParserErrorType {
     UnexpectedToken,
     UnterminatedArgList,
     UnterminatedList,
@@ -232,6 +234,10 @@ impl Parser {
         if assign_stmt.is_some() {
             return Box::new(assign_stmt.unwrap());
         }
+        let print_stmt = self.parse_print_statement();
+        if print_stmt.is_some() {
+            return Box::new(print_stmt.unwrap());
+        }
         Box::new(SyntaxErrorStatement::new())
     }
 
@@ -322,6 +328,19 @@ impl Parser {
             assignmentstatement.set_expr(self.parse_expression());
             self.require_token(SemiColon);
             return Option::Some(assignmentstatement);
+        }
+        Option::None
+    }
+
+    fn parse_print_statement(&mut self) -> Option<PrintStatement> {
+        if self.match_token(Print) {
+            self.require_token(Print);
+            self.require_token(LeftParen);
+            let expr = self.parse_expression();
+            let print_stmt = PrintStatement::new(expr);
+            self.require_token(RightParen);
+            self.require_token(SemiColon);
+            return Option::Some(print_stmt);
         }
         Option::None
     }
@@ -537,6 +556,9 @@ impl Parser {
     }
 }
 
+///
+/// WhiteLang Parser Tests
+///
 #[cfg(test)]
 mod test {
     use super::*;
@@ -549,6 +571,7 @@ mod test {
     }
 
     #[test]
+    /// Make sure that token consuming is working properly
     fn test_match_and_consume() {
         let mut parser = init_parser(String::from("1"));
         assert_eq!(parser.curr_idx, 0);
@@ -557,6 +580,7 @@ mod test {
     }
 
     #[test]
+    /// Assert that a string is not an integer
     fn test_require() {
         let mut parser = init_parser("\"\"".to_string());
         parser.require_token(Int);
@@ -564,6 +588,7 @@ mod test {
     }
 
     #[test]
+    /// Test parsing an integer literal
     fn test_parse_integer_expression() {
         let mut parser = init_parser("1".to_string());
         let expr = parser.parse_expression();
@@ -574,6 +599,7 @@ mod test {
     }
 
     #[test]
+    /// Test parsing a string literal
     fn test_parse_string_expression() {
         let mut parser = init_parser("\"Hello World\"".to_string());
         let expr = parser.parse_expression();
@@ -584,6 +610,7 @@ mod test {
     }
 
     #[test]
+    /// Test parsing a float literal
     fn test_parse_float_expression() {
         let mut parser = init_parser("1.1".to_string());
         let expr = parser.parse_expression();
@@ -595,6 +622,7 @@ mod test {
     }
 
     #[test]
+    /// Test parsing a null literal expression
     fn test_null_literal_expression() {
         let mut parser = init_parser("null".to_string());
         let expr = parser.parse_expression();
@@ -605,6 +633,7 @@ mod test {
     }
 
     #[test]
+    /// Test parsing a boolean literal expression
     fn test_boolean_literal_expression() {
         let mut parser = init_parser("true false".to_string());
         let mut expr = parser.parse_expression();
@@ -622,6 +651,7 @@ mod test {
     }
 
     #[test]
+    /// test parsing a function call expression
     fn test_function_call_expression() {
         let mut parser = init_parser("x()".to_string());
         let expr = parser.parse_expression();
@@ -633,6 +663,7 @@ mod test {
     }
 
     #[test]
+    /// test parsing a function call expression, this time with args
     fn test_function_call_args_expression() {
         let mut parser = init_parser("x(1, 2)".to_string());
         let expr = parser.parse_expression();
@@ -644,6 +675,7 @@ mod test {
     }
 
     #[test]
+    /// test for errors when the function call doesn't have a closed paren
     fn test_fn_unterminated_args() {
         let mut parser = init_parser("x(".to_string());
         let expr = parser.parse_expression();
@@ -655,6 +687,7 @@ mod test {
     }
 
     #[test]
+    /// test parsing a comparison expression
     fn test_parse_comparison_expression() {
         let mut parser = init_parser("2 > 1".to_string());
         let expr = parser.parse_expression();
@@ -666,6 +699,7 @@ mod test {
     }
 
     #[test]
+    /// test parsing an additive expression
     fn test_parse_additive_expression() {
         let mut parser = init_parser("1 + 1 1 - 1".to_string());
         let mut expr = parser.parse_expression();
@@ -677,6 +711,7 @@ mod test {
     }
 
     #[test]
+    /// test parsing associativity of additive expressions
     fn additive_expressions_are_associative() {
         let mut parser = init_parser("1 + 1 - 1".to_string());
         let expr = parser.parse_expression();
@@ -694,6 +729,7 @@ mod test {
     }
 
     #[test]
+    /// test parsing a factor expression
     fn test_parse_factor_expression() {
         let mut parser = init_parser("1 * 1".to_string());
         let expr = parser.parse_expression();
@@ -702,6 +738,7 @@ mod test {
     }
 
     #[test]
+    /// test parsing equality expressions
     fn test_parse_equality_expression() {
         let mut parser = init_parser("1 == 1".to_string());
         let expr = parser.parse_expression();
@@ -710,6 +747,7 @@ mod test {
     }
 
     #[test]
+    /// test parsing list literal expressions
     fn test_parse_list_expression() {
         let mut parser = init_parser("[1, 2, 3, 4]".to_string());
         let expr = parser.parse_expression();
@@ -721,6 +759,7 @@ mod test {
     }
 
     #[test]
+    /// test parsing identifiers
     fn test_parse_identifier_expression() {
         let mut parser = init_parser("x".to_string());
         let expr = parser.parse_expression();
@@ -732,6 +771,7 @@ mod test {
     }
 
     #[test]
+    /// test parsing parenthesized expressions
     fn test_parse_parenthesized_expression() {
         let mut parser = init_parser("(1+1)".to_string());
         let expr = parser.parse_expression();
@@ -752,6 +792,27 @@ mod test {
     }
 
     #[test]
+    /// beefy test for parsing unary expressions
+    fn test_unary_expressions() {
+        let mut parser = init_parser("not not true".to_string()); // not not true is valid WhiteLang :)
+        let mut expr = parser.parse_expression();
+        assert!(expr.to_any().downcast_ref::<UnaryExpression>().is_some());
+        parser = init_parser("-(-1)".to_string());
+        expr = parser.parse_expression();
+        assert!(expr.to_any().downcast_ref::<UnaryExpression>().is_some());
+        // TODO: potentially make not do bitwise negation instead of throwing an error
+        parser = init_parser("not 1".to_string()); // not 1 doesn't make any sense because an integer is not a boolean
+        expr = parser.parse_expression();
+        assert!(expr.has_errors());
+        parser = init_parser("-true".to_string());
+        expr = parser.parse_expression();
+        assert!(expr.has_errors());
+
+    }
+
+
+    #[test]
+    /// test retrieving values from SymbolTable
     fn test_symbol_table() {
         let mut st: SymbolTable = SymbolTable::new();
         st.register_symbol(String::from("x"), Type::Integer);
@@ -883,5 +944,15 @@ mod test {
         stmt.validate(&mut st);
         let a_stmt = stmt.to_any().downcast_ref::<AssignmentStatement>().unwrap();
         assert!(!a_stmt.has_errors());
+    }
+
+    #[test]
+    fn test_print_statement_parse() {
+        let mut parser = init_parser("print(1);".to_string());
+        let mut st = SymbolTable::new();
+        let mut print_stmt = parser.parse_statement();
+        print_stmt.validate(&mut st);
+        assert!(!print_stmt.has_errors());
+
     }
 }

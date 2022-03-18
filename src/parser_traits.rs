@@ -20,9 +20,11 @@ use crate::symbol_table::SymbolTable;
 use std::any::Any;
 
 use crate::parser::functiondefinitionstatement::FunctionDefinitionStatement;
+use crate::parser::printstatement::PrintStatement;
 use crate::parser::returnstatement::ReturnStatement;
 use crate::parser::syntaxerrorstatement::SyntaxErrorStatement;
 use crate::parser::variablestatement::VariableStatement;
+use crate::parser::functioncallstatement::FunctionCallStatement;
 
 pub(crate) trait ToAny: 'static {
     fn to_any(&self) -> &dyn Any;
@@ -34,14 +36,14 @@ pub(crate) fn default_expr() -> Box<dyn Expression> {
 
 #[allow(dead_code)]
 pub(crate) trait Expression: ToAny {
-    fn evaluate(&self) -> Box<dyn Any>; // evaluate the expression
-    fn compile(&self) -> String; // compile the expression to nasm
-    fn transpile(&self) -> String; // transpile the expression to javascript
-    fn validate(&mut self, st: &SymbolTable); // validate the expression via the symbol table
-    fn debug(&self) -> String; // for retrieving information about the expression
-    fn get_white_type(&self) -> Type; // getting the type of the expression
-    fn has_errors(&self) -> bool; // check if the expression has errors
-    fn get_expr_type(&self) -> String; // get the rust type of the expression
+    fn evaluate(&self) -> Box<dyn Any>;         // evaluate the expression
+    fn compile(&self) -> String;                // compile the expression to nasm
+    fn transpile(&self) -> String;              // transpile the expression to javascript
+    fn validate(&mut self, st: &SymbolTable);   // validate the expression via the symbol table
+    fn debug(&self) -> String;                  // for retrieving information about the expression
+    fn get_white_type(&self) -> Type;           // getting the type of the expression
+    fn has_errors(&self) -> bool;               // check if the expression has errors
+    fn get_expr_type(&self) -> String;          // get the rust type of the expression
 }
 
 // using to any to downcast the dyn Expression to the concrete class
@@ -85,13 +87,13 @@ impl Clone for Box<dyn Expression> {
 
 #[allow(dead_code)]
 pub(crate) trait Statement: ToAny {
-    fn execute(&self) -> String; // execute the statement
-    fn compile(&self) -> String; // compile the statement to nasm
-    fn transpile(&self) -> String; // transpile the statement to Javascript
-    fn validate(&mut self, st: &mut SymbolTable); // validate the statement via the symbol table
-    fn get_expr(&self) -> &Box<dyn Expression>; // retrieve the expression if the statement has one
-    fn get_statement_type(&self) -> String;
-    fn has_errors(&self) -> bool;
+    fn execute(&self) -> String;                        // execute the statement
+    fn compile(&self) -> String;                        // compile the statement to nasm
+    fn transpile(&self) -> String;                      // transpile the statement to Javascript
+    fn validate(&mut self, st: &mut SymbolTable);       // validate the statement via the symbol table
+    fn get_expr(&self) -> &Box<dyn Expression>;         // retrieve the expression if the statement has one
+    fn get_statement_type(&self) -> String;             // debug info of the class
+    fn has_errors(&self) -> bool;                       // tells us if the statement has errors
 }
 
 impl Clone for Box<dyn Statement> {
@@ -108,7 +110,11 @@ impl Clone for Box<dyn Statement> {
             return Box::new(stmt.clone());
         } else if let Some(stmt) = self.to_any().downcast_ref::<ForStatement>() {
             return Box::new(stmt.clone());
-        }
+        } else if let Some(stmt) = self.to_any().downcast_ref::<PrintStatement>() {
+            return Box::new(stmt.clone());
+        } /*else if let Some(stmt) = self.to_any().downcast_ref::<FunctionCallStatement>() {
+            return Box::new(stmt.clone());
+        }*/
         panic!("Didn't cover statements exhaustively");
     }
 }
