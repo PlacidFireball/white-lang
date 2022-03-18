@@ -49,6 +49,8 @@ mod ifstatement;
 pub(crate) mod printstatement;
 use crate::parser::printstatement::PrintStatement;
 use crate::parser::assignmentstatement::AssignmentStatement;
+use crate::parser::ifstatement::IfStatement;
+
 pub(crate) mod returnstatement;
 pub(crate) mod syntaxerrorstatement;
 use crate::parser::syntaxerrorstatement::SyntaxErrorStatement;
@@ -238,6 +240,10 @@ impl Parser {
         if print_stmt.is_some() {
             return Box::new(print_stmt.unwrap());
         }
+        let if_stmt = self.parse_if_statement();
+        if if_stmt.is_some() {
+            return Box::new(if_stmt.unwrap());
+        }
         Box::new(SyntaxErrorStatement::new())
     }
 
@@ -341,6 +347,39 @@ impl Parser {
             self.require_token(RightParen);
             self.require_token(SemiColon);
             return Option::Some(print_stmt);
+        }
+        Option::None
+    }
+
+    fn parse_if_statement(&mut self) -> Option<IfStatement> {
+        // if ( <expr> ) { stmts } [else { stmts }]
+        if self.match_token(If) {
+            let mut if_stmt = IfStatement::new();
+            self.require_token(If);
+            self.require_token(LeftParen);
+            let expr = self.parse_expression();
+            if_stmt.set_expr(expr);
+            self.require_token(RightParen);
+            self.require_token(LeftBrace);
+            while !self.match_and_consume(RightBrace) && self.has_tokens() {
+                if_stmt.add_true_statement(self.parse_statement());
+                if !self.has_tokens() {
+                    self.errors.push(ParserErrorType::UnexpectedToken);
+                    break;
+                }
+            }
+            if self.match_and_consume(Else) {
+                self.require_token(LeftBrace);
+                while !self.match_and_consume(RightBrace) && self.has_tokens() {
+                    if_stmt.add_false_statement(self.parse_statement());
+                    if !self.has_tokens() {
+                        self.errors.push(ParserErrorType::UnexpectedToken);
+                        break;
+                    }
+                }
+            }
+            return Option::Some(if_stmt);
+
         }
         Option::None
     }
@@ -953,6 +992,16 @@ mod test {
         let mut print_stmt = parser.parse_statement();
         print_stmt.validate(&mut st);
         assert!(!print_stmt.has_errors());
+    }
 
+    #[test]
+    fn test_if_statement_parses() {
+        let mut parser = init_parser("if (1 < 2) { print(\"Hello World\"); } else { print(\"Goodbye!\"); }".to_string());
+        let mut st = SymbolTable::new();
+        let mut stmt = parser.parse_statement();
+        assert!(stmt.to_any().downcast_ref::<IfStatement>().is_some());
+        assert!(!stmt.has_errors());
+        assert!(!parser.has_errors());
+        stmt.validate(&mut st);
     }
 }
