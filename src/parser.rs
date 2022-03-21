@@ -49,6 +49,7 @@ mod ifstatement;
 pub(crate) mod printstatement;
 use crate::parser::printstatement::PrintStatement;
 use crate::parser::assignmentstatement::AssignmentStatement;
+use crate::parser::functioncallstatement::FunctionCallStatement;
 use crate::parser::ifstatement::IfStatement;
 
 pub(crate) mod returnstatement;
@@ -224,6 +225,10 @@ impl Parser {
         if fds.is_some() {
             return Box::new(fds.unwrap());
         }
+        let fcs = self.parse_function_call_statement();
+        if fcs.is_some() {
+            return Box::new(fcs.unwrap());
+        }
         let ret = self.parse_return_statement();
         if ret.is_some() {
             return Box::new(ret.unwrap());
@@ -270,12 +275,13 @@ impl Parser {
             }
 
             self.require_token(LeftBrace);
-            self.curr_fn_def = name;
+            self.curr_fn_def = name.clone();
             while !self.match_and_consume(RightBrace) {
                 let stmt = self.parse_statement();
                 fds.add_statement(stmt);
             }
             self.curr_fn_def = String::new();
+            self.st.register_function(name, fds.clone());
             return Option::Some(fds);
         }
         Option::None
@@ -380,6 +386,18 @@ impl Parser {
             }
             return Option::Some(if_stmt);
 
+        }
+        Option::None
+    }
+
+    fn parse_function_call_statement(&mut self) -> Option<FunctionCallStatement> {
+        if self.match_token(Identifier) && self.peek_next_token(LeftParen) {
+            let name = self.token_list[self.curr_idx.clone()].get_string_value();
+            let expr = self.parse_expression(); // retrieve the function call expression
+            let fds = self.st.get_function(name);
+            assert!(fds.is_some());
+            let fcs = FunctionCallStatement::new(expr, fds.unwrap());
+            return Option::Some(fcs);
         }
         Option::None
     }
@@ -1023,6 +1041,18 @@ mod test {
         let mut stmt = parser.parse_statement();
         stmt.validate(&mut st);
         assert!(stmt.to_any().downcast_ref::<IfStatement>().is_some());
+        assert!(!stmt.has_errors());
+        assert!(!parser.has_errors());
+    }
+
+    #[test]
+    fn test_function_call_statement_parses() {
+        let mut parser = init_parser("fn foo() : string { return \"Hello World!\\n\"; } foo();".to_string());
+        let mut st = SymbolTable::new();
+        parser.parse_statement();
+        let mut stmt = parser.parse_statement();
+        stmt.validate(&mut st);
+        assert!(stmt.to_any().downcast_ref::<FunctionCallStatement>().is_some());
         assert!(!stmt.has_errors());
         assert!(!parser.has_errors());
     }

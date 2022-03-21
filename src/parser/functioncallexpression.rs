@@ -71,7 +71,7 @@ impl Expression for FunctionCallExpression {
     }
 
     fn has_errors(&self) -> bool {
-        todo!()
+        !self.errors.is_empty()
     }
 
     fn get_expr_type(&self) -> String {
@@ -87,7 +87,14 @@ impl FunctionCallExpression {
             errors: vec![],
         }
     }
+
     pub fn add_arg(&mut self, arg: Box<dyn Expression>) {
         self.args.push(arg);
+    }
+    pub fn get_args(&self) -> &Vec<Box<dyn Expression>> {
+        &self.args
+    }
+    pub fn get_name(&self) -> String {
+        self.name.clone()
     }
 }
