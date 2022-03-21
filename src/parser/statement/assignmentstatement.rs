@@ -1,7 +1,7 @@
 use crate::parser::expression::identifierexpression::IdentifierExpression;
 use crate::parser::expression::syntaxerrorexpression::SyntaxErrorExpression;
 use crate::parser::ParserErrorType;
-use crate::parser_traits::{Expression, Statement, ToAny};
+use crate::parser::parser_traits::{Expression, Statement, ToAny};
 use crate::symbol_table::SymbolTable;
 use std::any::Any;
 

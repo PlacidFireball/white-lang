@@ -1,6 +1,6 @@
 use crate::parser::whitetypes::Type;
 use crate::parser::ParserErrorType;
-use crate::parser_traits::{Expression, ToAny};
+use crate::parser::parser_traits::{Expression, ToAny};
 use crate::symbol_table::SymbolTable;
 use std::any::Any;
 

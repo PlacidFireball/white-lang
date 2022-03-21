@@ -1,3 +1,6 @@
+pub(crate) mod expression;
+pub(crate) mod statement;
+pub(crate) mod parser_traits;
 use crate::parser::whitetypes::*;
 use crate::tokenizer::TokenType::*;
 use crate::tokenizer::*;
@@ -24,7 +27,6 @@ use statement::forstatement::ForStatement;
 
 use statement::functiondefinitionstatement::FunctionDefinitionStatement;
 use statement::returnstatement::ReturnStatement;
-use crate::parser_traits::{Expression, Statement};
 
 use statement::printstatement::PrintStatement;
 use statement::assignmentstatement::AssignmentStatement;
@@ -33,10 +35,9 @@ use statement::ifstatement::IfStatement;
 
 use statement::syntaxerrorstatement::SyntaxErrorStatement;
 
-pub(crate) mod expression;
-pub(crate) mod statement;
 
 use statement::variablestatement::VariableStatement;
+use crate::parser::parser_traits::{Expression, Statement};
 use crate::symbol_table::SymbolTable;
 
 // Parsing Errors
@@ -599,7 +600,7 @@ impl Parser {
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::parser_traits::{Expression, ToAny};
+    use crate::parser::parser_traits::{Expression, ToAny};
     use crate::symbol_table::SymbolTable;
 
     fn init_parser(src: String) -> Parser {

@@ -1,5 +1,5 @@
 use crate::parser;
-use crate::parser_traits::{Expression, Statement};
+use crate::parser::parser_traits::{Expression, Statement};
 use crate::parser::ParserErrorType;
 
 struct Program {
