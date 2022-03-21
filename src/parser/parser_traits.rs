@@ -16,7 +16,7 @@ use crate::parser::expression::stringliteralexpression::StringLiteralExpression;
 use crate::parser::expression::syntaxerrorexpression::SyntaxErrorExpression;
 use crate::parser::expression::unaryexpression::UnaryExpression;
 use crate::parser::whitetypes::Type;
-use crate::symbol_table::SymbolTable;
+use crate::parser::symbol_table::SymbolTable;
 use std::any::Any;
 
 use crate::parser::statement::functiondefinitionstatement::FunctionDefinitionStatement;
@@ -25,6 +25,7 @@ use crate::parser::statement::returnstatement::ReturnStatement;
 use crate::parser::statement::syntaxerrorstatement::SyntaxErrorStatement;
 use crate::parser::statement::variablestatement::VariableStatement;
 use crate::parser::statement::functioncallstatement::FunctionCallStatement;
+use crate::parser::statement::ifstatement::IfStatement;
 
 pub(crate) trait ToAny: 'static {
     fn to_any(&self) -> &dyn Any;
@@ -112,9 +113,11 @@ impl Clone for Box<dyn Statement> {
             return Box::new(stmt.clone());
         } else if let Some(stmt) = self.to_any().downcast_ref::<PrintStatement>() {
             return Box::new(stmt.clone());
-        } /*else if let Some(stmt) = self.to_any().downcast_ref::<FunctionCallStatement>() {
+        } else if let Some(stmt) = self.to_any().downcast_ref::<FunctionCallStatement>() {
             return Box::new(stmt.clone());
-        }*/
+        } else if let Some(stmt) = self.to_any().downcast_ref::<IfStatement>() {
+            return Box::new(stmt.clone());
+        }
         panic!("Didn't cover statements exhaustively");
     }
 }

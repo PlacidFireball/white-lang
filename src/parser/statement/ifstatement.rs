@@ -4,7 +4,7 @@ use crate::parser::ParserErrorType::UnexpectedToken;
 use crate::parser::expression::syntaxerrorexpression::SyntaxErrorExpression;
 use crate::parser::whitetypes::Type;
 use crate::parser::parser_traits::{Expression, Statement, ToAny};
-use crate::symbol_table::SymbolTable;
+use crate::parser::symbol_table::SymbolTable;
 
 #[derive(Clone)]
 pub struct IfStatement {

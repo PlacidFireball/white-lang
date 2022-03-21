@@ -2,10 +2,7 @@ mod tokenizer;
 use tokenizer::*;
 mod parser;
 use parser::Parser;
-
 mod program;
-
-mod symbol_table;
 
 #[allow(unused_variables)]
 fn main() {

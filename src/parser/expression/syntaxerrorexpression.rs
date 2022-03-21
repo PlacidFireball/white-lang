@@ -1,6 +1,6 @@
 use crate::parser::whitetypes::Type;
 use crate::parser::parser_traits::{Expression, ToAny};
-use crate::symbol_table::SymbolTable;
+use crate::parser::symbol_table::SymbolTable;
 use std::any::Any;
 
 #[derive(Clone)]

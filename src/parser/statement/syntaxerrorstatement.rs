@@ -1,5 +1,5 @@
 use crate::parser::parser_traits::{Expression, Statement, ToAny};
-use crate::symbol_table::SymbolTable;
+use crate::parser::symbol_table::SymbolTable;
 use std::any::Any;
 
 #[derive(Clone)]

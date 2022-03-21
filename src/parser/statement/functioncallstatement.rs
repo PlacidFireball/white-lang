@@ -3,8 +3,9 @@ use crate::parser::expression::functioncallexpression::FunctionCallExpression;
 use crate::parser::statement::functiondefinitionstatement::FunctionDefinitionStatement;
 use crate::parser::ParserErrorType;
 use crate::parser::parser_traits::{Expression, Statement, ToAny};
-use crate::symbol_table::SymbolTable;
+use crate::parser::symbol_table::SymbolTable;
 
+#[derive(Clone)]
 pub struct FunctionCallStatement {
     name: String,
     expr: Box<dyn Expression>,
