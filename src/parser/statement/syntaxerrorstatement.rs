@@ -24,7 +24,7 @@ impl Statement for SyntaxErrorStatement {
         todo!()
     }
 
-    fn validate(&mut self, st: &mut SymbolTable) { }
+    fn validate(&mut self, st: &mut SymbolTable) {}
 
     fn get_expr(&self) -> &Box<dyn Expression> {
         todo!()

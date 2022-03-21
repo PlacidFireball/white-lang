@@ -1,8 +1,8 @@
 // Expression modules
 pub(crate) mod additiveexpression;
 pub(crate) mod booleanliteralexpression;
-pub(crate) mod equalityexpression;
 pub(crate) mod comparisonexpression;
+pub(crate) mod equalityexpression;
 pub(crate) mod factorexpression;
 pub(crate) mod floatliteralexpression;
 pub(crate) mod functioncallexpression;

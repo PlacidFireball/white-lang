@@ -1,7 +1,7 @@
-use crate::parser::statement::returnstatement::ReturnStatement;
-use crate::parser::*;
 use crate::parser::parser_traits::{Expression, Statement, ToAny};
+use crate::parser::statement::returnstatement::ReturnStatement;
 use crate::parser::symbol_table::SymbolTable;
+use crate::parser::*;
 
 #[derive(Clone)]
 pub(crate) struct FunctionDefinitionStatement {

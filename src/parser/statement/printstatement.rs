@@ -1,14 +1,16 @@
-use std::any::Any;
 use crate::parser::parser_traits::{Expression, Statement, ToAny};
 use crate::parser::symbol_table::SymbolTable;
+use std::any::Any;
 
 #[derive(Clone)]
 pub(crate) struct PrintStatement {
-    expr: Box<dyn Expression>
+    expr: Box<dyn Expression>,
 }
 
 impl ToAny for PrintStatement {
-    fn to_any(&self) -> &dyn Any { self }
+    fn to_any(&self) -> &dyn Any {
+        self
+    }
 }
 
 impl Statement for PrintStatement {
@@ -43,8 +45,6 @@ impl Statement for PrintStatement {
 
 impl PrintStatement {
     pub fn new(expr: Box<dyn Expression>) -> Self {
-        PrintStatement {
-            expr
-        }
+        PrintStatement { expr }
     }
 }

@@ -1,25 +1,24 @@
 pub(crate) mod expression;
-pub(crate) mod statement;
 pub(crate) mod parser_traits;
+pub(crate) mod statement;
 use crate::parser::whitetypes::*;
 use crate::tokenizer::TokenType::*;
 use crate::tokenizer::*;
 use std::any::Any;
-use std::fmt::Alignment::Right;
 
-pub(crate) mod whitetypes;
 mod symbol_table;
 mod test;
+pub(crate) mod whitetypes;
 
-use expression::booleanliteralexpression::BooleanLiteralExpression;
-use expression::integerliteralexpression::IntegerLiteralExpression;
-use expression::floatliteralexpression::FloatLiteralExpression;
 use expression::additiveexpression::AdditiveExpression;
+use expression::booleanliteralexpression::BooleanLiteralExpression;
 use expression::comparisonexpression::ComparisonExpression;
 use expression::equalityexpression::EqualityExpression;
 use expression::factorexpression::FactorExpression;
+use expression::floatliteralexpression::FloatLiteralExpression;
 use expression::functioncallexpression::FunctionCallExpression;
 use expression::identifierexpression::IdentifierExpression;
+use expression::integerliteralexpression::IntegerLiteralExpression;
 use expression::listliteralexpression::ListLiteralExpression;
 use expression::nullliteralexpression::NullLiteralExpression;
 use expression::parenthesizedexpression::ParenthesizedExpression;
@@ -31,16 +30,15 @@ use statement::forstatement::ForStatement;
 use statement::functiondefinitionstatement::FunctionDefinitionStatement;
 use statement::returnstatement::ReturnStatement;
 
-use statement::printstatement::PrintStatement;
 use statement::assignmentstatement::AssignmentStatement;
 use statement::functioncallstatement::FunctionCallStatement;
 use statement::ifstatement::IfStatement;
+use statement::printstatement::PrintStatement;
 
 use statement::syntaxerrorstatement::SyntaxErrorStatement;
 
-
-use statement::variablestatement::VariableStatement;
 use crate::parser::parser_traits::{Expression, Statement};
+use statement::variablestatement::VariableStatement;
 use symbol_table::SymbolTable;
 
 // Parsing Errors
@@ -369,7 +367,6 @@ impl Parser {
                 }
             }
             return Option::Some(if_stmt);
-
         }
         Option::None
     }

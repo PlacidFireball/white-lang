@@ -3,7 +3,7 @@
 ///
 #[cfg(test)]
 mod test {
-    use crate::{Parser, Tokenizer};
+    use super::*;
     use crate::parser::expression::additiveexpression::AdditiveExpression;
     use crate::parser::expression::booleanliteralexpression::BooleanLiteralExpression;
     use crate::parser::expression::comparisonexpression::ComparisonExpression;
@@ -18,7 +18,6 @@ mod test {
     use crate::parser::expression::parenthesizedexpression::ParenthesizedExpression;
     use crate::parser::expression::stringliteralexpression::StringLiteralExpression;
     use crate::parser::expression::unaryexpression::UnaryExpression;
-    use super::*;
     use crate::parser::parser_traits::{Expression, Statement, ToAny};
     use crate::parser::statement::assignmentstatement::AssignmentStatement;
     use crate::parser::statement::forstatement::ForStatement;
@@ -29,7 +28,7 @@ mod test {
     use crate::parser::symbol_table::SymbolTable;
     use crate::parser::whitetypes::Type;
     use crate::TokenType::*;
-
+    use crate::{Parser, Tokenizer};
 
     fn init_parser(src: String) -> Parser {
         let tokenizer: Tokenizer = Tokenizer::init(src);
@@ -273,9 +272,7 @@ mod test {
         parser = init_parser("-true".to_string());
         expr = parser.parse_expression();
         assert!(expr.has_errors());
-
     }
-
 
     #[test]
     /// test retrieving values from SymbolTable
@@ -423,7 +420,9 @@ mod test {
 
     #[test]
     fn test_if_statement_with_else_parses() {
-        let mut parser = init_parser("if (1 < 2) { print(\"Hello World\"); } else { print(\"Goodbye!\"); }".to_string());
+        let mut parser = init_parser(
+            "if (1 < 2) { print(\"Hello World\"); } else { print(\"Goodbye!\"); }".to_string(),
+        );
         let mut st = SymbolTable::new();
         let mut stmt = parser.parse_statement();
         stmt.validate(&mut st);
@@ -456,14 +455,17 @@ mod test {
 
     #[test]
     fn test_function_call_statement_parses() {
-        let mut parser = init_parser("fn foo() : string { return \"Hello World!\\n\"; } foo();".to_string());
+        let mut parser =
+            init_parser("fn foo() : string { return \"Hello World!\\n\"; } foo();".to_string());
         let mut st = SymbolTable::new();
         parser.parse_statement();
         let mut stmt = parser.parse_statement();
         stmt.validate(&mut st);
-        assert!(stmt.to_any().downcast_ref::<FunctionCallStatement>().is_some());
+        assert!(stmt
+            .to_any()
+            .downcast_ref::<FunctionCallStatement>()
+            .is_some());
         assert!(!stmt.has_errors());
         assert!(!parser.has_errors());
     }
-
 }

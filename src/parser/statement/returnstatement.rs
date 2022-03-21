@@ -1,6 +1,6 @@
-use crate::parser::*;
 use crate::parser::parser_traits::{Expression, Statement, ToAny};
 use crate::parser::symbol_table::SymbolTable;
+use crate::parser::*;
 
 #[derive(Clone)]
 pub(crate) struct ReturnStatement {

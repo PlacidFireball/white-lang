@@ -1,17 +1,17 @@
-use std::any::Any;
-use crate::parser::ParserErrorType;
-use crate::parser::ParserErrorType::UnexpectedToken;
 use crate::parser::expression::syntaxerrorexpression::SyntaxErrorExpression;
-use crate::parser::whitetypes::Type;
 use crate::parser::parser_traits::{Expression, Statement, ToAny};
 use crate::parser::symbol_table::SymbolTable;
+use crate::parser::whitetypes::Type;
+use crate::parser::ParserErrorType;
+use crate::parser::ParserErrorType::UnexpectedToken;
+use std::any::Any;
 
 #[derive(Clone)]
 pub struct IfStatement {
     true_stmts: Vec<Box<dyn Statement>>,
     false_stmts: Vec<Box<dyn Statement>>,
     expr: Box<dyn Expression>,
-    errors: Vec<ParserErrorType>
+    errors: Vec<ParserErrorType>,
 }
 
 impl ToAny for IfStatement {
@@ -72,7 +72,7 @@ impl IfStatement {
             true_stmts: vec![],
             false_stmts: vec![],
             expr: Box::new(SyntaxErrorExpression::new()),
-            errors: vec![]
+            errors: vec![],
         }
     }
     pub(crate) fn set_expr(&mut self, expr: Box<dyn Expression>) {

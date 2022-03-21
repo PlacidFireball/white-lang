@@ -1,8 +1,8 @@
 use crate::parser::expression::identifierexpression::IdentifierExpression;
 use crate::parser::expression::syntaxerrorexpression::SyntaxErrorExpression;
-use crate::parser::ParserErrorType;
 use crate::parser::parser_traits::{Expression, Statement, ToAny};
 use crate::parser::symbol_table::SymbolTable;
+use crate::parser::ParserErrorType;
 use std::any::Any;
 
 #[derive(Clone)]
