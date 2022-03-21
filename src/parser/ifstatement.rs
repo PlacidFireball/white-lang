@@ -38,14 +38,18 @@ impl Statement for IfStatement {
             self.errors.push(UnexpectedToken);
         }
         st.push_scope();
-        for i in 0..self.true_stmts.len()-1{
-            // TODO: Body Validation, variables within blocks and for statements (iterated vars)
-            self.true_stmts[i].validate(st);
+        if !self.true_stmts.is_empty() {
+            for i in 0..self.true_stmts.len() {
+                // TODO: Body Validation, variables within blocks and for statements (iterated vars)
+                self.true_stmts[i].validate(st);
+            }
         }
         st.pop_scope();
         st.push_scope();
-        for i in 0..self.false_stmts.len()-1{
-            self.false_stmts[i].validate(st);
+        if !self.false_stmts.is_empty() {
+            for i in 0..self.false_stmts.len() {
+                self.false_stmts[i].validate(st);
+            }
         }
         st.pop_scope();
     }

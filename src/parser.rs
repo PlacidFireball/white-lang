@@ -995,13 +995,36 @@ mod test {
     }
 
     #[test]
-    fn test_if_statement_parses() {
+    fn test_if_statement_with_else_parses() {
         let mut parser = init_parser("if (1 < 2) { print(\"Hello World\"); } else { print(\"Goodbye!\"); }".to_string());
         let mut st = SymbolTable::new();
         let mut stmt = parser.parse_statement();
+        stmt.validate(&mut st);
         assert!(stmt.to_any().downcast_ref::<IfStatement>().is_some());
         assert!(!stmt.has_errors());
         assert!(!parser.has_errors());
-        stmt.validate(&mut st);
     }
+
+    #[test]
+    fn test_if_statement_no_else_parses() {
+        let mut parser = init_parser("if (1 < 2) { print(\"Hello World!\\n\"); }".to_string());
+        let mut st = SymbolTable::new();
+        let mut stmt = parser.parse_statement();
+        stmt.validate(&mut st);
+        assert!(stmt.to_any().downcast_ref::<IfStatement>().is_some());
+        assert!(!stmt.has_errors());
+        assert!(!parser.has_errors());
+    }
+
+    #[test]
+    fn test_if_statement_empty_parses() {
+        let mut parser = init_parser("if (1 < 2) { }".to_string());
+        let mut st = SymbolTable::new();
+        let mut stmt = parser.parse_statement();
+        stmt.validate(&mut st);
+        assert!(stmt.to_any().downcast_ref::<IfStatement>().is_some());
+        assert!(!stmt.has_errors());
+        assert!(!parser.has_errors());
+    }
+
 }
