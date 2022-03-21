@@ -1,4 +1,4 @@
-use crate::parser::functiondefinitionstatement::FunctionDefinitionStatement;
+use crate::parser::statement::functiondefinitionstatement::FunctionDefinitionStatement;
 use crate::parser::whitetypes::Type;
 use std::any::Any;
 use std::collections::HashMap;

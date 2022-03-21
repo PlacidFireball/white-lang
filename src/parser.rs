@@ -4,59 +4,39 @@ use crate::tokenizer::*;
 use std::any::Any;
 use std::fmt::Alignment::Right;
 
-// expressions
-pub(crate) mod booleanliteralexpression;
 pub(crate) mod whitetypes;
-use crate::parser::booleanliteralexpression::BooleanLiteralExpression;
-pub(crate) mod integerliteralexpression;
-use crate::parser::integerliteralexpression::IntegerLiteralExpression;
-pub(crate) mod floatliteralexpression;
-use crate::parser::floatliteralexpression::FloatLiteralExpression;
-pub(crate) mod additiveexpression;
-use crate::parser::additiveexpression::AdditiveExpression;
-pub(crate) mod comparisonexpression;
-use crate::parser::comparisonexpression::ComparisonExpression;
-pub(crate) mod equalityexpression;
-use crate::parser::equalityexpression::EqualityExpression;
-pub(crate) mod factorexpression;
-use crate::parser::factorexpression::FactorExpression;
-pub(crate) mod functioncallexpression;
-use crate::parser::functioncallexpression::FunctionCallExpression;
-pub(crate) mod identifierexpression;
-use crate::parser::identifierexpression::IdentifierExpression;
-pub(crate) mod listliteralexpression;
-use crate::parser::listliteralexpression::ListLiteralExpression;
-pub(crate) mod nullliteralexpression;
-use crate::parser::nullliteralexpression::NullLiteralExpression;
-pub(crate) mod parenthesizedexpression;
-use crate::parser::parenthesizedexpression::ParenthesizedExpression;
-pub(crate) mod stringliteralexpression;
-use crate::parser::stringliteralexpression::StringLiteralExpression;
-pub(crate) mod syntaxerrorexpression;
-use crate::parser::syntaxerrorexpression::SyntaxErrorExpression;
-pub(crate) mod unaryexpression;
-use crate::parser::unaryexpression::UnaryExpression;
-// statements
-pub(crate) mod forstatement;
-use crate::parser::forstatement::ForStatement;
-pub(crate) mod functioncallstatement;
-pub(crate) mod functiondefinitionstatement;
-use crate::parser::functiondefinitionstatement::FunctionDefinitionStatement;
-use crate::parser::returnstatement::ReturnStatement;
-use crate::parser_traits::{Expression, Statement};
-pub(crate) mod assignmentstatement;
-mod ifstatement;
-pub(crate) mod printstatement;
-use crate::parser::printstatement::PrintStatement;
-use crate::parser::assignmentstatement::AssignmentStatement;
-use crate::parser::functioncallstatement::FunctionCallStatement;
-use crate::parser::ifstatement::IfStatement;
+use expression::booleanliteralexpression::BooleanLiteralExpression;
+use expression::integerliteralexpression::IntegerLiteralExpression;
+use expression::floatliteralexpression::FloatLiteralExpression;
+use expression::additiveexpression::AdditiveExpression;
+use expression::comparisonexpression::ComparisonExpression;
+use expression::equalityexpression::EqualityExpression;
+use expression::factorexpression::FactorExpression;
+use expression::functioncallexpression::FunctionCallExpression;
+use expression::identifierexpression::IdentifierExpression;
+use expression::listliteralexpression::ListLiteralExpression;
+use expression::nullliteralexpression::NullLiteralExpression;
+use expression::parenthesizedexpression::ParenthesizedExpression;
+use expression::stringliteralexpression::StringLiteralExpression;
+use expression::syntaxerrorexpression::SyntaxErrorExpression;
+use expression::unaryexpression::UnaryExpression;
+use statement::forstatement::ForStatement;
 
-pub(crate) mod returnstatement;
-pub(crate) mod syntaxerrorstatement;
-use crate::parser::syntaxerrorstatement::SyntaxErrorStatement;
-pub(crate) mod variablestatement;
-use crate::parser::variablestatement::VariableStatement;
+use statement::functiondefinitionstatement::FunctionDefinitionStatement;
+use statement::returnstatement::ReturnStatement;
+use crate::parser_traits::{Expression, Statement};
+
+use statement::printstatement::PrintStatement;
+use statement::assignmentstatement::AssignmentStatement;
+use statement::functioncallstatement::FunctionCallStatement;
+use statement::ifstatement::IfStatement;
+
+use statement::syntaxerrorstatement::SyntaxErrorStatement;
+
+pub(crate) mod expression;
+pub(crate) mod statement;
+
+use statement::variablestatement::VariableStatement;
 use crate::symbol_table::SymbolTable;
 
 // Parsing Errors

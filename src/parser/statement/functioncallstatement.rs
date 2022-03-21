@@ -1,6 +1,6 @@
 use std::any::Any;
-use crate::parser::functioncallexpression::FunctionCallExpression;
-use crate::parser::functiondefinitionstatement::FunctionDefinitionStatement;
+use crate::parser::expression::functioncallexpression::FunctionCallExpression;
+use crate::parser::statement::functiondefinitionstatement::FunctionDefinitionStatement;
 use crate::parser::ParserErrorType;
 use crate::parser_traits::{Expression, Statement, ToAny};
 use crate::symbol_table::SymbolTable;

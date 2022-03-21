@@ -1,7 +1,7 @@
 use std::any::Any;
 use crate::parser::ParserErrorType;
 use crate::parser::ParserErrorType::UnexpectedToken;
-use crate::parser::syntaxerrorexpression::SyntaxErrorExpression;
+use crate::parser::expression::syntaxerrorexpression::SyntaxErrorExpression;
 use crate::parser::whitetypes::Type;
 use crate::parser_traits::{Expression, Statement, ToAny};
 use crate::symbol_table::SymbolTable;

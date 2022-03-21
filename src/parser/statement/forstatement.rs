@@ -1,6 +1,6 @@
-use crate::parser::identifierexpression::IdentifierExpression;
-use crate::parser::listliteralexpression::ListLiteralExpression;
-use crate::parser::syntaxerrorexpression::SyntaxErrorExpression;
+use crate::parser::expression::identifierexpression::IdentifierExpression;
+use crate::parser::expression::listliteralexpression::ListLiteralExpression;
+use crate::parser::expression::syntaxerrorexpression::SyntaxErrorExpression;
 use crate::parser::whitetypes::Type;
 use crate::parser::ParserErrorType;
 use crate::parser_traits::{Expression, Statement, ToAny};
