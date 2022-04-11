@@ -3,7 +3,7 @@ use crate::parser::whitetypes::Type;
 use std::any::Any;
 use std::collections::HashMap;
 
-pub(crate) struct SymbolTable {
+pub struct SymbolTable {
     symbol_stack: Vec<HashMap<String, Box<dyn Any>>>,
 }
 

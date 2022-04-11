@@ -15,7 +15,7 @@ impl ToAny for SyntaxErrorExpression {
 
 impl Expression for SyntaxErrorExpression {
     fn evaluate(&self, runtime: &Runtime) -> Box<dyn Any> {
-        todo!()
+        unimplemented!()
     }
 
     fn compile(&self) -> String {

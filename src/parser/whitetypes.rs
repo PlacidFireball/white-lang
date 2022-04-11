@@ -1,5 +1,5 @@
 #[derive(Clone, Copy, Debug, PartialEq)]
-pub(crate) enum Type {
+pub enum Type {
     Char,
     String,
     Integer,

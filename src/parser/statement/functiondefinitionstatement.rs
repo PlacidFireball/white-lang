@@ -4,7 +4,7 @@ use crate::parser::symbol_table::SymbolTable;
 use crate::parser::*;
 
 #[derive(Clone)]
-pub(crate) struct FunctionDefinitionStatement {
+pub struct FunctionDefinitionStatement {
     name: String,
     return_type: Type,
     args: Vec<Box<dyn Expression>>,

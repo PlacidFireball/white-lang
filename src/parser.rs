@@ -106,6 +106,20 @@ impl Parser {
         }
     }
 
+    pub fn get_expr(&self) -> Option<&Box<dyn Expression>> {
+        if let Some(_) = self.expr.to_any().downcast_ref::<SyntaxErrorExpression>() {
+            return Option::None
+        }
+        Option::Some(&self.expr)
+    }
+
+    pub fn get_statements(&self) -> Option<&Vec<Box<dyn Statement>>> {
+        if let Some(_) = self.expr.to_any().downcast_ref::<SyntaxErrorExpression>() {
+            return Option::Some(&self.statement_list);
+        }
+        Option::None
+    }
+
     // tells us if parsing is done or not
     fn has_tokens(&self) -> bool {
         !(self.get_curr_tok().get_type() == Eof)

@@ -28,16 +28,16 @@ use crate::parser::statement::syntaxerrorstatement::SyntaxErrorStatement;
 use crate::parser::statement::variablestatement::VariableStatement;
 use crate::runtime::Runtime;
 
-pub(crate) trait ToAny: 'static {
+pub trait ToAny: 'static {
     fn to_any(&self) -> &dyn Any;
 }
 
-pub(crate) fn default_expr() -> Box<dyn Expression> {
+pub fn default_expr() -> Box<dyn Expression> {
     Box::new(SyntaxErrorExpression::new())
 }
 
 #[allow(dead_code)]
-pub(crate) trait Expression: ToAny {
+pub trait Expression: ToAny {
     fn evaluate(&self, runtime: &Runtime) -> Box<dyn Any>; // evaluate the expression
     fn compile(&self) -> String; // compile the expression to nasm
     fn transpile(&self) -> String; // transpile the expression to javascript
@@ -88,7 +88,7 @@ impl Clone for Box<dyn Expression> {
 }
 
 #[allow(dead_code)]
-pub(crate) trait Statement: ToAny {
+pub trait Statement: ToAny {
     fn execute(&self) -> String; // execute the statement
     fn compile(&self) -> String; // compile the statement to nasm
     fn transpile(&self) -> String; // transpile the statement to Javascript

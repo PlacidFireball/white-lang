@@ -3,7 +3,6 @@
 ///
 #[cfg(test)]
 mod test {
-    use super::*;
     use crate::parser::expression::additiveexpression::AdditiveExpression;
     use crate::parser::expression::booleanliteralexpression::BooleanLiteralExpression;
     use crate::parser::expression::comparisonexpression::ComparisonExpression;
@@ -18,7 +17,7 @@ mod test {
     use crate::parser::expression::parenthesizedexpression::ParenthesizedExpression;
     use crate::parser::expression::stringliteralexpression::StringLiteralExpression;
     use crate::parser::expression::unaryexpression::UnaryExpression;
-    use crate::parser::parser_traits::{Expression, Statement, ToAny};
+    use crate::parser::parser_traits::{Statement};
     use crate::parser::statement::assignmentstatement::AssignmentStatement;
     use crate::parser::statement::forstatement::ForStatement;
     use crate::parser::statement::functioncallstatement::FunctionCallStatement;
@@ -29,6 +28,8 @@ mod test {
     use crate::parser::whitetypes::Type;
     use crate::TokenType::*;
     use crate::{Parser, Tokenizer};
+    use crate::runtime::Runtime;
+    use crate::program::Program;
 
     fn init_parser(src: String) -> Parser {
         let tokenizer: Tokenizer = Tokenizer::init(src);
@@ -467,5 +468,14 @@ mod test {
             .is_some());
         assert!(!stmt.has_errors());
         assert!(!parser.has_errors());
+    }
+
+    #[test]
+    fn test_additive_expression_eval() {
+        let mut parser = init_parser("1 + 1".to_string());
+        parser.parse();
+        let mut program = Program::from_parser(&mut parser);
+        program.execute();
+        assert!(program.output.eq(&String::from("2\n")));
     }
 }

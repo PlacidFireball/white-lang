@@ -8,7 +8,7 @@ use std::any::Any;
 pub(crate) struct BooleanLiteralExpression {
     boolean: bool,
 }
-
+#[allow(unused_variables)]
 impl ToAny for BooleanLiteralExpression {
     fn to_any(&self) -> &dyn Any {
         self

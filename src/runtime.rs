@@ -1,8 +1,7 @@
 use std::any::Any;
-use std::borrow::BorrowMut;
 use std::collections::HashMap;
 
-pub(crate) struct Runtime {
+pub struct Runtime {
     scopes: Vec<HashMap<String, Box<dyn Any>>>,
 }
 impl Runtime {
