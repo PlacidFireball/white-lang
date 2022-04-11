@@ -1,6 +1,7 @@
 use crate::parser::parser_traits::{Expression, ToAny};
 use crate::parser::symbol_table::SymbolTable;
 use crate::parser::whitetypes::Type;
+use crate::runtime::Runtime;
 use std::any::Any;
 
 #[derive(Clone)]
@@ -15,8 +16,8 @@ impl ToAny for ParenthesizedExpression {
 }
 
 impl Expression for ParenthesizedExpression {
-    fn evaluate(&self) -> Box<dyn Any> {
-        self.expr.evaluate()
+    fn evaluate(&self, runtime: &Runtime) -> Box<dyn Any> {
+        self.expr.evaluate(runtime)
     }
 
     fn compile(&self) -> String {

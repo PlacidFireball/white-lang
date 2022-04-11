@@ -26,6 +26,7 @@ use crate::parser::statement::printstatement::PrintStatement;
 use crate::parser::statement::returnstatement::ReturnStatement;
 use crate::parser::statement::syntaxerrorstatement::SyntaxErrorStatement;
 use crate::parser::statement::variablestatement::VariableStatement;
+use crate::runtime::Runtime;
 
 pub(crate) trait ToAny: 'static {
     fn to_any(&self) -> &dyn Any;
@@ -37,7 +38,7 @@ pub(crate) fn default_expr() -> Box<dyn Expression> {
 
 #[allow(dead_code)]
 pub(crate) trait Expression: ToAny {
-    fn evaluate(&self) -> Box<dyn Any>; // evaluate the expression
+    fn evaluate(&self, runtime: &Runtime) -> Box<dyn Any>; // evaluate the expression
     fn compile(&self) -> String; // compile the expression to nasm
     fn transpile(&self) -> String; // transpile the expression to javascript
     fn validate(&mut self, st: &SymbolTable); // validate the expression via the symbol table

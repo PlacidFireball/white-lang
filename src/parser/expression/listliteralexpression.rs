@@ -2,6 +2,7 @@ use crate::parser::parser_traits::{Expression, ToAny};
 use crate::parser::symbol_table::SymbolTable;
 use crate::parser::whitetypes::Type;
 use crate::parser::ParserErrorType;
+use crate::runtime::Runtime;
 use std::any::Any;
 
 #[derive(Clone)]
@@ -18,7 +19,7 @@ impl ToAny for ListLiteralExpression {
 }
 
 impl Expression for ListLiteralExpression {
-    fn evaluate(&self) -> Box<dyn Any> {
+    fn evaluate(&self, runtime: &Runtime) -> Box<dyn Any> {
         todo!()
     }
 

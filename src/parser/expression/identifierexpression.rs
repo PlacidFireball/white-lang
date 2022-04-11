@@ -3,6 +3,7 @@ use crate::parser::symbol_table::SymbolTable;
 use crate::parser::whitetypes::Type;
 use crate::parser::ParserErrorType;
 use crate::parser::ParserErrorType::{UnexpectedToken, UnknownName};
+use crate::runtime::Runtime;
 use std::any::Any;
 
 #[derive(Clone)]
@@ -19,7 +20,7 @@ impl ToAny for IdentifierExpression {
 }
 
 impl Expression for IdentifierExpression {
-    fn evaluate(&self) -> Box<dyn Any> {
+    fn evaluate(&self, runtime: &Runtime) -> Box<dyn Any> {
         Box::new(self.name.clone())
     }
 

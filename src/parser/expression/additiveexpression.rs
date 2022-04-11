@@ -1,8 +1,10 @@
 use crate::parser::whitetypes::Type;
 use crate::parser::ParserErrorType;
 
+use crate::parser::expression::floatliteralexpression::FloatLiteralExpression;
 use crate::parser::parser_traits::{Expression, ToAny};
 use crate::parser::symbol_table::SymbolTable;
+use crate::runtime::Runtime;
 use std::any::Any;
 
 #[derive(Clone)]
@@ -11,6 +13,7 @@ pub(crate) struct AdditiveExpression {
     operator: String,
     rhs: Box<dyn Expression>,
     errors: Vec<ParserErrorType>,
+    is_add: bool,
 }
 
 impl ToAny for AdditiveExpression {
@@ -20,8 +23,13 @@ impl ToAny for AdditiveExpression {
 }
 
 impl Expression for AdditiveExpression {
-    fn evaluate(&self) -> Box<dyn Any> {
-        todo!()
+    fn evaluate(&self, runtime: &Runtime) -> Box<dyn Any> {
+        let lhs_eval = self.lhs.evaluate(runtime);
+        let rhs_eval = self.rhs.evaluate(runtime);
+        // while eval.is<expression> -> eval //TODO
+        if lhs_eval.is::<f64>() {}
+        if lhs_eval.is::<i64>() {}
+        unimplemented!();
     }
 
     fn compile(&self) -> String {
@@ -35,6 +43,7 @@ impl Expression for AdditiveExpression {
     fn validate(&mut self, st: &SymbolTable) {
         self.lhs.validate(st);
         self.rhs.validate(st);
+        // TODO: Figure out what kind of types we should allow +/- to be called on
     }
 
     // gives debug information of the expression without having to downcast it
@@ -66,9 +75,10 @@ impl AdditiveExpression {
     ) -> AdditiveExpression {
         AdditiveExpression {
             lhs,
-            operator,
+            operator: operator.clone(),
             rhs,
             errors: vec![],
+            is_add: operator.contains("+"),
         }
     }
 

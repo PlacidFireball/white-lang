@@ -3,6 +3,7 @@ use tokenizer::*;
 mod parser;
 use parser::Parser;
 mod program;
+mod runtime;
 
 #[allow(unused_variables)]
 fn main() {
