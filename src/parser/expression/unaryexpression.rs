@@ -10,6 +10,7 @@ pub(crate) struct UnaryExpression {
     operator: String,
     expr: Box<dyn Expression>,
     errors: Vec<ParserErrorType>,
+    is_not: bool
 }
 
 impl ToAny for UnaryExpression {
@@ -20,7 +21,21 @@ impl ToAny for UnaryExpression {
 
 impl Expression for UnaryExpression {
     fn evaluate(&self, runtime: &Runtime) -> Box<dyn Any> {
-        todo!()
+        if self.is_not {
+            let eval = self.expr.evaluate(runtime);
+            if let Some(eval_bool) = eval.downcast_ref::<bool>() {
+                return Box::new(!eval_bool);
+            }
+        } else {
+            let eval = self.expr.evaluate(runtime);
+            if let Some(eval_isize) = eval.downcast_ref::<isize>() {
+                return Box::new(-1 * eval_isize);
+            }
+            if let Some(eval_f64) = eval.downcast_ref::<f64>() {
+                return Box::new(-1 as f64 * eval_f64);
+            }
+        }
+        unimplemented!()
     }
 
     fn compile(&self) -> String {
@@ -32,7 +47,7 @@ impl Expression for UnaryExpression {
     }
 
     fn validate(&mut self, st: &SymbolTable) {
-        if self.operator == "not" && self.expr.get_white_type() == Type::Integer {
+        if self.operator == "not" && (self.expr.get_white_type() == Type::Integer || self.expr.get_white_type() == Type::Float) {
             self.errors.push(ParserErrorType::BadOperator);
         }
         if self.operator == "-" && self.expr.get_white_type() == Type::Boolean {
@@ -61,9 +76,10 @@ impl Expression for UnaryExpression {
 impl UnaryExpression {
     pub(crate) fn new(operator: String, expr: Box<dyn Expression>) -> UnaryExpression {
         UnaryExpression {
-            operator,
+            operator: operator.clone(),
             expr,
             errors: vec![],
+            is_not: operator.contains("not")
         }
     }
 }

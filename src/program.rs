@@ -46,9 +46,12 @@ impl Program {
     fn try_print_output(&mut self, evaluated : Box<dyn Any>) {
         if let Some(eval_f64) = evaluated.downcast_ref::<f64>() {
             self.output.push_str(eval_f64.to_string().as_str());
-        }
-        else if let Some(eval_isize) = evaluated.downcast_ref::<isize>() {
+        } else if let Some(eval_isize) = evaluated.downcast_ref::<isize>() {
             self.output.push_str(eval_isize.to_string().as_str());
+        } else if let Some(eval_bool) = evaluated.downcast_ref::<bool>() {
+            self.output.push_str(eval_bool.to_string().as_str());
+        } else if let Some(eval_str) = evaluated.downcast_ref::<&str>() {
+            self.output.push_str(eval_str);
         }
         self.output.push_str("\n");
     }

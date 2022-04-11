@@ -11,6 +11,7 @@ pub(crate) struct FactorExpression {
     operator: String,
     rhs: Box<dyn Expression>,
     errors: Vec<ParserErrorType>,
+    is_mult: bool
 }
 
 impl ToAny for FactorExpression {
@@ -20,8 +21,39 @@ impl ToAny for FactorExpression {
 }
 
 impl Expression for FactorExpression {
+
     fn evaluate(&self, runtime: &Runtime) -> Box<dyn Any> {
-        todo!()
+        let lhs_eval = self.lhs.evaluate(runtime);
+        let rhs_eval = self.rhs.evaluate(runtime);
+        if let Some(lhs_f64) = lhs_eval.downcast_ref::<f64>() {
+            if let Some(rhs_f64) = rhs_eval.downcast_ref::<f64>() {
+                if self.is_mult {
+                    return Box::new(lhs_f64 * rhs_f64);
+                }
+                return Box::new(lhs_f64 / rhs_f64);
+            }
+            if let Some(rhs_isize) = rhs_eval.downcast_ref::<isize>() {
+                if self.is_mult {
+                    return Box::new(lhs_f64 * *rhs_isize as f64);
+                }
+                return Box::new(lhs_f64 / *rhs_isize as f64);
+            }
+        }
+        if let Some(lhs_isize) = lhs_eval.downcast_ref::<isize>() {
+            if let Some(rhs_f64) = rhs_eval.downcast_ref::<f64>() {
+                if self.is_mult {
+                    return Box::new(*lhs_isize as f64 * rhs_f64);
+                }
+                return Box::new(*lhs_isize as f64 / rhs_f64);
+            }
+            if let Some(rhs_isize) = rhs_eval.downcast_ref::<isize>() {
+                if self.is_mult {
+                    return Box::new(lhs_isize * rhs_isize);
+                }
+                return Box::new(lhs_isize / rhs_isize);
+            }
+        }
+        unreachable!()
     }
 
     fn compile(&self) -> String {
@@ -65,16 +97,16 @@ impl FactorExpression {
     ) -> FactorExpression {
         FactorExpression {
             lhs,
-            operator,
+            operator: operator.clone(),
             rhs,
             errors: vec![],
+            is_mult: operator.contains("*")
         }
     }
 
     fn get_lhs(&self) -> &Box<dyn Expression> {
         &self.lhs
     }
-
     fn get_rhs(&self) -> &Box<dyn Expression> {
         &self.rhs
     }

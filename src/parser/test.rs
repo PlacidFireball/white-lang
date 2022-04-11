@@ -36,6 +36,14 @@ mod test {
         Parser::init(&mut tokenizer.clone())
     }
 
+    fn test_execute(src : &str, expected : &str) {
+        let mut parser = init_parser(src.to_string());
+        parser.parse();
+        let mut program = Program::from_parser(&mut parser);
+        program.execute();
+        assert_eq!(program.output.as_str(), expected);
+    }
+
     #[test]
     /// Make sure that token consuming is working properly
     fn test_match_and_consume() {
@@ -472,10 +480,42 @@ mod test {
 
     #[test]
     fn test_additive_expression_eval() {
-        let mut parser = init_parser("1 + 1".to_string());
-        parser.parse();
-        let mut program = Program::from_parser(&mut parser);
-        program.execute();
-        assert!(program.output.eq(&String::from("2\n")));
+        test_execute("1 + 1", "2\n");
+        test_execute("2 + 3", "5\n");
+        test_execute("1 + 0", "1\n");
+        test_execute("1 + -1", "0\n");
+    }
+
+    #[test]
+    fn test_additive_expression_eval_minus() {
+        test_execute("1 - 1", "0\n");
+        test_execute("1 - -1", "2\n");
+        test_execute("1 - 0", "1\n");
+        test_execute("2 - 3", "-1\n");
+    }
+
+    #[test]
+    fn test_additive_expression_eval_float() {
+        test_execute("1.1 - 0.2", "0.9000000000000001\n");
+        test_execute("1.1 - 2.1", "-1\n");
+        test_execute("0.33 + 0.33", "0.66\n");
+        test_execute("21.54 + 0.46", "22\n");
+    }
+
+    #[test]
+    fn test_factor_expression_eval_integers() {
+        test_execute("9 * 3", "27\n");
+        test_execute("8 * -1", "-8\n");
+        test_execute("-1 * -1", "1\n");
+        test_execute("9 / -3", "-3\n");
+        test_execute("0 * 8", "0\n");
+        test_execute("0 / 456.24", "0\n");
+    }
+
+    #[test]
+    fn test_factor_expression_eval_floats() {
+        test_execute("9 * 0.33", "2.97\n");
+        test_execute("9 * 0.1", "0.9\n");
+        test_execute("9 / 3.0", "3\n");
     }
 }
