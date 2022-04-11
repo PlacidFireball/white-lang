@@ -4,6 +4,7 @@ use crate::parser::whitetypes::Type;
 use crate::parser::ParserErrorType;
 use crate::runtime::Runtime;
 use std::any::Any;
+use crate::config::*;
 
 #[derive(Clone)]
 pub(crate) struct ComparisonExpression {
@@ -11,6 +12,9 @@ pub(crate) struct ComparisonExpression {
     operator: String,
     rhs: Box<dyn Expression>,
     errors: Vec<ParserErrorType>,
+    is_greater: bool,
+    is_less: bool,
+    is_equal: bool,
 }
 
 impl ToAny for ComparisonExpression {
@@ -21,7 +25,57 @@ impl ToAny for ComparisonExpression {
 
 impl Expression for ComparisonExpression {
     fn evaluate(&self, runtime: &Runtime) -> Box<dyn Any> {
-        todo!()
+        let lhs_eval = self.lhs.evaluate(runtime);
+        let rhs_eval = self.rhs.evaluate(runtime);
+        if let Some(lhs_f64) = lhs_eval.downcast_ref::<WhiteLangFloat>() {
+            if let Some(rhs_f64) = rhs_eval.downcast_ref::<WhiteLangFloat>() {
+                return if self.is_greater && self.is_equal {
+                    Box::new(lhs_f64 >= rhs_f64)
+                } else if self.is_less && self.is_equal {
+                    Box::new(lhs_f64 <= rhs_f64)
+                } else if self.is_greater {
+                    Box::new(lhs_f64 > rhs_f64)
+                } else {
+                    Box::new(lhs_f64 < rhs_f64)
+                };
+            }
+            if let Some(rhs_isize) = rhs_eval.downcast_ref::<WhiteLangInt>() {
+                return if self.is_greater && self.is_equal {
+                    Box::new(*lhs_f64 >= *rhs_isize as WhiteLangFloat)
+                } else if self.is_less && self.is_equal {
+                    Box::new(*lhs_f64 <= *rhs_isize as WhiteLangFloat)
+                } else if self.is_greater {
+                    Box::new(*lhs_f64 > *rhs_isize as WhiteLangFloat)
+                } else {
+                    Box::new(*lhs_f64 < *rhs_isize as WhiteLangFloat)
+                };
+            }
+        }
+        if let Some(lhs_isize) = lhs_eval.downcast_ref::<isize>() {
+            if let Some(rhs_f64) = rhs_eval.downcast_ref::<f64>() {
+                return if self.is_greater && self.is_equal {
+                    Box::new(*lhs_isize as f64 >= *rhs_f64)
+                } else if self.is_less && self.is_equal {
+                    Box::new(*lhs_isize as f64 <= *rhs_f64)
+                } else if self.is_greater {
+                    Box::new(*lhs_isize as f64 > *rhs_f64)
+                } else {
+                    Box::new((*lhs_isize as f64) < *rhs_f64)
+                };
+            }
+            if let Some(rhs_isize) = rhs_eval.downcast_ref::<isize>() {
+                return if self.is_greater && self.is_equal {
+                    Box::new(*lhs_isize >= *rhs_isize)
+                } else if self.is_less && self.is_equal {
+                    Box::new(*lhs_isize <= *rhs_isize)
+                } else if self.is_greater {
+                    Box::new(*lhs_isize > *rhs_isize)
+                } else {
+                    Box::new(*lhs_isize < *rhs_isize)
+                };
+            }
+        }
+        unreachable!()
     }
 
     fn compile(&self) -> String {
@@ -69,16 +123,17 @@ impl ComparisonExpression {
     ) -> ComparisonExpression {
         ComparisonExpression {
             lhs,
-            operator,
+            operator: operator.clone(),
             rhs,
             errors: vec![],
+            is_greater: operator.contains(">"),
+            is_less: operator.contains("<"),
+            is_equal: operator.contains("="),
         }
     }
-
     fn get_lhs(&self) -> &Box<dyn Expression> {
         &self.lhs
     }
-
     fn get_rhs(&self) -> &Box<dyn Expression> {
         &self.rhs
     }

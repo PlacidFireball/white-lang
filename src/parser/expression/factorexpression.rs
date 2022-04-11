@@ -4,6 +4,7 @@ use crate::parser::whitetypes::Type;
 use crate::parser::ParserErrorType;
 use crate::runtime::Runtime;
 use std::any::Any;
+use crate::config::{WhiteLangFloat, WhiteLangInt};
 
 #[derive(Clone)]
 pub(crate) struct FactorExpression {
@@ -11,7 +12,7 @@ pub(crate) struct FactorExpression {
     operator: String,
     rhs: Box<dyn Expression>,
     errors: Vec<ParserErrorType>,
-    is_mult: bool
+    is_mult: bool,
 }
 
 impl ToAny for FactorExpression {
@@ -21,32 +22,31 @@ impl ToAny for FactorExpression {
 }
 
 impl Expression for FactorExpression {
-
     fn evaluate(&self, runtime: &Runtime) -> Box<dyn Any> {
         let lhs_eval = self.lhs.evaluate(runtime);
         let rhs_eval = self.rhs.evaluate(runtime);
-        if let Some(lhs_f64) = lhs_eval.downcast_ref::<f64>() {
-            if let Some(rhs_f64) = rhs_eval.downcast_ref::<f64>() {
+        if let Some(lhs_f64) = lhs_eval.downcast_ref::<WhiteLangFloat>() {
+            if let Some(rhs_f64) = rhs_eval.downcast_ref::<WhiteLangFloat>() {
                 if self.is_mult {
                     return Box::new(lhs_f64 * rhs_f64);
                 }
                 return Box::new(lhs_f64 / rhs_f64);
             }
-            if let Some(rhs_isize) = rhs_eval.downcast_ref::<isize>() {
+            if let Some(rhs_isize) = rhs_eval.downcast_ref::<WhiteLangInt>() {
                 if self.is_mult {
-                    return Box::new(lhs_f64 * *rhs_isize as f64);
+                    return Box::new(lhs_f64 * *rhs_isize as WhiteLangFloat);
                 }
-                return Box::new(lhs_f64 / *rhs_isize as f64);
+                return Box::new(lhs_f64 / *rhs_isize as WhiteLangFloat);
             }
         }
-        if let Some(lhs_isize) = lhs_eval.downcast_ref::<isize>() {
-            if let Some(rhs_f64) = rhs_eval.downcast_ref::<f64>() {
+        if let Some(lhs_isize) = lhs_eval.downcast_ref::<WhiteLangInt>() {
+            if let Some(rhs_f64) = rhs_eval.downcast_ref::<WhiteLangFloat>() {
                 if self.is_mult {
-                    return Box::new(*lhs_isize as f64 * rhs_f64);
+                    return Box::new(*lhs_isize as WhiteLangFloat * rhs_f64);
                 }
-                return Box::new(*lhs_isize as f64 / rhs_f64);
+                return Box::new(*lhs_isize as WhiteLangFloat / rhs_f64);
             }
-            if let Some(rhs_isize) = rhs_eval.downcast_ref::<isize>() {
+            if let Some(rhs_isize) = rhs_eval.downcast_ref::<WhiteLangInt>() {
                 if self.is_mult {
                     return Box::new(lhs_isize * rhs_isize);
                 }
@@ -100,7 +100,7 @@ impl FactorExpression {
             operator: operator.clone(),
             rhs,
             errors: vec![],
-            is_mult: operator.contains("*")
+            is_mult: operator.contains("*"),
         }
     }
 

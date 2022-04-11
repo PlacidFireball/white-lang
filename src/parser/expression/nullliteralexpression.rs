@@ -15,7 +15,7 @@ impl ToAny for NullLiteralExpression {
 
 impl Expression for NullLiteralExpression {
     fn evaluate(&self, runtime: &Runtime) -> Box<dyn Any> {
-        Box::new(String::from("null"))
+        Box::new("null")
     }
 
     fn compile(&self) -> String {

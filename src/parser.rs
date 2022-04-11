@@ -108,7 +108,7 @@ impl Parser {
 
     pub fn get_expr(&self) -> Option<&Box<dyn Expression>> {
         if let Some(_) = self.expr.to_any().downcast_ref::<SyntaxErrorExpression>() {
-            return Option::None
+            return Option::None;
         }
         Option::Some(&self.expr)
     }

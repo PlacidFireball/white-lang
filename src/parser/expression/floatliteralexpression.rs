@@ -3,10 +3,11 @@ use crate::parser::symbol_table::SymbolTable;
 use crate::parser::whitetypes::Type;
 use crate::runtime::Runtime;
 use std::any::Any;
+use crate::config::WhiteLangFloat;
 
 #[derive(Clone)]
 pub(crate) struct FloatLiteralExpression {
-    value: f64,
+    value: WhiteLangFloat,
 }
 
 impl ToAny for FloatLiteralExpression {
@@ -47,7 +48,7 @@ impl Expression for FloatLiteralExpression {
     }
 }
 impl FloatLiteralExpression {
-    pub(crate) fn new(value: f64) -> FloatLiteralExpression {
+    pub(crate) fn new(value: f64) -> Self {
         FloatLiteralExpression { value }
     }
 }

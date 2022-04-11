@@ -4,6 +4,7 @@ mod parser;
 use parser::Parser;
 mod program;
 mod runtime;
+mod config;
 
 #[allow(unused_variables)]
 fn main() {

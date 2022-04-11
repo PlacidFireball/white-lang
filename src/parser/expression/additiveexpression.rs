@@ -5,6 +5,7 @@ use crate::parser::parser_traits::{Expression, ToAny};
 use crate::parser::symbol_table::SymbolTable;
 use crate::runtime::Runtime;
 use std::any::Any;
+use crate::config::{WhiteLangFloat, WhiteLangInt};
 
 #[derive(Clone)]
 pub(crate) struct AdditiveExpression {
@@ -23,34 +24,39 @@ impl ToAny for AdditiveExpression {
 
 impl Expression for AdditiveExpression {
     fn evaluate(&self, runtime: &Runtime) -> Box<dyn Any> {
+        // Lots of syntax here, but basically what we are doing is getting whatever
+        // the runtime knows, and doing + or - on it based on the operator
+        // currently WhiteLangFloat and WhiteLangInt are hard coded to f64 and isize
+        // respectively but that will be system dependent in the future, I just
+        // abstracted it to make my life easier in the future
         let lhs_eval = self.lhs.evaluate(runtime);
         let rhs_eval = self.rhs.evaluate(runtime);
-        if let Some(lhs_f64) = lhs_eval.downcast_ref::<f64>() {
-            if let Some(rhs_f64) = rhs_eval.downcast_ref::<f64>() {
+        if let Some(lhs_float) = lhs_eval.downcast_ref::<WhiteLangFloat>() {
+            if let Some(rhs_float) = rhs_eval.downcast_ref::<WhiteLangFloat>() {
                 if self.is_add {
-                    return Box::new(lhs_f64 + rhs_f64);
+                    return Box::new(lhs_float + rhs_float);
                 }
-                return Box::new(lhs_f64 - rhs_f64);
+                return Box::new(lhs_float - rhs_float);
             }
-            if let Some(rhs_isize) = rhs_eval.downcast_ref::<isize>() {
+            if let Some(rhs_int) = rhs_eval.downcast_ref::<WhiteLangInt>() {
                 if self.is_add {
-                    return Box::new(lhs_f64 - *rhs_isize as f64);
+                    return Box::new(lhs_float - *rhs_int as WhiteLangFloat);
                 }
-                return Box::new(lhs_f64 - *rhs_isize as f64);
+                return Box::new(lhs_float - *rhs_int as WhiteLangFloat);
             }
         }
-        if let Some(lhs_isize) = lhs_eval.downcast_ref::<isize>() {
-            if let Some(rhs_f64) = rhs_eval.downcast_ref::<f64>() {
+        if let Some(lhs_int) = lhs_eval.downcast_ref::<WhiteLangInt>() {
+            if let Some(rhs_float) = rhs_eval.downcast_ref::<WhiteLangFloat>() {
                 if self.is_add {
-                    return Box::new(*lhs_isize as f64 + rhs_f64);
+                    return Box::new(*lhs_int as WhiteLangFloat + rhs_float);
                 }
-                return Box::new(*lhs_isize as f64 - rhs_f64);
+                return Box::new(*lhs_int as WhiteLangFloat - rhs_float);
             }
-            if let Some(rhs_isize) = rhs_eval.downcast_ref::<isize>() {
+            if let Some(rhs_int) = rhs_eval.downcast_ref::<WhiteLangInt>() {
                 if self.is_add {
-                    return Box::new(lhs_isize + rhs_isize);
+                    return Box::new(lhs_int + rhs_int);
                 }
-                return Box::new(lhs_isize - rhs_isize);
+                return Box::new(lhs_int - rhs_int);
             }
         }
         unreachable!()
@@ -65,9 +71,10 @@ impl Expression for AdditiveExpression {
     }
 
     fn validate(&mut self, st: &SymbolTable) {
+        // I have decided that I am not going to allow + being called on strings,
+        // gonna do some other op, perhaps a concatenate function in std
         self.lhs.validate(st);
         self.rhs.validate(st);
-        // TODO: Figure out what kind of types we should allow +/- to be called on
     }
 
     // gives debug information of the expression without having to downcast it

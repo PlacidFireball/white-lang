@@ -1,9 +1,9 @@
-use std::any::Any;
 use crate::parser;
 use crate::parser::expression::syntaxerrorexpression::SyntaxErrorExpression;
 use crate::parser::parser_traits::{Expression, Statement};
 use crate::parser::ParserErrorType;
 use crate::runtime::Runtime;
+use std::any::Any;
 
 pub struct Program {
     statements: Vec<Box<dyn Statement>>,
@@ -18,7 +18,7 @@ impl Program {
                 statements: statements.clone(),
                 expr: Box::new(SyntaxErrorExpression::new()),
                 output: String::new(),
-                errors: vec![]
+                errors: vec![],
             };
         }
         if let Some(expr) = parser.get_expr() {
@@ -26,7 +26,7 @@ impl Program {
                 statements: vec![],
                 expr: expr.clone(),
                 output: String::new(),
-                errors: vec![]
+                errors: vec![],
             };
         }
         panic!("Uncaught parser error...")
@@ -43,7 +43,7 @@ impl Program {
         }
     }
 
-    fn try_print_output(&mut self, evaluated : Box<dyn Any>) {
+    fn try_print_output(&mut self, evaluated: Box<dyn Any>) {
         if let Some(eval_f64) = evaluated.downcast_ref::<f64>() {
             self.output.push_str(eval_f64.to_string().as_str());
         } else if let Some(eval_isize) = evaluated.downcast_ref::<isize>() {

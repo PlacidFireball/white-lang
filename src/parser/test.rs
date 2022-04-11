@@ -17,7 +17,7 @@ mod test {
     use crate::parser::expression::parenthesizedexpression::ParenthesizedExpression;
     use crate::parser::expression::stringliteralexpression::StringLiteralExpression;
     use crate::parser::expression::unaryexpression::UnaryExpression;
-    use crate::parser::parser_traits::{Statement};
+    use crate::parser::parser_traits::Statement;
     use crate::parser::statement::assignmentstatement::AssignmentStatement;
     use crate::parser::statement::forstatement::ForStatement;
     use crate::parser::statement::functioncallstatement::FunctionCallStatement;
@@ -26,17 +26,17 @@ mod test {
     use crate::parser::statement::variablestatement::VariableStatement;
     use crate::parser::symbol_table::SymbolTable;
     use crate::parser::whitetypes::Type;
+    use crate::program::Program;
+    use crate::runtime::Runtime;
     use crate::TokenType::*;
     use crate::{Parser, Tokenizer};
-    use crate::runtime::Runtime;
-    use crate::program::Program;
 
     fn init_parser(src: String) -> Parser {
         let tokenizer: Tokenizer = Tokenizer::init(src);
         Parser::init(&mut tokenizer.clone())
     }
 
-    fn test_execute(src : &str, expected : &str) {
+    fn test_execute(src: &str, expected: &str) {
         let mut parser = init_parser(src.to_string());
         parser.parse();
         let mut program = Program::from_parser(&mut parser);
@@ -479,15 +479,11 @@ mod test {
     }
 
     #[test]
-    fn test_additive_expression_eval() {
+    fn test_additive_expression_eval_integers() {
         test_execute("1 + 1", "2\n");
         test_execute("2 + 3", "5\n");
         test_execute("1 + 0", "1\n");
         test_execute("1 + -1", "0\n");
-    }
-
-    #[test]
-    fn test_additive_expression_eval_minus() {
         test_execute("1 - 1", "0\n");
         test_execute("1 - -1", "2\n");
         test_execute("1 - 0", "1\n");
@@ -517,5 +513,15 @@ mod test {
         test_execute("9 * 0.33", "2.97\n");
         test_execute("9 * 0.1", "0.9\n");
         test_execute("9 / 3.0", "3\n");
+    }
+
+    #[test]
+    fn test_comparison_expression_eval() {
+        test_execute("2 < 1", "false\n");
+        test_execute("2 <= 2", "true\n");
+        test_execute("1 < 2", "true\n");
+        test_execute("1 >= 1", "true\n");
+        test_execute("2 > 1", "true\n");
+        test_execute("-1 < 0", "true\n");
     }
 }

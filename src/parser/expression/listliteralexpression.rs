@@ -20,7 +20,7 @@ impl ToAny for ListLiteralExpression {
 
 impl Expression for ListLiteralExpression {
     fn evaluate(&self, runtime: &Runtime) -> Box<dyn Any> {
-        let mut evals : Vec<Box<dyn Any>> = vec![];
+        let mut evals: Vec<Box<dyn Any>> = vec![];
         for expr in &self.exprs {
             evals.push(expr.evaluate(runtime));
         }
