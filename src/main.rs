@@ -2,9 +2,9 @@ mod tokenizer;
 use tokenizer::*;
 mod parser;
 use parser::Parser;
+mod config;
 mod program;
 mod runtime;
-mod config;
 
 #[allow(unused_variables)]
 fn main() {

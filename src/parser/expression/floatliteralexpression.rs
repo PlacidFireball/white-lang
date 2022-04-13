@@ -1,9 +1,9 @@
+use crate::config::WhiteLangFloat;
 use crate::parser::parser_traits::{Expression, ToAny};
 use crate::parser::symbol_table::SymbolTable;
 use crate::parser::whitetypes::Type;
 use crate::runtime::Runtime;
 use std::any::Any;
-use crate::config::WhiteLangFloat;
 
 #[derive(Clone)]
 pub(crate) struct FloatLiteralExpression {

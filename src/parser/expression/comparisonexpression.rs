@@ -1,10 +1,10 @@
+use crate::config::*;
 use crate::parser::parser_traits::{Expression, ToAny};
 use crate::parser::symbol_table::SymbolTable;
 use crate::parser::whitetypes::Type;
 use crate::parser::ParserErrorType;
 use crate::runtime::Runtime;
 use std::any::Any;
-use crate::config::*;
 
 #[derive(Clone)]
 pub(crate) struct ComparisonExpression {

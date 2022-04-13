@@ -479,6 +479,15 @@ mod test {
     }
 
     #[test]
+    fn test_basic_expression_eval() {
+        test_execute("1", "1\n");
+        test_execute("false", "false\n");
+        test_execute("null", "null\n");
+        test_execute("\"Hello World!\"", "Hello World!\n");
+        test_execute("[1, 2, 3, 4]", "[1, 2, 3, 4]\n");
+    }
+
+    #[test]
     fn test_additive_expression_eval_integers() {
         test_execute("1 + 1", "2\n");
         test_execute("2 + 3", "5\n");
@@ -523,5 +532,19 @@ mod test {
         test_execute("1 >= 1", "true\n");
         test_execute("2 > 1", "true\n");
         test_execute("-1 < 0", "true\n");
+    }
+
+    #[test]
+    fn test_equality_expression_eval() {
+        test_execute("1 == 1", "true\n");
+        test_execute("1 != 2", "true\n");
+        test_execute("1 != 1", "false\n");
+        test_execute("1 == null", "false\n");
+        test_execute("\"\" == null", "false\n");
+        test_execute("\"\" == \"\"", "true\n");
+        test_execute("null == null", "true\n");
+        test_execute("1 == 1.0", "true\n");
+        test_execute("1 != 1.1", "true\n");
+        test_execute("1.1 != null", "true\n");
     }
 }
