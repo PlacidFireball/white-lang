@@ -16,7 +16,7 @@ impl ToAny for BooleanLiteralExpression {
 }
 
 impl Expression for BooleanLiteralExpression {
-    fn evaluate(&self, runtime: &mut Runtime) -> Box<dyn Any> {
+    fn evaluate(&self, _runtime: &mut Runtime) -> Box<dyn Any> {
         Box::new(self.boolean)
     }
 
@@ -28,7 +28,7 @@ impl Expression for BooleanLiteralExpression {
         todo!()
     }
 
-    fn validate(&mut self, st: &SymbolTable) {}
+    fn validate(&mut self, _st: &SymbolTable) {}
 
     fn debug(&self) -> String {
         String::from(self.boolean.to_string())

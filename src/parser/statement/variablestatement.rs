@@ -77,9 +77,7 @@ impl VariableStatement {
             self.errors.push(ParserErrorType::MismatchedTypes);
         }
     }
-    pub fn get_type(&self) -> Type {
-        self.typ.clone()
-    }
+
     pub fn set_expr(&mut self, expr: Box<dyn Expression>) {
         self.expr = expr;
     }

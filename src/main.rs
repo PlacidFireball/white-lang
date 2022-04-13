@@ -14,5 +14,5 @@ fn main() {
         String::from("print(\"Hello World!\");")
     );
     program.execute();
-    println!("{}", program.output);
+    print!("{}", program.output);
 }

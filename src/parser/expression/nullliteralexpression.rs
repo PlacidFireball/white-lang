@@ -1,10 +1,8 @@
-use crate::config::WhiteLangInt;
 use crate::parser::parser_traits::{Expression, ToAny};
 use crate::parser::symbol_table::SymbolTable;
 use crate::parser::whitetypes::Type;
 use crate::runtime::Runtime;
 use std::any::Any;
-use std::ptr::null;
 
 #[derive(Clone)]
 pub(crate) struct NullLiteralExpression {}
@@ -16,7 +14,7 @@ impl ToAny for NullLiteralExpression {
 }
 
 impl Expression for NullLiteralExpression {
-    fn evaluate(&self, runtime: &mut Runtime) -> Box<dyn Any> {
+    fn evaluate(&self, _runtime: &mut Runtime) -> Box<dyn Any> {
         Box::new("null")
     }
 
@@ -28,7 +26,7 @@ impl Expression for NullLiteralExpression {
         todo!()
     }
 
-    fn validate(&mut self, st: &SymbolTable) {}
+    fn validate(&mut self, _st: &SymbolTable) {}
 
     fn debug(&self) -> String {
         String::from("null")

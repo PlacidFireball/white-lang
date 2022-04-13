@@ -1,6 +1,8 @@
 use std::any::Any;
 use std::collections::HashMap;
 use std::ops::Deref;
+use std::rc::Rc;
+use crate::config::*;
 use crate::parser::expression::syntaxerrorexpression::SyntaxErrorExpression;
 use crate::parser::parser_traits::Expression;
 
@@ -21,8 +23,9 @@ impl Runtime {
     pub fn get_value(&mut self, name: String) -> Option<Box<dyn Any + '_>> {
         for i in self.scopes.len()-1..0 {
             if self.scopes[i].contains_key(&name) {
+
                 let val = self.scopes[i].remove(&name).unwrap();
-                return Option::Some(val);
+                return Some(val);
             }
         }
         if self.scopes.len() == 1 {
@@ -45,10 +48,13 @@ impl Runtime {
     pub fn push_scope(&mut self) {
         self.scopes.push(HashMap::new());
     }
+
     pub fn pop_scope(&mut self) {
         self.scopes.pop();
     }
+
     pub fn set_return(&mut self, ret: Box<dyn Expression>) { self.ret = ret; }
+
     pub fn has_return(&mut self) -> bool {
         if let Some(expr) = self.ret.to_any().downcast_ref::<SyntaxErrorExpression>() {
             return false
@@ -58,7 +64,9 @@ impl Runtime {
     pub fn push_output(&mut self, str: String) {
         self.output.push_str(str.as_str());
     }
+
     pub fn get_output(&self) -> String { return self.output.clone(); }
+
     pub fn has_symbol(&self, name : String) -> bool {
         for i in self.scopes.len()-1..0 {
             if self.scopes[i].contains_key(&name) {

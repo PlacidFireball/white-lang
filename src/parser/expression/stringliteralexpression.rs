@@ -16,7 +16,7 @@ impl ToAny for StringLiteralExpression {
 }
 
 impl Expression for StringLiteralExpression {
-    fn evaluate(&self, runtime: &mut Runtime) -> Box<dyn Any> {
+    fn evaluate(&self, _runtime: &mut Runtime) -> Box<dyn Any> {
         Box::new(self.string_value.clone())
     }
 
@@ -28,7 +28,7 @@ impl Expression for StringLiteralExpression {
         todo!()
     }
 
-    fn validate(&mut self, st: &SymbolTable) {}
+    fn validate(&mut self, _st: &SymbolTable) {}
 
     fn debug(&self) -> String {
         self.string_value.clone()

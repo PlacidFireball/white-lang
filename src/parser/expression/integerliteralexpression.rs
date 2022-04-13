@@ -17,7 +17,7 @@ impl ToAny for IntegerLiteralExpression {
 }
 
 impl Expression for IntegerLiteralExpression {
-    fn evaluate(&self, runtime: &mut Runtime) -> Box<dyn Any> {
+    fn evaluate(&self, _runtime: &mut Runtime) -> Box<dyn Any> {
         Box::new(self.value)
     }
 
@@ -29,7 +29,7 @@ impl Expression for IntegerLiteralExpression {
         todo!()
     }
 
-    fn validate(&mut self, st: &SymbolTable) {}
+    fn validate(&mut self, _st: &SymbolTable) {}
 
     fn debug(&self) -> String {
         String::from(self.value.to_string())

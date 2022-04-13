@@ -14,8 +14,8 @@ impl ToAny for SyntaxErrorExpression {
 }
 
 impl Expression for SyntaxErrorExpression {
-    fn evaluate(&self, runtime: &mut Runtime) -> Box<dyn Any> {
-        unimplemented!()
+    fn evaluate(&self, _runtime: &mut Runtime) -> Box<dyn Any> {
+        panic!("Evaluating SyntaxErrorExpression... panic");
     }
 
     fn compile(&self) {
@@ -26,7 +26,7 @@ impl Expression for SyntaxErrorExpression {
         todo!()
     }
 
-    fn validate(&mut self, st: &SymbolTable) {}
+    fn validate(&mut self, _st: &SymbolTable) {}
 
     fn debug(&self) -> String {
         String::from("Syntax Error")

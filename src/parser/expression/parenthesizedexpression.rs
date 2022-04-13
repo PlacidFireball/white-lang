@@ -52,7 +52,4 @@ impl ParenthesizedExpression {
     pub fn new(expr: Box<dyn Expression>) -> ParenthesizedExpression {
         ParenthesizedExpression { expr }
     }
-    pub fn get_expr(&self) -> &Box<dyn Expression> {
-        &self.expr
-    }
 }

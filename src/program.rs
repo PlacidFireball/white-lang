@@ -5,8 +5,8 @@ use crate::parser::parser_traits::{Expression, Statement};
 use crate::parser::ParserErrorType;
 use crate::runtime::Runtime;
 use std::any::Any;
-use std::ops::Deref;
 
+#[allow(dead_code)]
 pub struct Program {
     statements: Vec<Box<dyn Statement>>,
     expr: Box<dyn Expression>,
