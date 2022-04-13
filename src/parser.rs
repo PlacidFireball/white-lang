@@ -40,38 +40,39 @@ use statement::syntaxerrorstatement::SyntaxErrorStatement;
 use crate::parser::parser_traits::{Expression, Statement};
 use statement::variablestatement::VariableStatement;
 use symbol_table::SymbolTable;
+use crate::config::WhiteLangFloat;
 
 // Parsing Errors
 #[derive(Clone, Copy, Debug, PartialOrd, PartialEq)]
 pub(crate) enum ParserErrorType {
-    UnexpectedToken,
-    UnterminatedArgList,
-    UnterminatedList,
-    BadOperator,
-    MismatchedTypes,
-    SymbolDefinitionError,
-    DuplicateName,
-    BadReturnType,
-    BadVariableType,
-    UnknownName,
-    ArgMismatch,
-    IncompatibleTypes,
+    UnexpectedToken,        // we've encountered some unexpected token
+    UnterminatedArgList,    // function has unterminated argument list
+    UnterminatedList,       // list literal is unterminated
+    BadOperator,            // calling operator on types that don't make sense
+    MismatchedTypes,        // attempting to pass bad types into various facets of whitelang
+    SymbolDefinitionError,  //
+    DuplicateName,          // attempting to redefine a symbol already in the symbol table
+    BadReturnType,          // function returns a type that it's not supposed to
+    BadVariableType,        // variable has bad type
+    UnknownName,            // trying to assign to a variable that whitelang doesn't know about
+    ArgMismatch,            //
+    IncompatibleTypes,      //
 }
 
 // The White-lang parser
 #[allow(dead_code)]
 pub struct Parser {
     token_list: Vec<Token>, // gets the token list
-    statement_list: Vec<Box<dyn Statement>>,
-    st: SymbolTable,
-    expr: Box<dyn Expression>,
+    statement_list: Vec<Box<dyn Statement>>, // generates a list of statements
+    st: SymbolTable, // has a symbol table
+    expr: Box<dyn Expression>, // generates an expression
     curr_idx: usize, // what token it's on
     curr_fn_def: String,
     errors: Vec<ParserErrorType>, // and possible errors
 }
 #[allow(dead_code)]
 impl Parser {
-    pub fn init(tokenizer: &mut Tokenizer) -> Parser {
+    pub fn new(tokenizer: &mut Tokenizer) -> Parser {
         // the constructor
         if tokenizer.get_token_list().to_vec().is_empty() {
             tokenizer.tokenize();
@@ -87,15 +88,17 @@ impl Parser {
         }
     }
 
-    // main loop (eventually)
+    // main loop
     pub fn parse(&mut self) {
-        let expr = self.parse_expression();
+        let expr = self.parse_expression(); // try to parse an expression
+        // check if the parser got a good expression, and if all tokens are consumed
         if expr
             .to_any()
             .downcast_ref::<SyntaxErrorExpression>()
             .is_some()
             || self.has_tokens()
         {
+            // if we've got more stuff to do, parse statements
             self.curr_idx = 0;
             while self.has_tokens() {
                 let stmt = self.parse_statement();
@@ -106,6 +109,7 @@ impl Parser {
         }
     }
 
+    /// Retrieve the expression if the parser has it
     pub fn get_expr(&self) -> Option<&Box<dyn Expression>> {
         if let Some(_) = self.expr.to_any().downcast_ref::<SyntaxErrorExpression>() {
             return Option::None;
@@ -113,6 +117,7 @@ impl Parser {
         Option::Some(&self.expr)
     }
 
+    /// Get the statement list if the parser has it
     pub fn get_statements(&self) -> Option<&Vec<Box<dyn Statement>>> {
         if let Some(_) = self.expr.to_any().downcast_ref::<SyntaxErrorExpression>() {
             return Option::Some(&self.statement_list);
@@ -180,28 +185,28 @@ impl Parser {
     }
 
     fn require_a_type(&mut self) -> Type {
-        let types = vec!["string", "bool", "float", "int", "void"];
+        let types = vec!["string", "bool", "float", "int", "void"]; // all the types we can assign to so far
         let curr_tok = self.get_curr_tok().get_string_value();
-        for i in 0..types.len() - 1 {
+        for i in 0..types.len() - 1 { // try to match some type, if we get a good one, return it
             if types[i] == curr_tok {
                 self.consume_token();
                 return Type::new(types[i]);
             }
         }
-        let opt_typ = self.try_parse_list_type();
+        let opt_typ = self.try_parse_list_type(); // try and parse a list<type>
         if opt_typ.is_some() {
             return opt_typ.unwrap();
         }
-        self.errors.push(ParserErrorType::BadVariableType);
+        self.errors.push(ParserErrorType::BadVariableType); // otherwise we've got some errors
         Type::Error
     }
 
     fn try_parse_list_type(&mut self) -> Option<Type> {
-        if self.match_str_val(String::from("list")) {
+        if self.match_str_val(String::from("list")) { // match list
             self.consume_token();
-            self.match_and_consume(Less);
-            let mut typ = self.require_a_type().get_list_type();
-            self.match_and_consume(Greater);
+            self.match_and_consume(Less); // <
+            let mut typ = self.require_a_type().get_list_type(); // make sure we are parsing some type
+            self.match_and_consume(Greater); // >
             if typ != Type::Error {
                 return Option::Some(typ);
             }
@@ -213,6 +218,7 @@ impl Parser {
     /* Statement Parsing - all the statements that White-Lang accepts for now     */
     // -------------------------------------------------------------------------- //
     fn parse_statement(&mut self) -> Box<dyn Statement> {
+        // pretty readable code, I assume you can read it :-)
         let var_stmt = self.parse_variable_statement();
         if var_stmt.is_some() {
             return Box::new(var_stmt.unwrap());
@@ -249,6 +255,7 @@ impl Parser {
     }
 
     fn parse_function_definition_statement(&mut self) -> Option<FunctionDefinitionStatement> {
+        // fn _name_(arg1 : type1, ... argn typen) [: return] { statements }
         if self.match_and_consume(Function) {
             let name = self.get_curr_tok().get_string_value();
             let mut fds = FunctionDefinitionStatement::new(name.clone());
@@ -302,6 +309,7 @@ impl Parser {
     }
 
     fn parse_return_statement(&mut self) -> Option<ReturnStatement> {
+        // return expr
         if self.match_token(Return) {
             self.consume_token();
             let rs = ReturnStatement::new(self.parse_expression(), self.curr_fn_def.clone());
@@ -312,12 +320,13 @@ impl Parser {
     }
 
     fn parse_for_statement(&mut self) -> Option<ForStatement> {
+        // for (x in [1, 2, 3]) { statements }
         if self.match_and_consume(For) {
             let mut fs = ForStatement::new();
             self.require_token(LeftParen);
             fs.set_iter_var(self.parse_identifier_expression());
             self.require_token(In);
-            fs.set_iter(self.parse_list_literal_expression());
+            fs.set_iter(self.parse_list_literal_expression()); // TODO: more iterators
             self.require_token(RightParen);
             self.require_token(LeftBrace);
             while !self.match_and_consume(RightBrace) {
@@ -329,6 +338,7 @@ impl Parser {
     }
 
     fn parse_assignment_statement(&mut self) -> Option<AssignmentStatement> {
+        // x = expr;
         if self.match_token(Identifier) && self.peek_next_token(Equal) {
             let mut assignmentstatement = AssignmentStatement::new();
             assignmentstatement.set_variable(self.parse_expression());
@@ -341,6 +351,7 @@ impl Parser {
     }
 
     fn parse_print_statement(&mut self) -> Option<PrintStatement> {
+        // print(expr);
         if self.match_token(Print) {
             self.require_token(Print);
             self.require_token(LeftParen);
@@ -386,6 +397,7 @@ impl Parser {
     }
 
     fn parse_function_call_statement(&mut self) -> Option<FunctionCallStatement> {
+        // x(args);
         if self.match_token(Identifier) && self.peek_next_token(LeftParen) {
             let name = self.token_list[self.curr_idx.clone()].get_string_value();
             let expr = self.parse_expression(); // retrieve the function call expression
@@ -400,6 +412,14 @@ impl Parser {
     // -------------------------------------------------------------------------- //
     /* Expression Parsing - all lexemes that can be evaluated to a specific value */
     // -------------------------------------------------------------------------- //
+
+    /*
+    This is a pretty cool algorithm. I was taught this in my compilers class at
+    Montana State University. It is called recursive descent.
+    https://en.wikipedia.org/wiki/Recursive_descent_parser#:~:text=In%20computer%20science%2C%20a%20recursive,the%20nonterminals%20of%20the%20grammar.
+     */
+
+
     fn parse_expression(&mut self) -> Box<dyn Expression> {
         let mut expr = self.parse_additive_expression();
         expr.validate(&self.st);
@@ -421,6 +441,8 @@ impl Parser {
 
     // <expr> * <expr>
     fn parse_factor_expression(&mut self) -> Box<dyn Expression> {
+        // similar to additive, but deeper in the grammar so we evaluate factor expressions
+        // before we evaluate additive expressions
         let mut expr = self.parse_comparison_expression();
         while self.match_token(Star) || self.match_token(Slash) {
             let operator = self.get_curr_tok().get_string_value();
@@ -508,6 +530,7 @@ impl Parser {
         self.parse_parenthesized_expression()
     }
 
+    // (expr)
     fn parse_parenthesized_expression(&mut self) -> Box<dyn Expression> {
         if self.match_token(LeftParen) {
             self.consume_token();
@@ -531,29 +554,29 @@ impl Parser {
     }
 
     fn parse_float_literal_expression(&mut self) -> Box<dyn Expression> {
-        if self.match_token(Float) {
+        return if self.match_token(Float) {
             // parse float
             let expr = FloatLiteralExpression::new(
                 self.token_list[self.curr_idx]
                     .get_string_value()
-                    .parse::<f64>()
+                    .parse::<WhiteLangFloat>()
                     .unwrap(),
             );
             self.consume_token();
-            return Box::new(expr);
+            Box::new(expr)
         } else {
-            return self.parse_string_literal_expression();
+            self.parse_string_literal_expression()
         }
     }
 
     fn parse_string_literal_expression(&mut self) -> Box<dyn Expression> {
-        if self.match_token(Str) {
+        return if self.match_token(Str) {
             // parse string
             let expr = StringLiteralExpression::new(self.get_curr_tok().get_string_value());
             self.consume_token();
-            return Box::new(expr);
+            Box::new(expr)
         } else {
-            return self.parse_integer_literal_expression();
+            self.parse_integer_literal_expression()
         }
     }
 

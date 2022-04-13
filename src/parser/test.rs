@@ -33,7 +33,7 @@ mod test {
 
     fn init_parser(src: String) -> Parser {
         let tokenizer: Tokenizer = Tokenizer::init(src);
-        Parser::init(&mut tokenizer.clone())
+        Parser::new(&mut tokenizer.clone())
     }
 
     fn test_execute(src: &str, expected: &str) {

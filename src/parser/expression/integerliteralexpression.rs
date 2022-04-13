@@ -3,10 +3,11 @@ use crate::parser::symbol_table::SymbolTable;
 use crate::parser::whitetypes::Type;
 use crate::runtime::Runtime;
 use std::any::Any;
+use crate::config::*;
 
 #[derive(Clone)]
 pub(crate) struct IntegerLiteralExpression {
-    value: isize,
+    value: WhiteLangInt,
 }
 
 impl ToAny for IntegerLiteralExpression {
@@ -47,7 +48,7 @@ impl Expression for IntegerLiteralExpression {
     }
 }
 impl IntegerLiteralExpression {
-    pub fn new(value: isize) -> IntegerLiteralExpression {
+    pub fn new(value: WhiteLangInt) -> IntegerLiteralExpression {
         IntegerLiteralExpression { value }
     }
 }

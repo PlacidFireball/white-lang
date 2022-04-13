@@ -21,7 +21,10 @@ impl ToAny for IdentifierExpression {
 
 impl Expression for IdentifierExpression {
     fn evaluate(&self, runtime: &Runtime) -> Box<dyn Any> {
-        Box::new(self.name.clone())
+        //if let Some(eval) = runtime.get_value(self.name.clone()) {
+        //    return eval;
+        //}
+        panic!()
     }
 
     fn compile(&self) -> String {

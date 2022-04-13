@@ -48,7 +48,7 @@ impl Expression for FloatLiteralExpression {
     }
 }
 impl FloatLiteralExpression {
-    pub(crate) fn new(value: f64) -> Self {
+    pub(crate) fn new(value: WhiteLangFloat) -> Self {
         FloatLiteralExpression { value }
     }
 }

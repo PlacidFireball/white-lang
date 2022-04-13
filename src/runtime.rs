@@ -10,12 +10,12 @@ impl Runtime {
             scopes: vec![HashMap::new()],
         }
     }
+
+    // TODO : figure out how to make this not 'static :)
     pub fn get_value(&'static self, name: String) -> Option<Box<dyn Any + '_>> {
-        let mut map_iterator = self.scopes.iter().rev();
-        while map_iterator.next().is_some() {
-            let scope = map_iterator.next().unwrap();
-            if scope.contains_key(&name) {
-                let val = scope.get(&name).unwrap();
+        for i in self.scopes.len()-1..0 {
+            if self.scopes[i].contains_key(&name) {
+                let val = self.scopes[i].get(&name).unwrap();
                 return Option::Some(Box::new(val));
             }
         }

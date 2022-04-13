@@ -185,7 +185,7 @@ impl Tokenizer {
             keywords: init_keywords(),
             src,
             char_vec: char_vec,
-            curr_char: 'a',
+            curr_char: '\0',
             position: 0,
             line: 1,
             line_offset: 0,
