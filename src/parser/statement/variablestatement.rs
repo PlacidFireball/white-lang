@@ -53,7 +53,7 @@ impl Statement for VariableStatement {
     }
 
     fn get_statement_type(&self) -> String {
-        todo!()
+        String::from("VariableStatement")
     }
 
     fn has_errors(&self) -> bool {
@@ -83,5 +83,8 @@ impl VariableStatement {
     }
     pub fn has_errors(&self) -> bool {
         !self.errors.is_empty()
+    }
+    pub fn get_type(&self) -> Type {
+        self.typ
     }
 }

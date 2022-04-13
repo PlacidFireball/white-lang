@@ -1,4 +1,5 @@
 use std::any::Any;
+use std::cell::RefCell;
 use std::collections::HashMap;
 use std::ops::Deref;
 use std::rc::Rc;
@@ -7,7 +8,7 @@ use crate::parser::expression::syntaxerrorexpression::SyntaxErrorExpression;
 use crate::parser::parser_traits::Expression;
 
 pub struct Runtime {
-    scopes: Vec<HashMap<String, Box<dyn Any>>>,
+    scopes: Vec<HashMap<String, Rc<RefCell<dyn Any>>>>,
     ret: Box<dyn Expression>,
     pub(crate) output: String
 }
@@ -21,29 +22,27 @@ impl Runtime {
     }
 
     pub fn get_value(&mut self, name: String) -> Option<Box<dyn Any + '_>> {
-        for i in self.scopes.len()-1..0 {
+        for i in (0..self.scopes.len()).rev() {
             if self.scopes[i].contains_key(&name) {
-
                 let val = self.scopes[i].remove(&name).unwrap();
-                return Some(val);
-            }
-        }
-        if self.scopes.len() == 1 {
-            if self.scopes[0].contains_key(&name) {
-                let val = self.scopes[0].remove(&name).unwrap();
-                return Option::Some(val);
+                if let Some(integer) = val.borrow().downcast_ref::<isize>() {
+                    println!("Got an integer!");
+                }
+                let cloned = val.clone();
+                self.scopes[i].insert(name.clone(), cloned);
+                return Some(Box::new(val));
             }
         }
         Option::None
     }
     pub fn set_value(&mut self, name: String, value: Box<dyn Any>) {
-        for i in self.scopes.len()-1..0 {
+        for i in (0..self.scopes.len()).rev() {
             if self.scopes[i].contains_key(&name) {
-                self.scopes[i].insert(name.clone(), value);
+                self.scopes[i].insert(name.clone(), Rc::new(RefCell::new(value)));
                 return;
             }
         }
-        self.scopes.last_mut().unwrap().insert(name.clone(), value);
+        self.scopes.last_mut().unwrap().insert(name.clone(), Rc::new(RefCell::new(value)));
     }
     pub fn push_scope(&mut self) {
         self.scopes.push(HashMap::new());

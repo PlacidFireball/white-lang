@@ -11,7 +11,7 @@ mod runtime;
 #[allow(unused_variables)]
 fn main() {
     let mut program : Program = Program::from_src(
-        String::from("print(\"Hello World!\");")
+        String::from("let x : int = 10; print(x); x = 20; print(x);")
     );
     program.execute();
     print!("{}", program.output);

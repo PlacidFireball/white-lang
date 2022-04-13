@@ -21,7 +21,10 @@ impl ToAny for IdentifierExpression {
 
 impl Expression for IdentifierExpression {
     fn evaluate(&self, runtime: &mut Runtime) -> Box<dyn Any> {
-        let _debug_has_key : bool = runtime.has_symbol(self.name.clone());
+        let debug_has_key : bool = runtime.has_symbol(self.name.clone());
+        if debug_has_key {
+            println!("Runtime has symbol: {}", self.name);
+        }
         if let Some(eval) = runtime.get_value(self.name.clone()) {
             return eval;
         }
