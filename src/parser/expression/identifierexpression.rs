@@ -5,6 +5,7 @@ use crate::parser::ParserErrorType;
 use crate::parser::ParserErrorType::UnknownName;
 use crate::runtime::Runtime;
 use std::any::Any;
+use std::ops::Deref;
 
 #[derive(Clone)]
 pub(crate) struct IdentifierExpression {
@@ -20,9 +21,10 @@ impl ToAny for IdentifierExpression {
 }
 
 impl Expression for IdentifierExpression {
-    fn evaluate(&self, runtime: &Runtime) -> Box<dyn Any + '_> {
+    fn evaluate(&self, runtime: &mut Runtime) -> Box<dyn Any> {
+        let has_key : bool = runtime.has_symbol(self.name.clone());
         if let Some(eval) = runtime.get_value(self.name.clone()) {
-            //return eval; // TODO: deref eval or change method signature
+            return eval;
         }
         panic!("Undefined variable")
     }

@@ -1,5 +1,5 @@
 use crate::config::WhiteLangList;
-use crate::parser;
+use crate::{parser, Parser, Tokenizer};
 use crate::parser::expression::syntaxerrorexpression::SyntaxErrorExpression;
 use crate::parser::parser_traits::{Expression, Statement};
 use crate::parser::ParserErrorType;
@@ -15,6 +15,12 @@ pub struct Program {
     errors: Vec<ParserErrorType>,
 }
 impl Program {
+    pub fn from_src(src: String) -> Self {
+        let mut tokenizer : Tokenizer = Tokenizer::init(src);
+        let mut parser : Parser = Parser::new(&mut tokenizer);
+        parser.parse();
+        Program::from_parser(&mut parser)
+    }
     pub fn from_parser(parser: &mut parser::Parser) -> Self {
         if let Some(statements) = parser.get_statements() {
             return Program {
@@ -39,7 +45,7 @@ impl Program {
 
     pub fn execute(&mut self) {
         if self.statements.is_empty() {
-            let eval = self.expr.evaluate(&self.runtime);
+            let eval = self.expr.evaluate(&mut self.runtime);
             self.output += &Program::try_print_output(&eval);
             self.output.push_str("\n");
         } else {

@@ -23,7 +23,8 @@ impl ToAny for VariableStatement {
 
 impl Statement for VariableStatement {
     fn execute(&self, runtime: &mut Runtime) {
-        runtime.set_value(self.name.clone(), self.expr.evaluate(runtime));
+        let eval = self.expr.evaluate(runtime);
+        runtime.set_value(self.name.clone(), eval);
     }
 
     fn compile(&self) {

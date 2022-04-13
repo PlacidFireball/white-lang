@@ -14,7 +14,7 @@ impl ToAny for SyntaxErrorExpression {
 }
 
 impl Expression for SyntaxErrorExpression {
-    fn evaluate(&self, runtime: &Runtime) -> Box<dyn Any> {
+    fn evaluate(&self, runtime: &mut Runtime) -> Box<dyn Any> {
         unimplemented!()
     }
 

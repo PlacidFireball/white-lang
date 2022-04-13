@@ -38,7 +38,7 @@ pub fn default_expr() -> Box<dyn Expression> {
 
 #[allow(dead_code)]
 pub trait Expression: ToAny {
-    fn evaluate(&self, runtime: &Runtime) -> Box<dyn Any>; // evaluate the expression
+    fn evaluate(&self, runtime: &mut Runtime) -> Box<dyn Any>; // evaluate the expression
     fn compile(&self); // compile the expression to nasm
     fn transpile(&self); // transpile the expression to javascript
     fn validate(&mut self, st: &SymbolTable); // validate the expression via the symbol table

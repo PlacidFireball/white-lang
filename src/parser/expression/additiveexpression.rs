@@ -23,7 +23,7 @@ impl ToAny for AdditiveExpression {
 }
 
 impl Expression for AdditiveExpression {
-    fn evaluate(&self, runtime: &Runtime) -> Box<dyn Any> {
+    fn evaluate(&self, runtime: &mut Runtime) -> Box<dyn Any> {
         // Lots of syntax here, but basically what we are doing is getting whatever
         // the runtime knows, and doing + or - on it based on the operator
         // currently WhiteLangFloat and WhiteLangInt are hard coded to f64 and isize

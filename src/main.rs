@@ -2,12 +2,17 @@ mod tokenizer;
 use tokenizer::*;
 mod parser;
 use parser::Parser;
+use crate::program::Program;
+
 mod config;
 mod program;
 mod runtime;
 
 #[allow(unused_variables)]
 fn main() {
-    let tokenizer = Tokenizer::init("1.1".to_string());
-    let parser = Parser::new(&mut tokenizer.clone());
+    let mut program : Program = Program::from_src(
+        String::from("print(\"Hello World!\");")
+    );
+    program.execute();
+    println!("{}", program.output);
 }

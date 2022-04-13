@@ -22,7 +22,7 @@ impl ToAny for EqualityExpression {
 }
 
 impl Expression for EqualityExpression {
-    fn evaluate(&self, runtime: &Runtime) -> Box<dyn Any> {
+    fn evaluate(&self, runtime: &mut Runtime) -> Box<dyn Any> {
         let lhs_eval = self.lhs.evaluate(runtime);
         let rhs_eval = self.rhs.evaluate(runtime);
         let is_equal = self.operator.contains("==");

@@ -16,7 +16,7 @@ impl ToAny for ParenthesizedExpression {
 }
 
 impl Expression for ParenthesizedExpression {
-    fn evaluate(&self, runtime: &Runtime) -> Box<dyn Any> {
+    fn evaluate(&self, runtime: &mut Runtime) -> Box<dyn Any> {
         self.expr.evaluate(runtime)
     }
 

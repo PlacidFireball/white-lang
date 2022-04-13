@@ -17,7 +17,7 @@ impl ToAny for FloatLiteralExpression {
 }
 
 impl Expression for FloatLiteralExpression {
-    fn evaluate(&self, runtime: &Runtime) -> Box<dyn Any> {
+    fn evaluate(&self, runtime: &mut Runtime) -> Box<dyn Any> {
         Box::new(self.value)
     }
 

@@ -21,7 +21,7 @@ impl ToAny for FunctionCallExpression {
 }
 
 impl Expression for FunctionCallExpression {
-    fn evaluate(&self, runtime: &Runtime) -> Box<dyn Any> {
+    fn evaluate(&self, runtime: &mut Runtime) -> Box<dyn Any> {
         todo!()
     }
 

@@ -16,7 +16,7 @@ impl ToAny for NullLiteralExpression {
 }
 
 impl Expression for NullLiteralExpression {
-    fn evaluate(&self, runtime: &Runtime) -> Box<dyn Any> {
+    fn evaluate(&self, runtime: &mut Runtime) -> Box<dyn Any> {
         Box::new("null")
     }
 

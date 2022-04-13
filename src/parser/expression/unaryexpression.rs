@@ -21,7 +21,7 @@ impl ToAny for UnaryExpression {
 }
 
 impl Expression for UnaryExpression {
-    fn evaluate(&self, runtime: &Runtime) -> Box<dyn Any> {
+    fn evaluate(&self, runtime: &mut Runtime) -> Box<dyn Any> {
         if self.is_not {
             let eval = self.expr.evaluate(runtime);
             if let Some(eval_bool) = eval.downcast_ref::<bool>() {

@@ -22,7 +22,7 @@ impl ToAny for FactorExpression {
 }
 
 impl Expression for FactorExpression {
-    fn evaluate(&self, runtime: &Runtime) -> Box<dyn Any> {
+    fn evaluate(&self, runtime: &mut Runtime) -> Box<dyn Any> {
         let lhs_eval = self.lhs.evaluate(runtime);
         let rhs_eval = self.rhs.evaluate(runtime);
         if let Some(lhs_f64) = lhs_eval.downcast_ref::<WhiteLangFloat>() {
