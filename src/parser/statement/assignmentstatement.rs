@@ -4,6 +4,7 @@ use crate::parser::parser_traits::{Expression, Statement, ToAny};
 use crate::parser::symbol_table::SymbolTable;
 use crate::parser::ParserErrorType;
 use std::any::Any;
+use crate::runtime::Runtime;
 
 #[derive(Clone)]
 pub(crate) struct AssignmentStatement {
@@ -19,11 +20,11 @@ impl ToAny for AssignmentStatement {
 }
 
 impl Statement for AssignmentStatement {
-    fn execute(&self) -> String {
+    fn execute(&self, runtime: &Runtime) {
         todo!()
     }
 
-    fn compile(&self) -> String {
+    fn compile(&self) {
         todo!()
     }
 

@@ -2,6 +2,7 @@ use crate::parser::parser_traits::{Expression, Statement, ToAny};
 use crate::parser::statement::returnstatement::ReturnStatement;
 use crate::parser::symbol_table::SymbolTable;
 use crate::parser::*;
+use crate::runtime::Runtime;
 
 #[derive(Clone)]
 pub struct FunctionDefinitionStatement {
@@ -33,11 +34,11 @@ impl Default for FunctionDefinitionStatement {
 }
 
 impl Statement for FunctionDefinitionStatement {
-    fn execute(&self) -> String {
+    fn execute(&self, runtime: &Runtime) {
         todo!()
     }
 
-    fn compile(&self) -> String {
+    fn compile(&self) {
         todo!()
     }
 

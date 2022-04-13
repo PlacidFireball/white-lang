@@ -62,12 +62,12 @@ impl Expression for AdditiveExpression {
         unreachable!()
     }
 
-    fn compile(&self) -> String {
-        String::from("")
+    fn compile(&self) {
+
     }
 
-    fn transpile(&self) -> String {
-        String::from("")
+    fn transpile(&self) {
+
     }
 
     fn validate(&mut self, st: &SymbolTable) {

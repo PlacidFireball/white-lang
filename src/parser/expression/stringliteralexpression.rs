@@ -20,11 +20,11 @@ impl Expression for StringLiteralExpression {
         Box::new(self.string_value.clone())
     }
 
-    fn compile(&self) -> String {
+    fn compile(&self) {
         todo!()
     }
 
-    fn transpile(&self) -> String {
+    fn transpile(&self) {
         todo!()
     }
 

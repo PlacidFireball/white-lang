@@ -6,6 +6,7 @@ use crate::parser::symbol_table::SymbolTable;
 use crate::parser::whitetypes::Type;
 use crate::parser::ParserErrorType;
 use std::any::Any;
+use crate::runtime::Runtime;
 
 #[derive(Clone)]
 pub(crate) struct ForStatement {
@@ -22,11 +23,11 @@ impl ToAny for ForStatement {
 }
 
 impl Statement for ForStatement {
-    fn execute(&self) -> String {
+    fn execute(&self, runtime: &Runtime) {
         todo!()
     }
 
-    fn compile(&self) -> String {
+    fn compile(&self) {
         todo!()
     }
 

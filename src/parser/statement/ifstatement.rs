@@ -5,6 +5,7 @@ use crate::parser::whitetypes::Type;
 use crate::parser::ParserErrorType;
 use crate::parser::ParserErrorType::UnexpectedToken;
 use std::any::Any;
+use crate::runtime::Runtime;
 
 #[derive(Clone)]
 pub struct IfStatement {
@@ -20,11 +21,11 @@ impl ToAny for IfStatement {
     }
 }
 impl Statement for IfStatement {
-    fn execute(&self) -> String {
+    fn execute(&self, runtime: &Runtime) {
         todo!()
     }
 
-    fn compile(&self) -> String {
+    fn compile(&self) {
         todo!()
     }
 

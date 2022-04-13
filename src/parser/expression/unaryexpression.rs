@@ -39,11 +39,11 @@ impl Expression for UnaryExpression {
         unimplemented!()
     }
 
-    fn compile(&self) -> String {
+    fn compile(&self) {
         todo!()
     }
 
-    fn transpile(&self) -> String {
+    fn transpile(&self) {
         todo!()
     }
 

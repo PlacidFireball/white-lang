@@ -27,11 +27,11 @@ impl Expression for ListLiteralExpression {
         Box::new(evals)
     }
 
-    fn compile(&self) -> String {
+    fn compile(&self) {
         todo!()
     }
 
-    fn transpile(&self) -> String {
+    fn transpile(&self) {
         todo!()
     }
 

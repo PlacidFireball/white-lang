@@ -5,6 +5,7 @@ use crate::parser::whitetypes::Type;
 use crate::parser::ParserErrorType;
 use crate::parser::ParserErrorType::SymbolDefinitionError;
 use std::any::Any;
+use crate::runtime::Runtime;
 
 #[derive(Clone)]
 pub(crate) struct VariableStatement {
@@ -21,11 +22,11 @@ impl ToAny for VariableStatement {
 }
 
 impl Statement for VariableStatement {
-    fn execute(&self) -> String {
+    fn execute(&self, runtime: &Runtime) {
         todo!()
     }
 
-    fn compile(&self) -> String {
+    fn compile(&self) {
         todo!()
     }
 

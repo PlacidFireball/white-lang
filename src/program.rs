@@ -10,6 +10,7 @@ use std::ops::Deref;
 pub struct Program {
     statements: Vec<Box<dyn Statement>>,
     expr: Box<dyn Expression>,
+    runtime: Runtime,
     pub output: String,
     errors: Vec<ParserErrorType>,
 }
@@ -19,6 +20,7 @@ impl Program {
             return Program {
                 statements: statements.clone(),
                 expr: Box::new(SyntaxErrorExpression::new()),
+                runtime: Runtime::new(),
                 output: String::new(),
                 errors: vec![],
             };
@@ -27,6 +29,7 @@ impl Program {
             return Program {
                 statements: vec![],
                 expr: expr.clone(),
+                runtime: Runtime::new(),
                 output: String::new(),
                 errors: vec![],
             };
@@ -36,12 +39,12 @@ impl Program {
 
     pub fn execute(&mut self) {
         if self.statements.is_empty() {
-            let eval = self.expr.evaluate(&Runtime::new());
+            let eval = self.expr.evaluate(&self.runtime);
             self.try_print_output(&eval);
             self.output.push_str("\n");
         } else {
             for statement in &self.statements {
-                statement.execute();
+                statement.execute(&self.runtime);
             }
         }
     }
