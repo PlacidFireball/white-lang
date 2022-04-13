@@ -89,7 +89,7 @@ impl Clone for Box<dyn Expression> {
 
 #[allow(dead_code)]
 pub trait Statement: ToAny {
-    fn execute(&self, runtime: &Runtime); // execute the statement
+    fn execute(&self, runtime: &mut Runtime); // execute the statement
     fn compile(&self); // compile the statement to nasm
     fn transpile(&self) -> String; // transpile the statement to Javascript
     fn validate(&mut self, st: &mut SymbolTable); // validate the statement via the symbol table

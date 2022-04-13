@@ -18,7 +18,7 @@ impl ToAny for ReturnStatement {
 }
 
 impl Statement for ReturnStatement {
-    fn execute(&self, runtime: &Runtime) {
+    fn execute(&self, runtime: &mut Runtime) {
         todo!()
     }
 

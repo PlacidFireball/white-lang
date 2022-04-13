@@ -23,7 +23,7 @@ impl ToAny for ForStatement {
 }
 
 impl Statement for ForStatement {
-    fn execute(&self, runtime: &Runtime) {
+    fn execute(&self, runtime: &mut Runtime) {
         todo!()
     }
 

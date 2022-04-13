@@ -21,7 +21,7 @@ impl ToAny for IfStatement {
     }
 }
 impl Statement for IfStatement {
-    fn execute(&self, runtime: &Runtime) {
+    fn execute(&self, runtime: &mut Runtime) {
         todo!()
     }
 

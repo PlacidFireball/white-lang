@@ -40,39 +40,42 @@ impl Program {
     pub fn execute(&mut self) {
         if self.statements.is_empty() {
             let eval = self.expr.evaluate(&self.runtime);
-            self.try_print_output(&eval);
+            self.output += &Program::try_print_output(&eval);
             self.output.push_str("\n");
         } else {
             for statement in &self.statements {
-                statement.execute(&self.runtime);
+                statement.execute(&mut self.runtime);
+                self.output = self.runtime.get_output();
             }
         }
     }
 
-    fn try_print_output(&mut self, evaluated: &Box<dyn Any>) {
+    pub fn try_print_output(evaluated: &Box<dyn Any>) -> String  {
+        let mut output = String::new();
         if let Some(eval_f64) = evaluated.downcast_ref::<f64>() {
             let push = eval_f64.to_string();
-            self.output.push_str(push.as_str());
+            output.push_str(push.as_str());
         } else if let Some(eval_isize) = evaluated.downcast_ref::<isize>() {
             let push = eval_isize.to_string();
-            self.output.push_str(push.as_str());
+            output.push_str(push.as_str());
         } else if let Some(eval_bool) = evaluated.downcast_ref::<bool>() {
             let push = eval_bool.to_string();
-            self.output.push_str(push.as_str());
+            output.push_str(push.as_str());
         } else if let Some(eval_str) = evaluated.downcast_ref::<&str>() {
             let push = eval_str.to_string();
-            self.output.push_str(push.as_str());
+            output.push_str(push.as_str());
         } else if let Some(eval_string) = evaluated.downcast_ref::<String>() {
-            self.output.push_str(eval_string.as_str());
+            output.push_str(eval_string.as_str());
         } else if let Some(eval_list) = evaluated.downcast_ref::<WhiteLangList<Box<dyn Any>>>() {
-            self.output.push_str("[");
+            output.push_str("[");
             for (i, thing) in eval_list.iter().enumerate() {
-                self.try_print_output(thing);
+                output.push_str(Program::try_print_output(thing).as_str());
                 if i < eval_list.len() - 1 {
-                    self.output.push_str(", ");
+                    output.push_str(", ");
                 }
             }
-            self.output.push_str("]");
+            output.push_str("]");
         }
+        output
     }
 }

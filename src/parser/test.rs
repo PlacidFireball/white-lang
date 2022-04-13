@@ -547,4 +547,9 @@ mod test {
         test_execute("1 != 1.1", "true\n");
         test_execute("1.1 != null", "true\n");
     }
+
+    #[test]
+    fn test_basic_assignment() {
+        test_execute("let x : int = 0; x = 1; print(x);", "1\n");
+    }
 }

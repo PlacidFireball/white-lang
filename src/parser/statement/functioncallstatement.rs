@@ -20,7 +20,7 @@ impl ToAny for FunctionCallStatement {
 }
 
 impl Statement for FunctionCallStatement {
-    fn execute(&self, runtime: &Runtime) {
+    fn execute(&self, runtime: &mut Runtime) {
         todo!()
     }
 

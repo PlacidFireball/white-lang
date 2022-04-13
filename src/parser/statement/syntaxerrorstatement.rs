@@ -13,7 +13,7 @@ impl ToAny for SyntaxErrorStatement {
 }
 
 impl Statement for SyntaxErrorStatement {
-    fn execute(&self, runtime: &Runtime) {
+    fn execute(&self, runtime: &mut Runtime) {
         todo!()
     }
 

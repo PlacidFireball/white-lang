@@ -544,8 +544,8 @@ mod test {
     #[test]
     fn test_keywords() {
         let tokenizer = init_test(String::from(""));
-        assert_eq!(false, tokenizer.is_keyword(&"not_a_keyword".to_string()));
-        assert_eq!(true, tokenizer.is_keyword(&"for".to_string()));
+        assert!(!tokenizer.is_keyword(&"not_a_keyword".to_string()));
+        assert!(tokenizer.is_keyword(&"for".to_string()));
     }
     #[test]
     fn test_consume_char() {

@@ -20,11 +20,11 @@ impl ToAny for IdentifierExpression {
 }
 
 impl Expression for IdentifierExpression {
-    fn evaluate(&self, runtime: &Runtime) -> Box<dyn Any> {
-        //if let Some(eval) = runtime.get_value(self.name.clone()) {
-        //    return eval;
-        //}
-        panic!()
+    fn evaluate(&self, runtime: &Runtime) -> Box<dyn Any + '_> {
+        if let Some(eval) = runtime.get_value(self.name.clone()) {
+            //return eval; // TODO: deref eval or change method signature
+        }
+        panic!("Undefined variable")
     }
 
     fn compile(&self) {

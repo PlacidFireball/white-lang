@@ -1,6 +1,7 @@
 use crate::parser::parser_traits::{Expression, Statement, ToAny};
 use crate::parser::symbol_table::SymbolTable;
 use std::any::Any;
+use crate::program::Program;
 use crate::runtime::Runtime;
 
 #[derive(Clone)]
@@ -15,8 +16,9 @@ impl ToAny for PrintStatement {
 }
 
 impl Statement for PrintStatement {
-    fn execute(&self, runtime: &Runtime) {
-        todo!()
+    fn execute(&self, runtime: &mut Runtime) {
+        let eval = self.expr.evaluate(runtime);
+        runtime.push_output(String::from(Program::try_print_output(&eval)));
     }
 
     fn compile(&self) {

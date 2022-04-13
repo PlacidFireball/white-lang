@@ -22,8 +22,8 @@ impl ToAny for VariableStatement {
 }
 
 impl Statement for VariableStatement {
-    fn execute(&self, runtime: &Runtime) {
-        todo!()
+    fn execute(&self, runtime: &mut Runtime) {
+        runtime.set_value(self.name.clone(), self.expr.evaluate(runtime));
     }
 
     fn compile(&self) {
