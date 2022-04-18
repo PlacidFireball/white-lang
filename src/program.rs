@@ -14,7 +14,8 @@ pub struct Program {
     statements: Vec<Box<dyn Statement>>,
     expr: Box<dyn Expression>,
     runtime: Runtime,
-    pub output: String,
+    pub stdout: String,
+    pub stderr: String,
     errors: Vec<ParserErrorType>,
 }
 impl Program {
@@ -30,7 +31,8 @@ impl Program {
                 statements: statements.clone(),
                 expr: Box::new(SyntaxErrorExpression::new()),
                 runtime: Runtime::new(),
-                output: String::new(),
+                stdout: String::new(),
+                stderr: String::new(),
                 errors: vec![],
             };
         }
@@ -39,7 +41,8 @@ impl Program {
                 statements: vec![],
                 expr: expr.clone(),
                 runtime: Runtime::new(),
-                output: String::new(),
+                stdout: String::new(),
+                stderr: String::new(),
                 errors: vec![],
             };
         }
@@ -49,12 +52,12 @@ impl Program {
     pub fn execute(&mut self) {
         if self.statements.is_empty() {
             let eval = self.expr.evaluate(&mut self.runtime);
-            self.output += &Program::try_print_output(&eval);
-            self.output.push_str("\n");
+            self.stdout += &Program::try_print_output(&eval);
+            self.stdout.push_str("\n");
         } else {
             for statement in &self.statements {
                 statement.execute(&mut self.runtime);
-                self.output = self.runtime.get_output();
+                self.stdout = self.runtime.get_output();
             }
         }
     }

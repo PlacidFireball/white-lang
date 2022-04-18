@@ -41,7 +41,7 @@ mod test {
         parser.parse();
         let mut program = Program::from_parser(&mut parser);
         program.execute();
-        assert_eq!(program.output.as_str(), expected);
+        assert_eq!(program.stdout.as_str(), expected);
     }
 
     #[test]

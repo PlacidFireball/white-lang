@@ -20,5 +20,5 @@ fn main() {
         String::from(src)
     );
     program.execute();
-    print!("{}", program.output);
+    print!("{}", program.stdout);
 }
