@@ -35,14 +35,7 @@ impl Default for FunctionDefinitionStatement {
 
 impl Statement for FunctionDefinitionStatement {
     fn execute(&self, runtime: &mut Runtime) {
-        runtime.set_value(self.name.clone(), Box::new(Self {
-            name: self.name.clone(),
-            return_type: self.return_type,
-            args: self.args.clone(),
-            arg_types: self.arg_types.clone(),
-            statements: self.statements.clone(),
-            errors: self.errors.clone()
-        }));
+        runtime.set_function(self.name.clone(), self.clone());
     }
 
     fn compile(&self) {

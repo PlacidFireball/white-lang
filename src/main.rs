@@ -10,8 +10,14 @@ mod runtime;
 
 #[allow(unused_variables)]
 fn main() {
+    let src = "\
+    let x : int = 10;\
+    print(x);\
+    let y = 30;\
+    print(x+y);\
+    ";
     let mut program : Program = Program::from_src(
-        String::from("let x : int = 10; print(x); x = 20; print(x);")
+        String::from(src)
     );
     program.execute();
     print!("{}", program.output);

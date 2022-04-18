@@ -22,8 +22,7 @@ impl ToAny for AssignmentStatement {
 impl Statement for AssignmentStatement {
     fn execute(&self, runtime: &mut Runtime) {
         let ident = self.variable.to_any().downcast_ref::<IdentifierExpression>().unwrap();
-        let eval = self.expr.evaluate(runtime);
-        runtime.set_value(ident.debug(), eval);
+        runtime.set_value(ident.debug(), self.expr.clone());
     }
 
     fn compile(&self) {

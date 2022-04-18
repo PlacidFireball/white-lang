@@ -6,9 +6,11 @@ use std::rc::Rc;
 use crate::config::*;
 use crate::parser::expression::syntaxerrorexpression::SyntaxErrorExpression;
 use crate::parser::parser_traits::Expression;
+use crate::parser::statement::functiondefinitionstatement::FunctionDefinitionStatement;
 
 pub struct Runtime {
-    scopes: Vec<HashMap<String, Rc<RefCell<dyn Any>>>>,
+    scopes: Vec<HashMap<String, Box<dyn Expression>>>,
+    functions: HashMap<String, FunctionDefinitionStatement>,
     ret: Box<dyn Expression>,
     pub(crate) output: String
 }
@@ -16,6 +18,7 @@ impl Runtime {
     pub fn new() -> Self {
         Runtime {
             scopes: vec![HashMap::new()],
+            functions: HashMap::new(),
             ret: Box::new(SyntaxErrorExpression::new()),
             output: String::new()
         }
@@ -25,25 +28,36 @@ impl Runtime {
         for i in (0..self.scopes.len()).rev() {
             if self.scopes[i].contains_key(&name) {
                 let val = self.scopes[i].remove(&name).unwrap();
-                if let Some(integer) = val.borrow().downcast_ref::<isize>() {
-                    println!("Got an integer!");
-                }
                 let cloned = val.clone();
                 self.scopes[i].insert(name.clone(), cloned);
-                return Some(Box::new(val));
+                return Some(val.evaluate(self));
             }
         }
         Option::None
     }
-    pub fn set_value(&mut self, name: String, value: Box<dyn Any>) {
+    pub fn set_value(&mut self, name: String, value: Box<dyn Expression>) {
         for i in (0..self.scopes.len()).rev() {
             if self.scopes[i].contains_key(&name) {
-                self.scopes[i].insert(name.clone(), Rc::new(RefCell::new(value)));
+                self.scopes[i].insert(name.clone(), value);
                 return;
             }
         }
-        self.scopes.last_mut().unwrap().insert(name.clone(), Rc::new(RefCell::new(value)));
+        self.scopes.last_mut().unwrap().insert(name.clone(), value);
     }
+
+    pub fn set_function(&mut self, name : String, fds: FunctionDefinitionStatement) {
+        self.functions.insert(name, fds);
+    }
+
+    pub fn get_function(&mut self, name : String) -> FunctionDefinitionStatement {
+        if !self.functions.contains_key(&name) {
+            panic!("function: `{}` not in the functions map", name);
+        }
+        let func = self.functions.remove(&name).unwrap();
+        self.functions.insert(name.clone(), func.clone());
+        func
+    }
+
     pub fn push_scope(&mut self) {
         self.scopes.push(HashMap::new());
     }
