@@ -8,6 +8,8 @@ use crate::parser::expression::syntaxerrorexpression::SyntaxErrorExpression;
 use crate::parser::parser_traits::Expression;
 use crate::parser::statement::functiondefinitionstatement::FunctionDefinitionStatement;
 
+mod test;
+
 pub struct Runtime {
     scopes: Vec<HashMap<String, Box<dyn Expression>>>,
     functions: HashMap<String, FunctionDefinitionStatement>,
