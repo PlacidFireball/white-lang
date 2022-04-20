@@ -9,6 +9,7 @@ pub struct FunctionDefinitionStatement {
     name: String,
     return_type: Type,
     args: Vec<Box<dyn Expression>>,
+    arg_names: Vec<String>,
     arg_types: Vec<Type>,
     statements: Vec<Box<dyn Statement>>,
     errors: Vec<ParserErrorType>,
@@ -26,6 +27,7 @@ impl Default for FunctionDefinitionStatement {
             name: String::from(""),
             return_type: Type::Void,
             args: vec![],
+            arg_names: vec![],
             arg_types: vec![],
             statements: vec![],
             errors: vec![],
@@ -82,6 +84,7 @@ impl FunctionDefinitionStatement {
             return_type: Type::Void,
             args: vec![],
             arg_types: vec![],
+            arg_names: vec![],
             statements: vec![],
             errors: vec![],
         }
@@ -101,9 +104,26 @@ impl FunctionDefinitionStatement {
         &mut self.args
     }
     pub fn add_arg(&mut self, expr: Box<dyn Expression>) {
+        self.arg_names.push(expr.debug()); // should be identifier expressions :)
         self.args.push(expr);
     }
     pub fn add_arg_type(&mut self, typ: Type) {
         self.arg_types.push(typ);
+    }
+    pub fn get_arg_names(&self) -> &Vec<String> {
+        &self.arg_names
+    }
+
+    pub fn invoke(&self, runtime: &mut Runtime, args : Vec<Box<dyn Expression>>) -> Box<dyn Any> {
+        for (i, arg) in args.iter().enumerate() {
+            runtime.set_value(self.arg_names[i].clone(), arg.clone());
+        }
+       for statement in &self.statements {
+           statement.execute(runtime);
+           if runtime.has_return() {
+                return runtime.get_return();
+           }
+       }
+       Box::new(())
     }
 }

@@ -72,6 +72,13 @@ impl Runtime {
         }
         return true;
     }
+
+    pub fn get_return(&mut self) -> Box<dyn Any> {
+        let ret = self.ret.clone();
+        ret.evaluate(self)
+        
+    }
+
     pub fn push_output(&mut self, str: String) {
         self.output.push_str(str.as_str());
     }

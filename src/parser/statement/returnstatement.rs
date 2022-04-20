@@ -19,7 +19,7 @@ impl ToAny for ReturnStatement {
 
 impl Statement for ReturnStatement {
     fn execute(&self, runtime: &mut Runtime) {
-        todo!()
+        runtime.set_return(self.expr.clone());
     }
 
     fn compile(&self) {

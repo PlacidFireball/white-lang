@@ -21,7 +21,12 @@ impl ToAny for FunctionCallStatement {
 
 impl Statement for FunctionCallStatement {
     fn execute(&self, runtime: &mut Runtime) {
-        todo!()
+        let mut eval_args : Vec<Box<dyn Expression>> = vec![];
+        for expr in &self.args {
+            eval_args.push(expr.clone());
+        }
+        self.fds.invoke(runtime, eval_args);
+          
     }
 
     fn compile(&self) {

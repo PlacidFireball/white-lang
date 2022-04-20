@@ -122,4 +122,24 @@ mod test{
         }";
         test_execute(src, "10\n");
     }
+
+    #[test]
+    fn test_function_call_no_return() {
+        let src = "\
+        fn foo(x : int) { \
+            print(x);\
+        } \
+        foo(1);";
+        test_execute(src, "1\n");
+    }
+
+    #[test]
+    fn test_function_call_return() {
+        let src = "\
+        fn foo(x: int) : int { 
+            return x;
+        }
+        print(foo(1));";
+        test_execute(src, "1\n");
+    }
 }

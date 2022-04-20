@@ -21,8 +21,14 @@ impl ToAny for FunctionCallExpression {
 }
 
 impl Expression for FunctionCallExpression {
-    fn evaluate(&self, _runtime: &mut Runtime) -> Box<dyn Any> {
-        todo!()
+    fn evaluate(&self, runtime: &mut Runtime) -> Box<dyn Any> {
+        runtime.push_scope();
+        let fds = runtime.get_function(self.name.clone());
+        let mut eval_args : Vec<Box<dyn Expression>> = vec![];
+        for expr in self.args.iter() {
+            eval_args.push(expr.clone());
+        }
+        fds.invoke(runtime, eval_args)
     }
 
     fn compile(&self) {

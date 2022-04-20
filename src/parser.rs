@@ -402,6 +402,7 @@ impl Parser {
             let name = self.token_list[self.curr_idx.clone()].get_string_value();
             let expr = self.parse_expression(); // retrieve the function call expression
             let fds = self.st.get_function(name);
+            self.require_token(TokenType::SemiColon);
             assert!(fds.is_some());
             let fcs = FunctionCallStatement::new(expr, fds.unwrap());
             return Option::Some(fcs);
