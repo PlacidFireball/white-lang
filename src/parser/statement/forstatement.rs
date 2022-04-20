@@ -13,7 +13,7 @@ pub(crate) struct ForStatement {
     errors: Vec<ParserErrorType>,
     statements: Vec<Box<dyn Statement>>,
     variable: Box<dyn Expression>, // list literal expression
-    iterator: Box<dyn Expression>,     // identifier expression
+    iterator: Box<dyn Expression>, // identifier expression
 }
 
 impl ToAny for ForStatement {
@@ -45,7 +45,11 @@ impl Statement for ForStatement {
             let name = id_expr.debug();
             if st.has_symbol(name.clone()) {
                 self.errors.push(ParserErrorType::DuplicateName);
-            } else if let Some(lle) = self.iterator.to_any().downcast_ref::<ListLiteralExpression>() {
+            } else if let Some(lle) = self
+                .iterator
+                .to_any()
+                .downcast_ref::<ListLiteralExpression>()
+            {
                 let mut lle_cln = lle.clone();
                 lle_cln.validate(st);
                 let typ = lle_cln.get_white_type().get_type_from_list();

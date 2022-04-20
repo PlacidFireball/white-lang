@@ -141,4 +141,10 @@ mod test {
         print(foo(1));";
         test_execute(src, "1\n");
     }
+
+    #[test]
+    fn test_logical_expression_evaluates() {
+        let src = "print(true && false);";
+        test_execute(src, "false\n");
+    }
 }

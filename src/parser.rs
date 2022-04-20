@@ -20,6 +20,7 @@ use expression::functioncallexpression::FunctionCallExpression;
 use expression::identifierexpression::IdentifierExpression;
 use expression::integerliteralexpression::IntegerLiteralExpression;
 use expression::listliteralexpression::ListLiteralExpression;
+use expression::logicalexpression::LogicalExpression;
 use expression::nullliteralexpression::NullLiteralExpression;
 use expression::parenthesizedexpression::ParenthesizedExpression;
 use expression::stringliteralexpression::StringLiteralExpression;
@@ -445,13 +446,26 @@ impl Parser {
     fn parse_factor_expression(&mut self) -> Box<dyn Expression> {
         // similar to additive, but deeper in the grammar so we evaluate factor expressions
         // before we evaluate additive expressions
-        let mut expr = self.parse_comparison_expression();
+        let mut expr = self.parse_logical_expression();
         while self.match_token(Star) || self.match_token(Slash) {
             let operator = self.get_curr_tok().get_string_value();
             self.consume_token();
             let rhs = self.parse_function_call_expression();
             let factor_expr = FactorExpression::new(expr, operator.clone(), rhs);
             expr = Box::new(factor_expr);
+        }
+        expr
+    }
+
+    fn parse_logical_expression(&mut self) -> Box<dyn Expression> {
+        let mut expr = self.parse_comparison_expression();
+        while self.match_token(Land) || self.match_token(Lor) {
+            let operator = self.get_curr_tok().get_string_value();
+            self.consume_token();
+            let rhs = self.parse_comparison_expression();
+            let mut logical_expr = LogicalExpression::new(expr, rhs);
+            logical_expr.set_operator(operator);
+            expr = Box::new(logical_expr);
         }
         expr
     }

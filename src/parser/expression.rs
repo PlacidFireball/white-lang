@@ -9,6 +9,7 @@ pub(crate) mod functioncallexpression;
 pub(crate) mod identifierexpression;
 pub(crate) mod integerliteralexpression;
 pub(crate) mod listliteralexpression;
+pub(crate) mod logicalexpression;
 pub(crate) mod nullliteralexpression;
 pub(crate) mod parenthesizedexpression;
 pub(crate) mod stringliteralexpression;

@@ -8,6 +8,7 @@ use crate::parser::expression::functioncallexpression::FunctionCallExpression;
 use crate::parser::expression::identifierexpression::IdentifierExpression;
 use crate::parser::expression::integerliteralexpression::IntegerLiteralExpression;
 use crate::parser::expression::listliteralexpression::ListLiteralExpression;
+use crate::parser::expression::logicalexpression::LogicalExpression;
 use crate::parser::expression::nullliteralexpression::NullLiteralExpression;
 use crate::parser::expression::parenthesizedexpression::ParenthesizedExpression;
 use crate::parser::expression::stringliteralexpression::StringLiteralExpression;
@@ -81,6 +82,8 @@ impl Clone for Box<dyn Expression> {
         } else if let Some(expr) = self.to_any().downcast_ref::<SyntaxErrorExpression>() {
             return Box::new(expr.clone());
         } else if let Some(expr) = self.to_any().downcast_ref::<UnaryExpression>() {
+            return Box::new(expr.clone());
+        } else if let Some(expr) = self.to_any().downcast_ref::<LogicalExpression>() {
             return Box::new(expr.clone());
         }
         panic!("Didn't cover expressions exhaustively")

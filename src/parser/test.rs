@@ -13,10 +13,12 @@ mod test {
     use crate::parser::expression::identifierexpression::IdentifierExpression;
     use crate::parser::expression::integerliteralexpression::IntegerLiteralExpression;
     use crate::parser::expression::listliteralexpression::ListLiteralExpression;
+    use crate::parser::expression::logicalexpression::LogicalExpression;
     use crate::parser::expression::nullliteralexpression::NullLiteralExpression;
     use crate::parser::expression::parenthesizedexpression::ParenthesizedExpression;
     use crate::parser::expression::stringliteralexpression::StringLiteralExpression;
     use crate::parser::expression::unaryexpression::UnaryExpression;
+    use crate::parser::parser_traits::Expression;
     use crate::parser::parser_traits::Statement;
     use crate::parser::statement::assignmentstatement::AssignmentStatement;
     use crate::parser::statement::forstatement::ForStatement;
@@ -465,6 +467,17 @@ mod test {
             .downcast_ref::<FunctionCallStatement>()
             .is_some());
         assert!(!stmt.has_errors());
+        assert!(!parser.has_errors());
+    }
+
+    #[test]
+    fn test_logical_expression_parses() {
+        let mut parser = init_parser("true && false".to_string());
+        let mut st = SymbolTable::new();
+        let mut expr = parser.parse_expression();
+        expr.validate(&mut st);
+        let le = expr.to_any().downcast_ref::<LogicalExpression>().unwrap();
+        assert!(!le.has_errors());
         assert!(!parser.has_errors());
     }
 }
