@@ -91,6 +91,15 @@ mod test {
     }
 
     #[test]
+    fn assignment_statement_executes() {
+        let src = "\
+        let x : int = 0;\
+        x = x + 1;\
+        print(x);";
+        test_execute(src, "1\n");
+    }
+
+    #[test]
     fn test_if_statement_execute() {
         test_execute("if(false) { print(1); } else { print(2); }", "2\n");
         test_execute("if(true) { print(1); } else { print(2); }", "1\n");
@@ -154,7 +163,6 @@ mod test {
 
     #[test]
     fn test_while_statement_executes() {
-        // TODO: fix runtime to not cause recursion on assignment statement
         let src = "
         let x : int = 0;
         while (x < 5) {

@@ -5,7 +5,7 @@ use crate::runtime::Runtime;
 use std::any::Any;
 
 #[derive(Clone)]
-pub(crate) struct BooleanLiteralExpression {
+pub struct BooleanLiteralExpression {
     boolean: bool,
 }
 #[allow(unused_variables)]

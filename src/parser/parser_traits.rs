@@ -19,6 +19,7 @@ use crate::parser::statement::forstatement::ForStatement;
 use crate::parser::symbol_table::SymbolTable;
 use crate::parser::whitetypes::Type;
 use std::any::Any;
+use crate::config::{WhiteLangBool, WhiteLangFloat, WhiteLangInt};
 
 use crate::parser::statement::functioncallstatement::FunctionCallStatement;
 use crate::parser::statement::functiondefinitionstatement::FunctionDefinitionStatement;
@@ -36,6 +37,27 @@ pub trait ToAny: 'static {
 
 pub fn default_expr() -> Box<dyn Expression> {
     Box::new(SyntaxErrorExpression::new())
+}
+
+pub fn any_into_int_literal(any : Box<dyn Any>) -> Option<IntegerLiteralExpression> {
+    if let Some(integer) = any.downcast_ref::<WhiteLangInt>() {
+        return Some(IntegerLiteralExpression::new(*integer));
+    }
+    None
+}
+
+pub fn any_into_f64_literal(any : Box<dyn Any>) -> Option<FloatLiteralExpression> {
+    if let Some(float) = any.downcast_ref::<WhiteLangFloat>() {
+        return Some(FloatLiteralExpression::new(*float));
+    }
+    None
+}
+
+pub fn any_into_bool_literal(any : Box<dyn Any>) -> Option<BooleanLiteralExpression> {
+    if let Some(bool) = any.downcast_ref::<WhiteLangBool>() {
+        return Some(BooleanLiteralExpression::new(*bool));
+    }
+    None
 }
 
 #[allow(dead_code)]

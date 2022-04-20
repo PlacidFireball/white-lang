@@ -6,7 +6,7 @@ use crate::runtime::Runtime;
 use std::any::Any;
 
 #[derive(Clone)]
-pub(crate) struct FloatLiteralExpression {
+pub struct FloatLiteralExpression {
     value: WhiteLangFloat,
 }
 

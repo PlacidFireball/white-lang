@@ -1,9 +1,10 @@
 use crate::parser::expression::identifierexpression::IdentifierExpression;
 use crate::parser::expression::syntaxerrorexpression::SyntaxErrorExpression;
-use crate::parser::parser_traits::{Expression, Statement, ToAny};
+use crate::parser::parser_traits::*;
 use crate::parser::symbol_table::SymbolTable;
 use crate::parser::ParserErrorType;
 use crate::runtime::Runtime;
+
 use std::any::Any;
 
 #[derive(Clone)]
@@ -26,7 +27,15 @@ impl Statement for AssignmentStatement {
             .to_any()
             .downcast_ref::<IdentifierExpression>()
             .unwrap();
-        runtime.set_value(ident.debug(), self.expr.clone());
+        if let Some(boolean) = any_into_bool_literal(self.expr.evaluate(runtime)) {
+            runtime.set_value(ident.debug(), Box::new(boolean.clone()));
+        } else if let Some(integer) = any_into_int_literal(self.expr.evaluate(runtime)) {
+            runtime.set_value(ident.debug(), Box::new(integer.clone()));
+        } else if let Some(float) = any_into_f64_literal(self.expr.evaluate(runtime)) {
+            runtime.set_value(ident.debug(), Box::new(float.clone()));
+        } else {
+            runtime.set_value(ident.debug(), self.expr.clone());
+        }
     }
 
     fn compile(&self) {
