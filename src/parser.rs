@@ -105,9 +105,21 @@ impl Parser {
             while self.has_tokens() {
                 let stmt = self.parse_statement();
                 self.statement_list.push(stmt);
+                self.check_for_parse_errors();
             }
         } else {
             self.expr = expr;
+        }
+    }
+
+    fn check_for_parse_errors(&self) {
+        if !self.errors.is_empty() {
+            panic!("Parse error occurred at token {}, with error type: {:?}", self.get_curr_tok().get_string_value(), self.errors[0]);
+        }
+        for statement in &self.statement_list {
+            if let Some(_) = statement.to_any().downcast_ref::<SyntaxErrorExpression>() {
+                panic!("Parse error occurred at token {}", self.get_curr_tok().get_string_value());
+            }
         }
     }
 
@@ -143,6 +155,7 @@ impl Parser {
 
     // consumes the token unconditionally
     fn consume_token(&mut self) {
+        println!("-->{}<--", self.get_curr_tok().get_string_value());
         self.curr_idx += 1;
     }
 
@@ -259,7 +272,7 @@ impl Parser {
         if while_stmt.is_some() {
             return Box::new(while_stmt.unwrap());
         }
-        Box::new(SyntaxErrorStatement::new())
+        panic!("Parse error occurred at token {}", self.get_curr_tok().get_string_value());
     }
 
     fn parse_function_definition_statement(&mut self) -> Option<FunctionDefinitionStatement> {
@@ -267,6 +280,7 @@ impl Parser {
         if self.match_and_consume(Function) {
             let name = self.get_curr_tok().get_string_value();
             let mut fds = FunctionDefinitionStatement::new(name.clone());
+            self.st.register_function(name.clone(), fds.clone());
             self.consume_token();
             self.require_token(LeftParen);
             while !self.match_and_consume(RightParen) {
@@ -280,11 +294,9 @@ impl Parser {
                     break;
                 }
             }
-
             if self.match_and_consume(Colon) {
                 fds.set_return_type(self.require_a_type());
             }
-
             self.require_token(LeftBrace);
             self.curr_fn_def = name.clone();
             while !self.match_and_consume(RightBrace) {
@@ -409,10 +421,8 @@ impl Parser {
         if self.match_token(Identifier) && self.peek_next_token(LeftParen) {
             let name = self.token_list[self.curr_idx.clone()].get_string_value();
             let expr = self.parse_expression(); // retrieve the function call expression
-            let fds = self.st.get_function(name);
             self.require_token(TokenType::SemiColon);
-            assert!(fds.is_some());
-            let fcs = FunctionCallStatement::new(expr, fds.unwrap());
+            let fcs = FunctionCallStatement::new(expr, name.clone());
             return Option::Some(fcs);
         }
         Option::None
@@ -477,7 +487,7 @@ impl Parser {
         while self.match_token(Star) || self.match_token(Slash) {
             let operator = self.get_curr_tok().get_string_value();
             self.consume_token();
-            let rhs = self.parse_function_call_expression();
+            let rhs = self.parse_logical_expression();
             let factor_expr = FactorExpression::new(expr, operator.clone(), rhs);
             expr = Box::new(factor_expr);
         }
@@ -576,9 +586,10 @@ impl Parser {
     // (expr)
     fn parse_parenthesized_expression(&mut self) -> Box<dyn Expression> {
         if self.match_token(LeftParen) {
-            self.consume_token();
+            self.require_token(LeftParen);
             let expr = self.parse_expression();
             let pe = ParenthesizedExpression::new(expr);
+            self.require_token(RightParen);
             return Box::new(pe);
         }
         self.parse_unary_expression()

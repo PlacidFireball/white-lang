@@ -145,10 +145,10 @@ mod test {
     fn test_function_call_return() {
         let src = "
         fn foo(x: int) : int { 
-            return x;
+            return x + 1;
         }
         print(foo(1));";
-        test_execute(src, "1\n");
+        test_execute(src, "2\n");
     }
 
     #[test]
@@ -170,5 +170,37 @@ mod test {
             x = x + 1; // this test is not passing because of this statement, causes infinite recursion
         }";
         test_execute(src, "0\n1\n2\n3\n4\n");
+    }
+
+    /*
+    #[test]
+    fn test_function_recursion_executes() {
+        // TODO: recursive functions cause stack overflow
+        let src = "\
+        fn foo(x : int) : int {\
+            if (x == 0) {\
+                return 1;\
+            }\
+            else {\
+               return foo(x-1);\
+            }\
+        }\
+        print(foo(5));";
+        test_execute(src, "1\n");
+    }
+    */
+    #[test]
+    fn test_basic_program() {
+        let src = "\
+        fn finiteSum(n : int) : int {\
+            return n*(n+1)/2;\
+        }\
+        let x = 10;
+        while (x > 0) {
+            print(finiteSum(x));
+            x = x - 1;
+        }";
+        // 1 2 3 4 5 6 7 8 9
+        test_execute(src, "55\n45\n36\n28\n21\n15\n10\n6\n3\n1\n");
     }
 }

@@ -5,6 +5,7 @@ use crate::parser::whitetypes::Type;
 use crate::parser::ParserErrorType;
 use crate::runtime::Runtime;
 use std::any::Any;
+use crate::TokenType::Float;
 
 #[derive(Clone)]
 pub(crate) struct FactorExpression {
@@ -67,6 +68,7 @@ impl Expression for FactorExpression {
     fn validate(&mut self, st: &SymbolTable) {
         self.lhs.validate(st);
         self.rhs.validate(st);
+        // TODO: Type Checking
     }
 
     fn debug(&self) -> String {
@@ -78,7 +80,10 @@ impl Expression for FactorExpression {
     }
 
     fn get_white_type(&self) -> Type {
-        todo!()
+        if self.lhs.get_white_type() == Type::Float || self.lhs.get_white_type() == Type::Float {
+            return Type::Float;
+        }
+        Type::Integer
     }
 
     fn has_errors(&self) -> bool {

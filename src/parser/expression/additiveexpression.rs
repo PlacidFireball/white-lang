@@ -83,7 +83,10 @@ impl Expression for AdditiveExpression {
     }
 
     fn get_white_type(&self) -> Type {
-        todo!()
+        if self.rhs.get_white_type() == Type::Float || self.lhs.get_white_type() == Type::Float {
+            return Type::Float;
+        }
+        Type::Integer
     }
 
     fn has_errors(&self) -> bool {

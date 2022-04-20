@@ -7,8 +7,8 @@ use std::any::Any;
 
 #[derive(Clone)]
 pub struct FunctionCallStatement {
+    name: String,
     expr: Box<dyn Expression>,
-    fds: FunctionDefinitionStatement,
     args: Vec<Box<dyn Expression>>,
 }
 
@@ -20,11 +20,12 @@ impl ToAny for FunctionCallStatement {
 
 impl Statement for FunctionCallStatement {
     fn execute(&self, runtime: &mut Runtime) {
+        let fds = runtime.get_function(self.name.clone());
         let mut eval_args: Vec<Box<dyn Expression>> = vec![];
         for expr in &self.args {
             eval_args.push(expr.clone());
         }
-        self.fds.invoke(runtime, eval_args);
+        fds.invoke(runtime, eval_args);
     }
 
     fn compile(&self) {
@@ -53,14 +54,14 @@ impl Statement for FunctionCallStatement {
 }
 
 impl FunctionCallStatement {
-    pub(crate) fn new(expr: Box<dyn Expression>, fds: FunctionDefinitionStatement) -> Self {
+    pub(crate) fn new(expr: Box<dyn Expression>, name: String) -> Self {
         let fce = expr
             .to_any()
             .downcast_ref::<FunctionCallExpression>()
             .unwrap();
         FunctionCallStatement {
+            name,
             expr: expr.clone(),
-            fds,
             args: fce.get_args().clone(),
         }
     }

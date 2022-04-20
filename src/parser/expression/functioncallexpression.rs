@@ -74,7 +74,7 @@ impl Expression for FunctionCallExpression {
     }
 
     fn get_white_type(&self) -> Type {
-        todo!()
+        self.typ
     }
 
     fn has_errors(&self) -> bool {
