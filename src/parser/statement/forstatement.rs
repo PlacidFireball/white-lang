@@ -12,8 +12,8 @@ use std::any::Any;
 pub(crate) struct ForStatement {
     errors: Vec<ParserErrorType>,
     statements: Vec<Box<dyn Statement>>,
-    iter_var: Box<dyn Expression>, // list literal expression
-    iter: Box<dyn Expression>,     // identifier expression
+    variable: Box<dyn Expression>, // list literal expression
+    iterator: Box<dyn Expression>,     // identifier expression
 }
 
 impl ToAny for ForStatement {
@@ -24,7 +24,7 @@ impl ToAny for ForStatement {
 
 impl Statement for ForStatement {
     fn execute(&self, runtime: &mut Runtime) {
-        todo!()
+        unimplemented!()
     }
 
     fn compile(&self) {
@@ -38,18 +38,18 @@ impl Statement for ForStatement {
     fn validate(&mut self, st: &mut SymbolTable) {
         st.push_scope();
         if let Some(id_expr) = self
-            .iter_var
+            .variable
             .to_any()
             .downcast_ref::<IdentifierExpression>()
         {
             let name = id_expr.debug();
             if st.has_symbol(name.clone()) {
                 self.errors.push(ParserErrorType::DuplicateName);
-            } else if let Some(lle) = self.iter.to_any().downcast_ref::<ListLiteralExpression>() {
+            } else if let Some(lle) = self.iterator.to_any().downcast_ref::<ListLiteralExpression>() {
                 let mut lle_cln = lle.clone();
                 lle_cln.validate(st);
                 let typ = lle_cln.get_white_type().get_type_from_list();
-                self.iter = Box::new(lle_cln);
+                self.iterator = Box::new(lle_cln);
                 if typ != Type::Error {
                     st.register_symbol(name.clone(), typ);
                 } else {
@@ -65,7 +65,7 @@ impl Statement for ForStatement {
     }
 
     fn get_expr(&self) -> &Box<dyn Expression> {
-        todo!()
+        &self.variable
     }
 
     fn get_statement_type(&self) -> String {
@@ -82,8 +82,8 @@ impl ForStatement {
         ForStatement {
             errors: vec![],
             statements: vec![],
-            iter_var: Box::new(SyntaxErrorExpression::new()),
-            iter: Box::new(SyntaxErrorExpression::new()),
+            variable: Box::new(SyntaxErrorExpression::new()),
+            iterator: Box::new(SyntaxErrorExpression::new()),
         }
     }
 
@@ -98,7 +98,7 @@ impl ForStatement {
         {
             self.errors.push(ParserErrorType::UnexpectedToken);
         } else {
-            self.iter_var = iter_var.clone();
+            self.variable = iter_var.clone();
         }
     }
     pub fn set_iter(&mut self, iter: Box<dyn Expression>) {
@@ -109,7 +109,7 @@ impl ForStatement {
         {
             self.errors.push(ParserErrorType::UnexpectedToken);
         } else {
-            self.iter = iter.clone();
+            self.iterator = iter.clone();
         }
     }
 }
