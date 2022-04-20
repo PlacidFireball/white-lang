@@ -301,14 +301,24 @@ impl Tokenizer {
                     self.add_token(TokenType::Less, String::from("<"));
                 }
             } else if self.match_and_consume('/') {
-                if self.match_and_consume('/') {
+                if self.match_and_consume('/') { // line comment begin
                     while !self.match_and_consume('\n') && !self.tokenization_end() {
                         self.consume_char();
                         if self.tokenization_end() {
                             break;
                         }
                     }
-                } else {
+                } else if self.match_and_consume('*') { // multiline comment begin
+                    while !(self.peek() == '*' && self.peek_next() == '/') && !self.tokenization_end() {
+                        self.consume_char();
+                        if self.tokenization_end() {
+                            break;
+                        }
+                    }
+                    self.consume_char(); // consume * and / at the end of the comment block
+                    self.consume_char();
+                }
+                else {
                     self.add_token(TokenType::Slash, String::from("/"));
                 }
             } else if self.match_and_consume('+') {
@@ -690,5 +700,12 @@ mod test {
         for i in 0..tok_l.len() - 1 {
             assert_eq!(tok_l[i].get_type(), type_vec[i]);
         }
+    }
+
+    #[test]
+    fn test_multiline_comment() {
+        let mut tokenizer = Tokenizer::init("/* fasdfkjas;ldfkjas;ldkgfjas;lhkgjnas;lfgkjasjmfl;askjesmf;laskjmfe;asjf */".to_string());
+        tokenizer.tokenize();
+        assert_eq!(tokenizer.token_list.len(), 1);
     }
 }

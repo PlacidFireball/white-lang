@@ -134,7 +134,7 @@ mod test {
 
     #[test]
     fn test_function_call_return() {
-        let src = "\
+        let src = "
         fn foo(x: int) : int { 
             return x;
         }
