@@ -62,6 +62,7 @@ pub enum TokenType {
     Function,   // fn
     True,       // true
     False,      // false
+    Break,      // break
     /* Future Tokens */
     Struct, // struct
     As,     // as
@@ -138,6 +139,7 @@ fn init_keywords() -> HashMap<String, TokenType> {
     let mut keywords = HashMap::new();
     keywords.insert("fn".to_string(), TokenType::Function);
     keywords.insert("return".to_string(), TokenType::Return);
+    keywords.insert("break".to_string(), TokenType::Break);
 
     keywords.insert("and".to_string(), TokenType::And);
     keywords.insert("not".to_string(), TokenType::Not);

@@ -43,6 +43,7 @@ use crate::config::WhiteLangFloat;
 use crate::parser::parser_traits::{Expression, Statement};
 use statement::variablestatement::VariableStatement;
 use symbol_table::SymbolTable;
+use crate::parser::statement::breakstatement::BreakStatement;
 
 // Parsing Errors
 #[derive(Clone, Copy, Debug, PartialOrd, PartialEq)]
@@ -447,6 +448,14 @@ impl Parser {
             return Option::Some(while_statement);
         }
 
+        None
+    }
+
+    fn parse_break_statement(&mut self) -> Option<BreakStatement> {
+        if self.match_and_consume(TokenType::Break) {
+            self.require_token(TokenType::SemiColon);
+            return Option::Some(BreakStatement::new());
+        }
         None
     }
 
