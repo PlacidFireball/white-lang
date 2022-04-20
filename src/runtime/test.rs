@@ -144,7 +144,11 @@ mod test {
 
     #[test]
     fn test_logical_expression_evaluates() {
-        let src = "print(true && false);";
+        let mut src = "print(true && false);";
+        test_execute(src, "false\n");
+        src = "let x = 10; let y = 20; let z = 30; print(x < y && x < z);";
+        test_execute(src, "true\n");
+        src = "let x = 10; let y = 20; let z = 30; print(x > y || x > z);";
         test_execute(src, "false\n");
     }
 }

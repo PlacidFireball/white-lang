@@ -27,6 +27,7 @@ use expression::stringliteralexpression::StringLiteralExpression;
 use expression::syntaxerrorexpression::SyntaxErrorExpression;
 use expression::unaryexpression::UnaryExpression;
 use statement::forstatement::ForStatement;
+use statement::whilestatement::WhileStatement;
 
 use statement::functiondefinitionstatement::FunctionDefinitionStatement;
 use statement::returnstatement::ReturnStatement;
@@ -254,6 +255,10 @@ impl Parser {
         if if_stmt.is_some() {
             return Box::new(if_stmt.unwrap());
         }
+        let while_stmt = self.parse_while_statement();
+        if while_stmt.is_some() {
+            return Box::new(while_stmt.unwrap());
+        }
         Box::new(SyntaxErrorStatement::new())
     }
 
@@ -411,6 +416,27 @@ impl Parser {
             return Option::Some(fcs);
         }
         Option::None
+    }
+
+    fn parse_while_statement(&mut self) -> Option<WhileStatement> {
+        if self.match_token(TokenType::While) {
+            self.require_token(LeftParen);
+            let expr = self.parse_expression(); // condition we will loop on
+            self.require_token(RightParen);
+            self.require_token(LeftBrace);
+            let mut while_statement = WhileStatement::new();
+            while_statement.set_expr(expr);
+            while !self.match_and_consume(RightBrace) && self.has_tokens() {
+                while_statement.add_body_statement(self.parse_statement());
+                if !self.has_tokens() {
+                    self.errors.push(ParserErrorType::UnexpectedToken);
+                    break;
+                }
+            }
+            Option::Some(while_statement);
+        }
+
+        None
     }
 
     // -------------------------------------------------------------------------- //
