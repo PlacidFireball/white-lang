@@ -37,36 +37,36 @@ use statement::printstatement::PrintStatement;
 
 use statement::syntaxerrorstatement::SyntaxErrorStatement;
 
+use crate::config::WhiteLangFloat;
 use crate::parser::parser_traits::{Expression, Statement};
 use statement::variablestatement::VariableStatement;
 use symbol_table::SymbolTable;
-use crate::config::WhiteLangFloat;
 
 // Parsing Errors
 #[derive(Clone, Copy, Debug, PartialOrd, PartialEq)]
 pub(crate) enum ParserErrorType {
-    UnexpectedToken,        // we've encountered some unexpected token
-    UnterminatedArgList,    // function has unterminated argument list
-    UnterminatedList,       // list literal is unterminated
-    BadOperator,            // calling operator on types that don't make sense
-    MismatchedTypes,        // attempting to pass bad types into various facets of whitelang
-    SymbolDefinitionError,  //
-    DuplicateName,          // attempting to redefine a symbol already in the symbol table
-    BadReturnType,          // function returns a type that it's not supposed to
-    BadVariableType,        // variable has bad type
-    UnknownName,            // trying to assign to a variable that whitelang doesn't know about
-    ArgMismatch,            //
-    IncompatibleTypes,      //
+    UnexpectedToken,       // we've encountered some unexpected token
+    UnterminatedArgList,   // function has unterminated argument list
+    UnterminatedList,      // list literal is unterminated
+    BadOperator,           // calling operator on types that don't make sense
+    MismatchedTypes,       // attempting to pass bad types into various facets of whitelang
+    SymbolDefinitionError, //
+    DuplicateName,         // attempting to redefine a symbol already in the symbol table
+    BadReturnType,         // function returns a type that it's not supposed to
+    BadVariableType,       // variable has bad type
+    UnknownName,           // trying to assign to a variable that whitelang doesn't know about
+    ArgMismatch,           //
+    IncompatibleTypes,     //
 }
 
 // The White-lang parser
 #[allow(dead_code)]
 pub struct Parser {
-    token_list: Vec<Token>, // gets the token list
+    token_list: Vec<Token>,                  // gets the token list
     statement_list: Vec<Box<dyn Statement>>, // generates a list of statements
-    st: SymbolTable, // has a symbol table
-    expr: Box<dyn Expression>, // generates an expression
-    curr_idx: usize, // what token it's on
+    st: SymbolTable,                         // has a symbol table
+    expr: Box<dyn Expression>,               // generates an expression
+    curr_idx: usize,                         // what token it's on
     curr_fn_def: String,
     errors: Vec<ParserErrorType>, // and possible errors
 }
@@ -91,7 +91,7 @@ impl Parser {
     // main loop
     pub fn parse(&mut self) {
         let expr = self.parse_expression(); // try to parse an expression
-        // check if the parser got a good expression, and if all tokens are consumed
+                                            // check if the parser got a good expression, and if all tokens are consumed
         if expr
             .to_any()
             .downcast_ref::<SyntaxErrorExpression>()
@@ -187,7 +187,8 @@ impl Parser {
     fn require_a_type(&mut self) -> Type {
         let types = vec!["string", "bool", "float", "int", "void"]; // all the types we can assign to so far
         let curr_tok = self.get_curr_tok().get_string_value();
-        for i in 0..types.len() - 1 { // try to match some type, if we get a good one, return it
+        for i in 0..types.len() - 1 {
+            // try to match some type, if we get a good one, return it
             if types[i] == curr_tok {
                 self.consume_token();
                 return Type::new(types[i]);
@@ -202,7 +203,8 @@ impl Parser {
     }
 
     fn try_parse_list_type(&mut self) -> Option<Type> {
-        if self.match_str_val(String::from("list")) { // match list
+        if self.match_str_val(String::from("list")) {
+            // match list
             self.consume_token();
             self.match_and_consume(Less); // <
             let typ = self.require_a_type().get_list_type(); // make sure we are parsing some type
@@ -420,7 +422,6 @@ impl Parser {
     https://en.wikipedia.org/wiki/Recursive_descent_parser#:~:text=In%20computer%20science%2C%20a%20recursive,the%20nonterminals%20of%20the%20grammar.
      */
 
-
     fn parse_expression(&mut self) -> Box<dyn Expression> {
         let mut expr = self.parse_additive_expression();
         expr.validate(&self.st);
@@ -567,7 +568,7 @@ impl Parser {
             Box::new(expr)
         } else {
             self.parse_string_literal_expression()
-        }
+        };
     }
 
     fn parse_string_literal_expression(&mut self) -> Box<dyn Expression> {
@@ -578,7 +579,7 @@ impl Parser {
             Box::new(expr)
         } else {
             self.parse_integer_literal_expression()
-        }
+        };
     }
 
     fn parse_integer_literal_expression(&mut self) -> Box<dyn Expression> {

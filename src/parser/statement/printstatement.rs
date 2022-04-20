@@ -1,8 +1,8 @@
 use crate::parser::parser_traits::{Expression, Statement, ToAny};
 use crate::parser::symbol_table::SymbolTable;
-use std::any::Any;
 use crate::program::Program;
 use crate::runtime::Runtime;
+use std::any::Any;
 
 #[derive(Clone)]
 pub(crate) struct PrintStatement {

@@ -114,16 +114,16 @@ impl FunctionDefinitionStatement {
         &self.arg_names
     }
 
-    pub fn invoke(&self, runtime: &mut Runtime, args : Vec<Box<dyn Expression>>) -> Box<dyn Any> {
+    pub fn invoke(&self, runtime: &mut Runtime, args: Vec<Box<dyn Expression>>) -> Box<dyn Any> {
         for (i, arg) in args.iter().enumerate() {
             runtime.set_value(self.arg_names[i].clone(), arg.clone());
         }
-       for statement in &self.statements {
-           statement.execute(runtime);
-           if runtime.has_return() {
+        for statement in &self.statements {
+            statement.execute(runtime);
+            if runtime.has_return() {
                 return runtime.get_return();
-           }
-       }
-       Box::new(())
+            }
+        }
+        Box::new(())
     }
 }

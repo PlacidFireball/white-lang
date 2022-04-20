@@ -24,7 +24,7 @@ impl Expression for FunctionCallExpression {
     fn evaluate(&self, runtime: &mut Runtime) -> Box<dyn Any> {
         runtime.push_scope();
         let fds = runtime.get_function(self.name.clone());
-        let mut eval_args : Vec<Box<dyn Expression>> = vec![];
+        let mut eval_args: Vec<Box<dyn Expression>> = vec![];
         for expr in self.args.iter() {
             eval_args.push(expr.clone());
         }
@@ -101,6 +101,7 @@ impl FunctionCallExpression {
     pub fn get_args(&self) -> &Vec<Box<dyn Expression>> {
         &self.args
     }
+    #[allow(dead_code)]
     pub fn get_name(&self) -> String {
         self.name.clone()
     }

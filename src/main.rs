@@ -1,8 +1,8 @@
 mod tokenizer;
 use tokenizer::*;
 mod parser;
-use parser::Parser;
 use crate::program::Program;
+use parser::Parser;
 
 mod config;
 mod program;
@@ -16,9 +16,7 @@ fn main() {
     let y = 30;\
     print(x+y);\
     ";
-    let mut program : Program = Program::from_src(
-        String::from(src)
-    );
+    let mut program: Program = Program::from_src(String::from(src));
     program.execute();
     print!("{}", program.stdout);
 }

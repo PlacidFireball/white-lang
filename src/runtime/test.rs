@@ -1,5 +1,5 @@
 #[cfg(test)]
-mod test{
+mod test {
     use crate::*;
 
     fn init_parser(src: String) -> Parser {
@@ -14,7 +14,6 @@ mod test{
         program.execute();
         assert_eq!(program.stdout.as_str(), expected);
     }
-
 
     #[test]
     fn test_basic_expression_eval() {

@@ -4,8 +4,8 @@ use crate::parser::symbol_table::SymbolTable;
 use crate::parser::whitetypes::Type;
 use crate::parser::ParserErrorType;
 use crate::parser::ParserErrorType::SymbolDefinitionError;
-use std::any::Any;
 use crate::runtime::Runtime;
+use std::any::Any;
 
 #[derive(Clone)]
 pub(crate) struct VariableStatement {

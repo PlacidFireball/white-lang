@@ -1,11 +1,11 @@
 use crate::config::WhiteLangList;
-use crate::{parser, Parser, Tokenizer};
+use crate::config::*;
 use crate::parser::expression::syntaxerrorexpression::SyntaxErrorExpression;
 use crate::parser::parser_traits::{Expression, Statement};
 use crate::parser::ParserErrorType;
 use crate::runtime::Runtime;
+use crate::{parser, Parser, Tokenizer};
 use std::any::Any;
-use crate::config::*;
 
 #[allow(dead_code)]
 pub struct Program {
@@ -18,8 +18,8 @@ pub struct Program {
 }
 impl Program {
     pub fn from_src(src: String) -> Self {
-        let mut tokenizer : Tokenizer = Tokenizer::init(src);
-        let mut parser : Parser = Parser::new(&mut tokenizer);
+        let mut tokenizer: Tokenizer = Tokenizer::init(src);
+        let mut parser: Parser = Parser::new(&mut tokenizer);
         parser.parse();
         Program::from_parser(&mut parser)
     }
@@ -60,7 +60,7 @@ impl Program {
         }
     }
 
-    pub fn try_print_output(evaluated: &Box<dyn Any>) -> String  {
+    pub fn try_print_output(evaluated: &Box<dyn Any>) -> String {
         let mut output = String::new();
         if let Some(eval_f64) = evaluated.downcast_ref::<WhiteLangFloat>() {
             let push = eval_f64.to_string();

@@ -5,8 +5,8 @@ use crate::parser::parser_traits::{Expression, Statement, ToAny};
 use crate::parser::symbol_table::SymbolTable;
 use crate::parser::whitetypes::Type;
 use crate::parser::ParserErrorType;
-use std::any::Any;
 use crate::runtime::Runtime;
+use std::any::Any;
 
 #[derive(Clone)]
 pub(crate) struct ForStatement {

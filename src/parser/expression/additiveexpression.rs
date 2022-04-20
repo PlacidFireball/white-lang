@@ -62,13 +62,9 @@ impl Expression for AdditiveExpression {
         unreachable!()
     }
 
-    fn compile(&self) {
+    fn compile(&self) {}
 
-    }
-
-    fn transpile(&self) {
-
-    }
+    fn transpile(&self) {}
 
     fn validate(&mut self, st: &SymbolTable) {
         // I have decided that I am not going to allow + being called on strings,

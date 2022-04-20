@@ -1,12 +1,12 @@
+use crate::config::*;
 use crate::parser::expression::syntaxerrorexpression::SyntaxErrorExpression;
 use crate::parser::parser_traits::{Expression, Statement, ToAny};
 use crate::parser::symbol_table::SymbolTable;
 use crate::parser::whitetypes::Type;
 use crate::parser::ParserErrorType;
 use crate::parser::ParserErrorType::UnexpectedToken;
-use std::any::Any;
 use crate::runtime::Runtime;
-use crate::config::*;
+use std::any::Any;
 
 #[derive(Clone)]
 pub struct IfStatement {
@@ -36,8 +36,6 @@ impl Statement for IfStatement {
             }
         }
         runtime.pop_scope();
-
-
     }
 
     fn compile(&self) {
