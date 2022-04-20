@@ -420,6 +420,7 @@ impl Parser {
 
     fn parse_while_statement(&mut self) -> Option<WhileStatement> {
         if self.match_token(TokenType::While) {
+            self.consume_token();
             self.require_token(LeftParen);
             let expr = self.parse_expression(); // condition we will loop on
             self.require_token(RightParen);
@@ -433,7 +434,7 @@ impl Parser {
                     break;
                 }
             }
-            Option::Some(while_statement);
+            return Option::Some(while_statement);
         }
 
         None

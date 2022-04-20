@@ -27,6 +27,7 @@ use crate::parser::statement::printstatement::PrintStatement;
 use crate::parser::statement::returnstatement::ReturnStatement;
 use crate::parser::statement::syntaxerrorstatement::SyntaxErrorStatement;
 use crate::parser::statement::variablestatement::VariableStatement;
+use crate::parser::statement::whilestatement::WhileStatement;
 use crate::runtime::Runtime;
 
 pub trait ToAny: 'static {
@@ -120,6 +121,8 @@ impl Clone for Box<dyn Statement> {
         } else if let Some(stmt) = self.to_any().downcast_ref::<FunctionCallStatement>() {
             return Box::new(stmt.clone());
         } else if let Some(stmt) = self.to_any().downcast_ref::<IfStatement>() {
+            return Box::new(stmt.clone());
+        } else if let Some(stmt) = self.to_any().downcast_ref::<WhileStatement>() {
             return Box::new(stmt.clone());
         }
         panic!("Didn't cover statements exhaustively");

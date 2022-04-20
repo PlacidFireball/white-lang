@@ -22,11 +22,12 @@ impl ToAny for WhileStatement {
 }
 impl Statement for WhileStatement {
     fn execute(&self, runtime: &mut Runtime) {
-        let cond = *self.expr.evaluate(runtime).downcast_ref::<bool>().unwrap();
+        let mut cond : bool = *self.expr.evaluate(runtime).downcast_ref::<bool>().unwrap();
         while cond {
             for statement in self.body.iter() {
                 statement.execute(runtime);
             }
+            cond = *self.expr.evaluate(runtime).downcast_ref::<bool>().unwrap();
         }
     }
 

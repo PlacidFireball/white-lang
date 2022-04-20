@@ -28,6 +28,7 @@ mod test {
     use crate::parser::statement::variablestatement::VariableStatement;
     use crate::parser::symbol_table::SymbolTable;
     use crate::parser::whitetypes::Type;
+    use crate::parser::statement::whilestatement::WhileStatement;
     use crate::TokenType::*;
     use crate::{Parser, Tokenizer};
 
@@ -478,6 +479,20 @@ mod test {
         expr.validate(&mut st);
         let le = expr.to_any().downcast_ref::<LogicalExpression>().unwrap();
         assert!(!le.has_errors());
+        assert!(!parser.has_errors());
+    }
+
+    #[test]
+    fn test_while_statement_parses() {
+        let mut parser = init_parser("while (true) { print(1); }".to_string());
+        let mut st = SymbolTable::new();
+        let mut stmt = parser.parse_statement();
+        stmt.validate(&mut st);
+        assert!(stmt
+            .to_any()
+            .downcast_ref::<WhileStatement>()
+            .is_some());
+        assert!(!stmt.has_errors());
         assert!(!parser.has_errors());
     }
 }

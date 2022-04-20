@@ -151,4 +151,16 @@ mod test {
         src = "let x = 10; let y = 20; let z = 30; print(x > y || x > z);";
         test_execute(src, "false\n");
     }
+
+    #[test]
+    fn test_while_statement_executes() {
+        // TODO: fix runtime to not cause recursion on assignment statement
+        let src = "
+        let x : int = 0;
+        while (x < 5) {
+            print(x);
+            x = x + 1; // this test is not passing because of this statement, causes infinite recursion
+        }";
+        test_execute(src, "0\n1\n2\n3\n4\n");
+    }
 }
