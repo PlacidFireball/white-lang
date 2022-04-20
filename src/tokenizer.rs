@@ -197,6 +197,7 @@ impl Tokenizer {
         &self.token_list
     }
     // gets a specific token at a specific index
+    #[allow(dead_code)]
     pub fn get_token(&self, idx: usize) -> Token {
         self.token_list[idx].clone()
     }

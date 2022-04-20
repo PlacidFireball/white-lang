@@ -113,9 +113,11 @@ impl AdditiveExpression {
         }
     }
 
+    #[allow(dead_code)]
     pub fn get_lhs(&self) -> &Box<dyn Expression> {
         &self.lhs
     }
+    #[allow(dead_code)]
     pub fn get_rhs(&self) -> &Box<dyn Expression> {
         &self.rhs
     }

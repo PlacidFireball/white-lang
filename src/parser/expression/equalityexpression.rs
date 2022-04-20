@@ -124,6 +124,7 @@ impl Expression for EqualityExpression {
         String::from("EqualityExpression")
     }
 }
+#[allow(dead_code)]
 impl EqualityExpression {
     pub fn new(
         lhs: Box<dyn Expression>,

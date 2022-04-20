@@ -89,6 +89,7 @@ impl Expression for FactorExpression {
         String::from("FactorExpression")
     }
 }
+#[allow(dead_code)]
 impl FactorExpression {
     pub(crate) fn new(
         lhs: Box<dyn Expression>,

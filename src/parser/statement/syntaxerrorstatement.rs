@@ -13,7 +13,7 @@ impl ToAny for SyntaxErrorStatement {
 }
 
 impl Statement for SyntaxErrorStatement {
-    fn execute(&self, runtime: &mut Runtime) {
+    fn execute(&self, _runtime: &mut Runtime) {
         todo!()
     }
 
@@ -25,7 +25,7 @@ impl Statement for SyntaxErrorStatement {
         todo!()
     }
 
-    fn validate(&mut self, st: &mut SymbolTable) {}
+    fn validate(&mut self, _st: &mut SymbolTable) {}
 
     fn get_expr(&self) -> &Box<dyn Expression> {
         todo!()

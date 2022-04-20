@@ -26,22 +26,12 @@ mod test {
     use crate::parser::statement::variablestatement::VariableStatement;
     use crate::parser::symbol_table::SymbolTable;
     use crate::parser::whitetypes::Type;
-    use crate::program::Program;
-    use crate::runtime::Runtime;
     use crate::TokenType::*;
     use crate::{Parser, Tokenizer};
 
     fn init_parser(src: String) -> Parser {
         let tokenizer: Tokenizer = Tokenizer::init(src);
         Parser::new(&mut tokenizer.clone())
-    }
-
-    fn test_execute(src: &str, expected: &str) {
-        let mut parser = init_parser(src.to_string());
-        parser.parse();
-        let mut program = Program::from_parser(&mut parser);
-        program.execute();
-        assert_eq!(program.stdout.as_str(), expected);
     }
 
     #[test]

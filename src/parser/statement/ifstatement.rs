@@ -82,6 +82,7 @@ impl Statement for IfStatement {
         !self.errors.is_empty()
     }
 }
+#[allow(dead_code)]
 impl IfStatement {
     pub fn new() -> Self {
         IfStatement {

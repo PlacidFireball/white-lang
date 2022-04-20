@@ -53,6 +53,7 @@ impl ParenthesizedExpression {
         ParenthesizedExpression { expr }
     }
 
+    #[allow(dead_code)]
     pub fn get_expr(&self) -> &Box<dyn Expression> {
         &self.expr
     }

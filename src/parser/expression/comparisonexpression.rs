@@ -115,6 +115,7 @@ impl Expression for ComparisonExpression {
         String::from("ComparisonExpression")
     }
 }
+#[allow(dead_code)]
 impl ComparisonExpression {
     pub fn new(
         lhs: Box<dyn Expression>,

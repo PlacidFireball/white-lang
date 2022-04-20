@@ -83,6 +83,7 @@ impl VariableStatement {
     pub fn has_errors(&self) -> bool {
         !self.errors.is_empty()
     }
+    #[allow(dead_code)]
     pub fn get_type(&self) -> Type {
         self.typ
     }

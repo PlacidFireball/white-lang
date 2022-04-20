@@ -205,7 +205,7 @@ impl Parser {
         if self.match_str_val(String::from("list")) { // match list
             self.consume_token();
             self.match_and_consume(Less); // <
-            let mut typ = self.require_a_type().get_list_type(); // make sure we are parsing some type
+            let typ = self.require_a_type().get_list_type(); // make sure we are parsing some type
             self.match_and_consume(Greater); // >
             if typ != Type::Error {
                 return Option::Some(typ);

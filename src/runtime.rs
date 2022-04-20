@@ -1,9 +1,5 @@
 use std::any::Any;
-use std::cell::RefCell;
 use std::collections::HashMap;
-use std::ops::Deref;
-use std::rc::Rc;
-use crate::config::*;
 use crate::parser::expression::syntaxerrorexpression::SyntaxErrorExpression;
 use crate::parser::parser_traits::Expression;
 use crate::parser::statement::functiondefinitionstatement::FunctionDefinitionStatement;
@@ -71,7 +67,7 @@ impl Runtime {
     pub fn set_return(&mut self, ret: Box<dyn Expression>) { self.ret = ret; }
 
     pub fn has_return(&mut self) -> bool {
-        if let Some(expr) = self.ret.to_any().downcast_ref::<SyntaxErrorExpression>() {
+        if let Some(_) = self.ret.to_any().downcast_ref::<SyntaxErrorExpression>() {
             return false
         }
         return true;
