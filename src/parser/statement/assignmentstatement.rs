@@ -27,11 +27,11 @@ impl Statement for AssignmentStatement {
             .to_any()
             .downcast_ref::<IdentifierExpression>()
             .unwrap();
-        if let Some(boolean) = any_into_bool_literal(self.expr.evaluate(runtime)) {
+        if let Some(boolean) = any_into_bool_literal(&self.expr.evaluate(runtime)) {
             runtime.set_value(ident.debug(), Box::new(boolean.clone()));
-        } else if let Some(integer) = any_into_int_literal(self.expr.evaluate(runtime)) {
+        } else if let Some(integer) = any_into_int_literal(&self.expr.evaluate(runtime)) {
             runtime.set_value(ident.debug(), Box::new(integer.clone()));
-        } else if let Some(float) = any_into_f64_literal(self.expr.evaluate(runtime)) {
+        } else if let Some(float) = any_into_f64_literal(&self.expr.evaluate(runtime)) {
             runtime.set_value(ident.debug(), Box::new(float.clone()));
         } else {
             runtime.set_value(ident.debug(), self.expr.clone());

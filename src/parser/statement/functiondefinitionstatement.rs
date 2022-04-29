@@ -1,4 +1,4 @@
-use crate::parser::parser_traits::{Expression, Statement, ToAny};
+use crate::parser::parser_traits::*;
 use crate::parser::statement::returnstatement::ReturnStatement;
 use crate::parser::symbol_table::SymbolTable;
 use crate::parser::*;
@@ -116,7 +116,18 @@ impl FunctionDefinitionStatement {
 
     pub fn invoke(&self, runtime: &mut Runtime, args: Vec<Box<dyn Expression>>) -> Box<dyn Any> {
         for (i, arg) in args.iter().enumerate() {
-            runtime.set_value(self.arg_names[i].clone(), arg.clone());
+            let eval = arg.evaluate(runtime);
+            let mut expr = arg.clone();
+            if let Some(integer) = any_into_int_literal(&eval) {
+                expr = Box::new(integer);
+            }
+            if let Some(float) = any_into_f64_literal(&eval) {
+                expr = Box::new(float);
+            }
+            if let Some(boolean) = any_into_bool_literal(&eval) {
+                expr = Box::new(boolean);
+            }
+            runtime.set_value(self.arg_names[i].clone(), expr);
         }
         for statement in &self.statements {
             statement.execute(runtime);

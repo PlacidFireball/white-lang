@@ -28,6 +28,7 @@ impl Runtime {
                 let val = self.scopes[i].remove(&name).unwrap();
                 let cloned = val.clone();
                 self.scopes[i].insert(name.clone(), cloned);
+                //println!("{}", val.debug());
                 return Some(val.evaluate(self));
             }
         }

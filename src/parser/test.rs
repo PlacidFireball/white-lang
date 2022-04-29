@@ -172,9 +172,11 @@ mod test {
         let mut expr = parser.parse_expression();
         assert!(expr.to_any().downcast_ref::<AdditiveExpression>().is_some());
         assert_eq!(expr.debug(), "1 + 1");
+        assert!(!expr.has_errors());
         expr = parser.parse_expression();
         assert!(expr.to_any().downcast_ref::<AdditiveExpression>().is_some());
         assert_eq!(expr.debug(), "1 - 1");
+        assert!(!expr.has_errors());
     }
 
     #[test]
@@ -191,6 +193,7 @@ mod test {
             .get_rhs()
             .to_any()
             .downcast_ref::<IntegerLiteralExpression>();
+        assert!(!additive_expression.has_errors());
         assert!(lhs.is_some());
         assert!(rhs.is_some());
     }
@@ -223,6 +226,7 @@ mod test {
             .downcast_ref::<ListLiteralExpression>()
             .is_some());
         assert_eq!(expr.debug(), "[1, 2, 3, 4]");
+        assert!(!expr.has_errors())
     }
 
     #[test]

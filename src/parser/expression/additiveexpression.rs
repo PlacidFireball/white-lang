@@ -7,6 +7,8 @@ use crate::parser::symbol_table::SymbolTable;
 use crate::runtime::Runtime;
 use std::any::Any;
 
+use super::integerliteralexpression::IntegerLiteralExpression;
+
 #[derive(Clone)]
 pub(crate) struct AdditiveExpression {
     lhs: Box<dyn Expression>,
@@ -30,7 +32,9 @@ impl Expression for AdditiveExpression {
         // respectively but that will be system dependent in the future, I just
         // abstracted it to make my life easier in the future
         let lhs_eval = self.lhs.evaluate(runtime);
+        println!("{:?}", lhs_eval);
         let rhs_eval = self.rhs.evaluate(runtime);
+        println!("{:?}", rhs_eval);
         if let Some(lhs_float) = lhs_eval.downcast_ref::<WhiteLangFloat>() {
             if let Some(rhs_float) = rhs_eval.downcast_ref::<WhiteLangFloat>() {
                 if self.is_add {
@@ -71,6 +75,12 @@ impl Expression for AdditiveExpression {
         // gonna do some other op, perhaps a concatenate function in std
         self.lhs.validate(st);
         self.rhs.validate(st);
+        if self.lhs.get_white_type() != Type::Integer && self.lhs.get_white_type() != Type::Float {
+            self.errors.push(ParserErrorType::IncompatibleTypes);
+        }
+        if self.rhs.get_white_type() != Type::Integer && self.rhs.get_white_type() != Type::Float {
+            self.errors.push(ParserErrorType::IncompatibleTypes);
+        }
     }
 
     // gives debug information of the expression without having to downcast it

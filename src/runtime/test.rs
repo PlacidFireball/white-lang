@@ -187,7 +187,7 @@ mod test {
                return foo(x-1);\
             }\
         }\
-        print(foo(5));";
+        print(foo(1));";
         test_execute(src, "1\n");
     }
 

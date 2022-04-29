@@ -37,8 +37,6 @@ use statement::functioncallstatement::FunctionCallStatement;
 use statement::ifstatement::IfStatement;
 use statement::printstatement::PrintStatement;
 
-use statement::syntaxerrorstatement::SyntaxErrorStatement;
-
 use crate::config::WhiteLangFloat;
 use crate::parser::parser_traits::{Expression, Statement};
 use statement::variablestatement::VariableStatement;

@@ -39,21 +39,21 @@ pub fn default_expr() -> Box<dyn Expression> {
     Box::new(SyntaxErrorExpression::new())
 }
 
-pub fn any_into_int_literal(any : Box<dyn Any>) -> Option<IntegerLiteralExpression> {
+pub fn any_into_int_literal(any : &Box<dyn Any>) -> Option<IntegerLiteralExpression> {
     if let Some(integer) = any.downcast_ref::<WhiteLangInt>() {
         return Some(IntegerLiteralExpression::new(*integer));
     }
     None
 }
 
-pub fn any_into_f64_literal(any : Box<dyn Any>) -> Option<FloatLiteralExpression> {
+pub fn any_into_f64_literal(any : &Box<dyn Any>) -> Option<FloatLiteralExpression> {
     if let Some(float) = any.downcast_ref::<WhiteLangFloat>() {
         return Some(FloatLiteralExpression::new(*float));
     }
     None
 }
 
-pub fn any_into_bool_literal(any : Box<dyn Any>) -> Option<BooleanLiteralExpression> {
+pub fn any_into_bool_literal(any : &Box<dyn Any>) -> Option<BooleanLiteralExpression> {
     if let Some(bool) = any.downcast_ref::<WhiteLangBool>() {
         return Some(BooleanLiteralExpression::new(*bool));
     }
