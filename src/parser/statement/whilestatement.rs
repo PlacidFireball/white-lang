@@ -1,4 +1,3 @@
-use crate::config::*;
 use crate::parser::expression::syntaxerrorexpression::SyntaxErrorExpression;
 use crate::parser::parser_traits::{Expression, Statement, ToAny};
 use crate::parser::symbol_table::SymbolTable;
@@ -22,12 +21,17 @@ impl ToAny for WhileStatement {
 }
 impl Statement for WhileStatement {
     fn execute(&self, runtime: &mut Runtime) {
+        let mut iterations : usize = 0;
         let mut cond : bool = *self.expr.evaluate(runtime).downcast_ref::<bool>().unwrap();
         while cond {
             for statement in self.body.iter() {
                 statement.execute(runtime);
             }
             cond = *self.expr.evaluate(runtime).downcast_ref::<bool>().unwrap();
+            iterations += 1;
+            if iterations > usize::MAX - 1 {
+                panic!("Infinite Loop!"); // idk about this one but I feel like this should be a feature
+            }
         }
     }
 
@@ -70,7 +74,6 @@ impl WhileStatement {
     pub fn new() -> Self {
         WhileStatement {
             body: vec![],
-
             expr: Box::new(SyntaxErrorExpression::new()),
             errors: vec![],
         }

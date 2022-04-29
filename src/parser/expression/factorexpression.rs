@@ -5,7 +5,6 @@ use crate::parser::whitetypes::Type;
 use crate::parser::ParserErrorType;
 use crate::runtime::Runtime;
 use std::any::Any;
-use crate::TokenType::Float;
 
 #[derive(Clone)]
 pub(crate) struct FactorExpression {

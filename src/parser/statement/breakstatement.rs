@@ -1,8 +1,5 @@
-use crate::parser::expression::identifierexpression::IdentifierExpression;
-use crate::parser::expression::syntaxerrorexpression::SyntaxErrorExpression;
 use crate::parser::parser_traits::*;
 use crate::parser::symbol_table::SymbolTable;
-use crate::parser::ParserErrorType;
 use crate::runtime::Runtime;
 
 use std::any::Any;
@@ -42,7 +39,7 @@ impl Statement for BreakStatement {
     }
 
     fn has_errors(&self) -> bool {
-        !self.errors.is_empty()
+        false
     }
 }
 

@@ -172,10 +172,12 @@ mod test {
         test_execute(src, "0\n1\n2\n3\n4\n");
     }
 
-    /*
+    
     #[test]
     fn test_function_recursion_executes() {
         // TODO: recursive functions cause stack overflow
+        // The debugger isn't good enough to tell me where this is happening
+        // it may be a while before this is fixed
         let src = "\
         fn foo(x : int) : int {\
             if (x == 0) {\
@@ -188,7 +190,7 @@ mod test {
         print(foo(5));";
         test_execute(src, "1\n");
     }
-    */
+
     #[test]
     fn test_basic_program() {
         let src = "\
@@ -200,7 +202,6 @@ mod test {
             print(finiteSum(x));
             x = x - 1;
         }";
-        // 1 2 3 4 5 6 7 8 9
         test_execute(src, "55\n45\n36\n28\n21\n15\n10\n6\n3\n1\n");
     }
 }

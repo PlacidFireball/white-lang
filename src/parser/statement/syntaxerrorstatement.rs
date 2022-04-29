@@ -39,6 +39,7 @@ impl Statement for SyntaxErrorStatement {
         true
     }
 }
+#[allow(dead_code)]
 impl SyntaxErrorStatement {
     pub fn new() -> SyntaxErrorStatement {
         SyntaxErrorStatement {}

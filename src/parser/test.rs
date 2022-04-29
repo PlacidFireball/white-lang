@@ -42,7 +42,7 @@ mod test {
     fn test_match_and_consume() {
         let mut parser = init_parser(String::from("1"));
         assert_eq!(parser.curr_idx, 0);
-        assert_eq!(parser.match_and_consume(Int), true);
+        assert!(parser.match_and_consume(Int));
         assert_eq!(parser.curr_idx, 1);
     }
 
