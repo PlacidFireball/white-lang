@@ -175,9 +175,6 @@ mod test {
     
     #[test]
     fn test_function_recursion_executes() {
-        // TODO: recursive functions cause stack overflow
-        // The debugger isn't good enough to tell me where this is happening
-        // it may be a while before this is fixed
         let src = "\
         fn foo(x : int) : int {\
             if (x == 0) {\
@@ -203,5 +200,25 @@ mod test {
             x = x - 1;
         }";
         test_execute(src, "55\n45\n36\n28\n21\n15\n10\n6\n3\n1\n");
+    }
+
+    #[test]
+    fn test_classic_fibonacci() {
+        // TODO: recursion no longer causes stack overflow, but instead scoping sucks. :)
+        let src = "
+        // returns the nth fibonacci number
+        fn fib(n : int) : int { 
+            if (n == 0) { 
+                return 0; 
+            }
+            if (n == 1) { 
+                return 1; 
+            }
+            return fib(n-1) + fib(n-2);
+        }
+        print(fib(6));";
+        // 0 1 1 2 3 5 8 13
+        // 1 2 3 4 5 6
+        test_execute(src, "5\n");
     }
 }
