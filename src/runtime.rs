@@ -3,6 +3,7 @@ use crate::parser::parser_traits::Expression;
 use crate::parser::statement::functiondefinitionstatement::FunctionDefinitionStatement;
 use std::any::Any;
 use std::collections::HashMap;
+use log::info;
 
 mod test;
 
@@ -26,9 +27,8 @@ impl Runtime {
         for i in (0..self.scopes.len()).rev() {
             if self.scopes[i].contains_key(&name) {
                 let val = self.scopes[i].remove(&name).unwrap();
-                let cloned = val.clone();
-                self.scopes[i].insert(name.clone(), cloned);
-                //println!("{}", val.debug());
+                self.scopes[i].insert(name.clone(), val.clone());
+                info!("[RUNTIME]: Name: {}\tValue: {}", name, val.debug());
                 return Some(val.evaluate(self));
             }
         }

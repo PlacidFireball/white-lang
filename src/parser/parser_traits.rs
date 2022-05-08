@@ -19,7 +19,7 @@ use crate::parser::statement::forstatement::ForStatement;
 use crate::parser::symbol_table::SymbolTable;
 use crate::parser::whitetypes::Type;
 use std::any::Any;
-use crate::config::{WhiteLangBool, WhiteLangFloat, WhiteLangInt};
+use crate::config::{WhiteLangBool, WhiteLangFloat, WhiteLangInt, WhiteLangList, WhiteLangString};
 
 use crate::parser::statement::functioncallstatement::FunctionCallStatement;
 use crate::parser::statement::functiondefinitionstatement::FunctionDefinitionStatement;
@@ -58,6 +58,35 @@ pub fn any_into_bool_literal(any : &Box<dyn Any>) -> Option<BooleanLiteralExpres
         return Some(BooleanLiteralExpression::new(*bool));
     }
     None
+}
+
+pub fn try_print_output(evaluated: &Box<dyn Any>) -> String {
+    let mut output = String::new();
+    if let Some(eval_f64) = evaluated.downcast_ref::<WhiteLangFloat>() {
+        let push = eval_f64.to_string();
+        output.push_str(push.as_str());
+    } else if let Some(eval_isize) = evaluated.downcast_ref::<WhiteLangInt>() {
+        let push = eval_isize.to_string();
+        output.push_str(push.as_str());
+    } else if let Some(eval_bool) = evaluated.downcast_ref::<WhiteLangBool>() {
+        let push = eval_bool.to_string();
+        output.push_str(push.as_str());
+    } else if let Some(eval_str) = evaluated.downcast_ref::<&'static str>() {
+        let push = eval_str.to_string();
+        output.push_str(push.as_str());
+    } else if let Some(eval_string) = evaluated.downcast_ref::<WhiteLangString>() {
+        output.push_str(eval_string.as_str());
+    } else if let Some(eval_list) = evaluated.downcast_ref::<WhiteLangList<Box<dyn Any>>>() {
+        output.push_str("[");
+        for (i, thing) in eval_list.iter().enumerate() {
+            output.push_str(try_print_output(thing).as_str());
+            if i < eval_list.len() - 1 {
+                output.push_str(", ");
+            }
+        }
+        output.push_str("]");
+    }
+    output
 }
 
 #[allow(dead_code)]

@@ -127,6 +127,7 @@ impl FunctionDefinitionStatement {
             if let Some(boolean) = any_into_bool_literal(&eval) {
                 expr = Box::new(boolean);
             }
+            println!("Function Call: {} Argument: {} Value: {}", self.name, self.arg_names[i], try_print_output(&eval));
             runtime.set_value(self.arg_names[i].clone(), expr);
         }
         for statement in &self.statements {
