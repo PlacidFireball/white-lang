@@ -1,3 +1,4 @@
+use log::info;
 use crate::parser::parser_traits::*;
 use crate::parser::statement::returnstatement::ReturnStatement;
 use crate::parser::symbol_table::SymbolTable;
@@ -115,26 +116,21 @@ impl FunctionDefinitionStatement {
     }
 
     pub fn invoke(&self, runtime: &mut Runtime, args: Vec<Box<dyn Expression>>) -> Box<dyn Any> {
+        runtime.push_scope();
         for (i, arg) in args.iter().enumerate() {
-            let eval = arg.evaluate(runtime);
-            let mut expr = arg.clone();
-            if let Some(integer) = any_into_int_literal(&eval) {
-                expr = Box::new(integer);
-            }
-            if let Some(float) = any_into_f64_literal(&eval) {
-                expr = Box::new(float);
-            }
-            if let Some(boolean) = any_into_bool_literal(&eval) {
-                expr = Box::new(boolean);
-            }
-            println!("Function Call: {} Argument: {} Value: {}", self.name, self.arg_names[i], try_print_output(&eval));
-            runtime.set_value(self.arg_names[i].clone(), expr);
+            println!("Function Call: {} Argument: {} Value: {}",
+                     self.name, self.arg_names[i],
+                     try_print_output(&arg.evaluate(runtime)));
+            runtime.set_value(self.arg_names[i].clone(), arg.clone());
         }
         for statement in &self.statements {
             statement.execute(runtime);
             if runtime.has_return() {
-                return runtime.get_return();
+                break;
             }
+        }
+        if runtime.has_return() {
+            return runtime.get_return();
         }
         Box::new(())
     }

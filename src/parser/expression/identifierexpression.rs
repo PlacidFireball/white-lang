@@ -28,7 +28,7 @@ impl Expression for IdentifierExpression {
         if let Some(eval) = runtime.get_value(self.name.clone()) {
             return eval;
         }
-        panic!("Undefined variable")
+        panic!("Undefined variable `{}`", self.name);
     }
 
     fn compile(&self) {

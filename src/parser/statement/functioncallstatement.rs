@@ -19,12 +19,7 @@ impl ToAny for FunctionCallStatement {
 
 impl Statement for FunctionCallStatement {
     fn execute(&self, runtime: &mut Runtime) {
-        let fds = runtime.get_function(self.name.clone());
-        let mut eval_args: Vec<Box<dyn Expression>> = vec![];
-        for expr in &self.args {
-            eval_args.push(expr.clone());
-        }
-        fds.invoke(runtime, eval_args);
+        self.expr.evaluate(runtime);
     }
 
     fn compile(&self) {

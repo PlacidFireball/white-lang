@@ -13,26 +13,28 @@ impl ToAny for SyntaxErrorStatement {
 }
 
 impl Statement for SyntaxErrorStatement {
-    fn execute(&self, _runtime: &mut Runtime) {
-        todo!()
+    fn execute(&self, runtime: &mut Runtime) {
+        panic!("Evaluated a syntax error")
     }
 
     fn compile(&self) {
-        todo!()
+        panic!("Compiled a syntax error")
     }
 
     fn transpile(&self) -> String {
-        todo!()
+        panic!("Transpiled a syntax error")
     }
 
-    fn validate(&mut self, _st: &mut SymbolTable) {}
+    fn validate(&mut self, _st: &mut SymbolTable) {
+        panic!("Validated a syntax error")
+    }
 
     fn get_expr(&self) -> &Box<dyn Expression> {
-        todo!()
+        panic!("Syntax errors don't have expressions")
     }
 
     fn get_statement_type(&self) -> String {
-        todo!()
+        String::from("SyntaxErrorStatement")
     }
 
     fn has_errors(&self) -> bool {

@@ -25,20 +25,24 @@ impl Runtime {
 
     pub fn get_value(&mut self, name: String) -> Option<Box<dyn Any + '_>> {
         for i in (0..self.scopes.len()).rev() {
+            println!("[RUNTIME] ---- Scope [{}] ----", i);
+            for (name, expr) in &self.scopes[i] {
+                println!("[RUNTIME] Name: {}\tValue: {}", name, expr.debug());
+            }
             if self.scopes[i].contains_key(&name) {
                 let val = self.scopes[i].remove(&name).unwrap();
                 self.scopes[i].insert(name.clone(), val.clone());
-                info!("[RUNTIME]: Name: {}\tValue: {}", name, val.debug());
+                println!("[RUNTIME]: Name: {}\tValue: {}\t Scope: {}", name, val.debug(), i);
                 return Some(val.evaluate(self));
             }
         }
         Option::None
     }
+
     pub fn set_value(&mut self, name: String, value: Box<dyn Expression>) {
         for i in (0..self.scopes.len()).rev() {
             if self.scopes[i].contains_key(&name) {
-                self.scopes[i].insert(name.clone(), value);
-                return;
+                self.scopes[i].insert(name.clone(), value.clone());
             }
         }
         self.scopes.last_mut().unwrap().insert(name.clone(), value);
@@ -58,7 +62,8 @@ impl Runtime {
     }
 
     pub fn push_scope(&mut self) {
-        self.scopes.push(HashMap::new());
+        let last = self.scopes.last().unwrap().clone();
+        self.scopes.push(last);
     }
 
     pub fn pop_scope(&mut self) {
@@ -77,7 +82,8 @@ impl Runtime {
     }
 
     pub fn get_return(&mut self) -> Box<dyn Any> {
-        let ret = self.ret.clone();
+        let ret = self.ret.clone();          // get the return value
+        self.ret = Box::new(SyntaxErrorExpression::new()); // clear the return slot
         ret.evaluate(self)
     }
 

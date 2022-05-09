@@ -1,5 +1,5 @@
 use crate::config::{WhiteLangBool, WhiteLangFloat, WhiteLangInt, WhiteLangString};
-use crate::parser::parser_traits::{Expression, ToAny};
+use crate::parser::parser_traits::{Expression, ToAny, try_print_output};
 use crate::parser::symbol_table::SymbolTable;
 use crate::parser::whitetypes::Type;
 use crate::parser::whitetypes::Type::Null;
@@ -26,6 +26,11 @@ impl Expression for EqualityExpression {
         let lhs_eval = self.lhs.evaluate(runtime);
         let rhs_eval = self.rhs.evaluate(runtime);
         let is_equal = self.operator.contains("==");
+        if is_equal {
+            println!("[EQ_EXPR]: {} == {}", try_print_output(&lhs_eval), try_print_output(&rhs_eval));
+        } else {
+            println!("[EQ_EXPR]: {} != {}", try_print_output(&lhs_eval), try_print_output(&rhs_eval));
+        }
         // handle null == null
         if self.lhs.get_white_type() == self.rhs.get_white_type()
             && self.lhs.get_white_type() == Null

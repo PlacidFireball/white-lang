@@ -32,9 +32,18 @@ impl Expression for AdditiveExpression {
         // respectively but that will be system dependent in the future, I just
         // abstracted it to make my life easier in the future
         let lhs_eval = self.lhs.evaluate(runtime);
-        println!("{}", try_print_output(&lhs_eval));
         let rhs_eval = self.rhs.evaluate(runtime);
-        println!("{}", try_print_output(&rhs_eval));
+        if self.is_add {
+            println!("[ADD_EXPR]: {} + {}",
+                     try_print_output(&lhs_eval),
+                     try_print_output(&rhs_eval)
+            );
+        } else {
+            println!("[ADDITIVE_EXPR]: {} - {}",
+                     try_print_output(&lhs_eval),
+                     try_print_output(&rhs_eval)
+            );
+        }
         if let Some(lhs_float) = lhs_eval.downcast_ref::<WhiteLangFloat>() {
             if let Some(rhs_float) = rhs_eval.downcast_ref::<WhiteLangFloat>() {
                 if self.is_add {

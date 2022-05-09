@@ -154,7 +154,7 @@ impl Parser {
 
     // consumes the token unconditionally
     fn consume_token(&mut self) {
-        println!("-->{}<--", self.get_curr_tok().get_string_value());
+        //println!("-->{}<--", self.get_curr_tok().get_string_value());
         self.curr_idx += 1;
     }
 

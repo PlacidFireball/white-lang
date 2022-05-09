@@ -1,10 +1,11 @@
-use crate::parser::parser_traits::{Expression, ToAny};
+use crate::parser::parser_traits::{any_into_bool_literal, any_into_f64_literal, any_into_int_literal, Expression, ToAny, try_print_output};
 use crate::parser::symbol_table::SymbolTable;
 use crate::parser::whitetypes::Type;
 use crate::parser::ParserErrorType;
 use crate::parser::ParserErrorType::{ArgMismatch, UnknownName};
 use crate::runtime::Runtime;
 use std::any::Any;
+use crate::parser::expression::syntaxerrorexpression::SyntaxErrorExpression;
 
 #[derive(Clone)]
 pub(crate) struct FunctionCallExpression {
@@ -22,13 +23,28 @@ impl ToAny for FunctionCallExpression {
 
 impl Expression for FunctionCallExpression {
     fn evaluate(&self, runtime: &mut Runtime) -> Box<dyn Any> {
-        runtime.push_scope();
         let fds = runtime.get_function(self.name.clone());
-        let mut eval_args: Vec<Box<dyn Expression>> = vec![];
-        for expr in self.args.iter() {
-            eval_args.push(expr.clone());
+        let mut evaluated_args: Vec<Box<dyn Expression>> = vec![];
+        for expr in &self.args {
+            let eval = expr.evaluate(runtime);
+            let mut tmp = expr.clone();
+            if let Some(integer) = any_into_int_literal(&eval) {
+                tmp = Box::new(integer);
+            }
+            if let Some(float) = any_into_f64_literal(&eval) {
+                tmp = Box::new(float);
+            }
+            if let Some(boolean) = any_into_bool_literal(&eval) {
+                tmp = Box::new(boolean);
+            }
+            evaluated_args.push(tmp);
         }
-        fds.invoke(runtime, eval_args)
+        for (i, arg) in evaluated_args.iter().enumerate() {
+            println!("[FNCALL]: Arg Name: {}\tValue: {}", fds.get_arg_names()[i], try_print_output(&arg.evaluate(runtime)));
+        }
+        let value = fds.invoke(runtime, evaluated_args);
+        runtime.pop_scope();
+        value
     }
 
     fn compile(&self) {
