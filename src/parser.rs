@@ -113,11 +113,11 @@ impl Parser {
 
     fn check_for_parse_errors(&self) {
         if !self.errors.is_empty() {
-            panic!("Parse error occurred at token {}, with error type: {:?}", self.get_curr_tok().get_string_value(), self.errors[0]);
+            panic!("Parse error occurred at token `{}`, with error type: {:?}", self.get_curr_tok().get_string_value(), self.errors[0]);
         }
         for statement in &self.statement_list {
             if let Some(_) = statement.to_any().downcast_ref::<SyntaxErrorExpression>() {
-                panic!("Parse error occurred at token {}", self.get_curr_tok().get_string_value());
+                panic!("Parse error occurred at token `{}`", self.get_curr_tok().get_string_value());
             }
         }
     }
@@ -270,6 +270,10 @@ impl Parser {
         let while_stmt = self.parse_while_statement();
         if while_stmt.is_some() {
             return Box::new(while_stmt.unwrap());
+        }
+        let break_stmt = self.parse_break_statement();
+        if break_stmt.is_some() {
+            return Box::new(break_stmt.unwrap());
         }
         panic!("Parse error occurred at token {}", self.get_curr_tok().get_string_value());
     }

@@ -15,6 +15,7 @@ use crate::parser::expression::stringliteralexpression::StringLiteralExpression;
 use crate::parser::expression::syntaxerrorexpression::SyntaxErrorExpression;
 use crate::parser::expression::unaryexpression::UnaryExpression;
 use crate::parser::statement::assignmentstatement::AssignmentStatement;
+use crate::parser::statement::breakstatement::BreakStatement;
 use crate::parser::statement::forstatement::ForStatement;
 use crate::parser::symbol_table::SymbolTable;
 use crate::parser::whitetypes::Type;
@@ -176,6 +177,9 @@ impl Clone for Box<dyn Statement> {
         } else if let Some(stmt) = self.to_any().downcast_ref::<WhileStatement>() {
             return Box::new(stmt.clone());
         }
+        else if let Some(stmt) = self.to_any().downcast_ref::<BreakStatement>() {
+            return Box::new(stmt.clone());
+        }        
         panic!("Didn't cover statements exhaustively");
     }
 }

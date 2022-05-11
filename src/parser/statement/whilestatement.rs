@@ -5,6 +5,7 @@ use crate::parser::whitetypes::Type;
 use crate::parser::ParserErrorType;
 use crate::parser::ParserErrorType::UnexpectedToken;
 use crate::runtime::Runtime;
+use crate::parser::statement::breakstatement::BreakStatement;
 use std::any::Any;
 
 #[derive(Clone)]
@@ -21,11 +22,20 @@ impl ToAny for WhileStatement {
 }
 impl Statement for WhileStatement {
     fn execute(&self, runtime: &mut Runtime) {
+        runtime.push_scope(String::from("while"));
         let mut iterations : usize = 0;
+        let mut is_broken = false;
         let mut cond : bool = *self.expr.evaluate(runtime).downcast_ref::<bool>().unwrap();
         while cond {
             for statement in self.body.iter() {
                 statement.execute(runtime);
+                if let Some(brk) = statement.to_any().downcast_ref::<BreakStatement>() {
+                    is_broken = true;
+                    break;
+                }
+            }
+            if is_broken {
+                break;
             }
             cond = *self.expr.evaluate(runtime).downcast_ref::<bool>().unwrap();
             iterations += 1;
@@ -33,6 +43,7 @@ impl Statement for WhileStatement {
                 panic!("Infinite Loop!"); // idk about this one but I feel like this should be a feature
             }
         }
+        runtime.pop_scope();
     }
 
     fn compile(&self) {

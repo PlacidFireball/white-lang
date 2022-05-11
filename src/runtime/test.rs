@@ -204,7 +204,7 @@ mod test {
 
     #[test]
     fn test_classic_fibonacci() {
-        // TODO: recursion no longer causes stack overflow, but instead scoping sucks. :)
+        // TODO: multiple function calls in the return statement cause stack overflow. basic recursion works.
         let src = "
         // returns the nth fibonacci number
         fn fib(n : int) : int { 
@@ -217,8 +217,28 @@ mod test {
             return fib(n-1) + fib(n-2);
         }
         print(fib(6));";
-        // 0 1 1 2 3 5 8 13
-        // 1 2 3 4 5 6
         test_execute(src, "5\n");
+    }
+
+    #[test]
+    fn test_top_level_break_while() {
+        let src = "
+        while(true) { 
+            print(1); 
+            break; 
+        }";
+        test_execute(src, "1\n");
+    }
+
+    #[test]
+    fn test_inner_break_works() {
+        let src = "
+        while(true) {
+            print(1);
+            if (true) {
+                break;
+            }
+        }";
+        test_execute(src, "1\n");
     }
 }

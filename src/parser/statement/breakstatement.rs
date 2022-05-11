@@ -17,7 +17,7 @@ impl ToAny for BreakStatement {
 
 impl Statement for BreakStatement {
     fn execute(&self, runtime: &mut Runtime) {
-        // TODO: make something like a return exception, and refactor return statement as well
+        
     }
 
     fn compile(&self) {

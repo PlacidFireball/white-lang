@@ -5,7 +5,6 @@ use crate::parser::ParserErrorType;
 use crate::parser::ParserErrorType::{ArgMismatch, UnknownName};
 use crate::runtime::Runtime;
 use std::any::Any;
-use crate::parser::expression::syntaxerrorexpression::SyntaxErrorExpression;
 
 #[derive(Clone)]
 pub(crate) struct FunctionCallExpression {

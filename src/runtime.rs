@@ -3,12 +3,12 @@ use crate::parser::parser_traits::Expression;
 use crate::parser::statement::functiondefinitionstatement::FunctionDefinitionStatement;
 use std::any::Any;
 use std::collections::HashMap;
-use log::info;
 
 mod test;
 
 pub struct Runtime {
     scopes: Vec<HashMap<String, Box<dyn Expression>>>,
+    scope_types: Vec<String>,
     functions: HashMap<String, FunctionDefinitionStatement>,
     ret: Box<dyn Expression>,
     pub(crate) output: String,
@@ -17,6 +17,7 @@ impl Runtime {
     pub fn new() -> Self {
         Runtime {
             scopes: vec![HashMap::new()],
+            scope_types: vec![String::from("global")],
             functions: HashMap::new(),
             ret: Box::new(SyntaxErrorExpression::new()),
             output: String::new(),
@@ -61,13 +62,23 @@ impl Runtime {
         func
     }
 
-    pub fn push_scope(&mut self) {
+    pub fn push_scope(&mut self, typ: String) {
+        self.scope_types.push(typ);
         let last = self.scopes.last().unwrap().clone();
         self.scopes.push(last);
     }
 
     pub fn pop_scope(&mut self) {
         self.scopes.pop();
+        self.scope_types.pop();
+    }
+
+    pub fn pop_nearest_loop(&mut self) {
+        for i in (0..self.scope_types.len()).rev() {
+            if self.scope_types[i].eq("while") {
+                // TODO: trying to implement inner break statement
+            }
+        }
     }
 
     pub fn set_return(&mut self, ret: Box<dyn Expression>) {
@@ -83,7 +94,7 @@ impl Runtime {
 
     pub fn get_return(&mut self) -> Box<dyn Any> {
         let ret = self.ret.clone();          // get the return value
-        self.ret = Box::new(SyntaxErrorExpression::new()); // clear the return slot
+        self.ret = Box::new(SyntaxErrorExpression::new());      // clear the return slot
         ret.evaluate(self)
     }
 

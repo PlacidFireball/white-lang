@@ -116,7 +116,7 @@ impl FunctionDefinitionStatement {
     }
 
     pub fn invoke(&self, runtime: &mut Runtime, args: Vec<Box<dyn Expression>>) -> Box<dyn Any> {
-        runtime.push_scope();
+        runtime.push_scope(String::from("fn"));
         for (i, arg) in args.iter().enumerate() {
             println!("Function Call: {} Argument: {} Value: {}",
                      self.name, self.arg_names[i],
