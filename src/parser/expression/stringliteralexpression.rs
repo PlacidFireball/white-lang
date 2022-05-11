@@ -5,7 +5,7 @@ use crate::runtime::Runtime;
 use std::any::Any;
 
 #[derive(Clone)]
-pub(crate) struct StringLiteralExpression {
+pub struct StringLiteralExpression {
     string_value: String,
 }
 

@@ -347,9 +347,9 @@ impl Parser {
         if self.match_and_consume(For) {
             let mut fs = ForStatement::new();
             self.require_token(LeftParen);
-            fs.set_iter_var(self.parse_identifier_expression());
+            fs.set_iter_var(self.parse_expression());
             self.require_token(In);
-            fs.set_iter(self.parse_list_literal_expression()); // TODO: more iterators
+            fs.set_iter(self.parse_expression()); // TODO: more iterators
             self.require_token(RightParen);
             self.require_token(LeftBrace);
             while !self.match_and_consume(RightBrace) {

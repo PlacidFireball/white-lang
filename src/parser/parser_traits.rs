@@ -61,6 +61,13 @@ pub fn any_into_bool_literal(any : &Box<dyn Any>) -> Option<BooleanLiteralExpres
     None
 }
 
+pub fn any_into_string_literal(any : &Box<dyn Any>) -> Option<StringLiteralExpression> {
+    if let Some(string) = any.downcast_ref::<WhiteLangString>() {
+        return Some(StringLiteralExpression::new(string.to_string()));
+    }
+    None
+}
+
 pub fn try_print_output(evaluated: &Box<dyn Any>) -> String {
     let mut output = String::new();
     if let Some(eval_f64) = evaluated.downcast_ref::<WhiteLangFloat>() {

@@ -499,4 +499,24 @@ mod test {
         assert!(!stmt.has_errors());
         assert!(!parser.has_errors());
     }
+
+    #[test]
+    fn test_for_statement_with_extra_var_parses() {
+        let src = "
+        let x = [1, 2, 3];
+        for (y in x) {
+            print(y);
+        }".to_string();
+        let mut parser = init_parser(src);
+        let mut st = SymbolTable::new();
+        let mut variable = parser.parse_statement();
+        let mut for_stmt = parser.parse_statement();
+        variable.validate(&mut st);
+        for_stmt.validate(&mut st);
+        assert!(variable.to_any().downcast_ref::<VariableStatement>().is_some());
+        assert!(for_stmt.to_any().downcast_ref::<ForStatement>().is_some());
+        assert!(!variable.has_errors());
+        assert!(!parser.has_errors());
+        assert!(for_stmt.has_errors());
+    }
 }

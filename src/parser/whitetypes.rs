@@ -68,4 +68,15 @@ impl Type {
         }
         false
     }
+    pub fn is_list_type(&self) -> bool {
+        use Type::*;
+        match self {
+            ListChar => true,
+            ListString => true,
+            ListInteger => true,
+            ListBoolean => true,
+            ListFloat => true,
+            _ => false
+        }
+    }
 }

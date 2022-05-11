@@ -241,4 +241,32 @@ mod test {
         }";
         test_execute(src, "1\n");
     }
+
+    #[test]
+    fn test_for_statement_works() {
+        let src = "
+        for (x in [1, 2, 3]) { 
+            print(x);
+        }";
+        test_execute(src, "1\n2\n3\n");
+    }
+
+    #[test]
+    fn test_for_statement_string_list() {
+        let src = "
+        for (x in [\"Hello\", \"World\", \"!\"]) { 
+            print(x); 
+        }";
+        test_execute(src, "Hello\nWorld\n!\n")
+    }
+
+    #[test]
+    fn test_for_statement_with_extra_var() {
+        let src = "
+        let x = [1, 2, 3];
+        for (y in x) {
+            print(y);
+        }";
+        test_execute(src, "1\n2\n3\n");
+    }
 }
