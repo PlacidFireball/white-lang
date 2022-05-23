@@ -172,7 +172,6 @@ mod test {
         test_execute(src, "0\n1\n2\n3\n4\n");
     }
 
-    
     #[test]
     fn test_function_recursion_executes() {
         let src = "\

@@ -1,4 +1,7 @@
-use crate::parser::parser_traits::{any_into_bool_literal, any_into_f64_literal, any_into_int_literal, Expression, ToAny, try_print_output};
+use crate::parser::parser_traits::{
+    any_into_bool_literal, any_into_f64_literal, any_into_int_literal, try_print_output,
+    Expression, ToAny,
+};
 use crate::parser::symbol_table::SymbolTable;
 use crate::parser::whitetypes::Type;
 use crate::parser::ParserErrorType;
@@ -39,7 +42,11 @@ impl Expression for FunctionCallExpression {
             evaluated_args.push(tmp);
         }
         for (i, arg) in evaluated_args.iter().enumerate() {
-            println!("[FNCALL]: Arg Name: {}\tValue: {}", fds.get_arg_names()[i], try_print_output(&arg.evaluate(runtime)));
+            println!(
+                "[FNCALL]: Arg Name: {}\tValue: {}",
+                fds.get_arg_names()[i],
+                try_print_output(&arg.evaluate(runtime))
+            );
         }
         let value = fds.invoke(runtime, evaluated_args);
         runtime.pop_scope();

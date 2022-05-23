@@ -1,8 +1,9 @@
-use crate::parser::parser_traits::{Expression, Statement, ToAny};
+use crate::parser::parser_traits::*;
 use crate::parser::symbol_table::SymbolTable;
 use crate::program::Program;
 use crate::runtime::Runtime;
 use std::any::Any;
+use crate::parser::expression::syntaxerrorexpression::SyntaxErrorExpression;
 
 #[derive(Clone)]
 pub(crate) struct PrintStatement {
@@ -16,10 +17,11 @@ impl ToAny for PrintStatement {
 }
 
 impl Statement for PrintStatement {
-    fn execute(&self, runtime: &mut Runtime) {
+    fn execute(&self, runtime: &mut Runtime) -> Result<Box<dyn Expression>> {
         let eval = self.expr.evaluate(runtime);
         runtime.push_output(String::from(Program::try_print_output(&eval)));
         runtime.push_output(String::from("\n"));
+        Ok(Box::new(SyntaxErrorExpression::new()))
     }
 
     fn compile(&self) {

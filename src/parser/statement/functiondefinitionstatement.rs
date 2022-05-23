@@ -1,9 +1,9 @@
-use log::info;
 use crate::parser::parser_traits::*;
 use crate::parser::statement::returnstatement::ReturnStatement;
 use crate::parser::symbol_table::SymbolTable;
 use crate::parser::*;
 use crate::runtime::Runtime;
+use log::info;
 
 #[derive(Clone)]
 pub struct FunctionDefinitionStatement {
@@ -37,8 +37,9 @@ impl Default for FunctionDefinitionStatement {
 }
 
 impl Statement for FunctionDefinitionStatement {
-    fn execute(&self, runtime: &mut Runtime) {
+    fn execute(&self, runtime: &mut Runtime) -> Result<Box<dyn Expression>> {
         runtime.set_function(self.name.clone(), self.clone());
+        Ok(Box::new(SyntaxErrorExpression::new()))
     }
 
     fn compile(&self) {
@@ -118,19 +119,19 @@ impl FunctionDefinitionStatement {
     pub fn invoke(&self, runtime: &mut Runtime, args: Vec<Box<dyn Expression>>) -> Box<dyn Any> {
         runtime.push_scope(String::from("fn"));
         for (i, arg) in args.iter().enumerate() {
-            println!("Function Call: {} Argument: {} Value: {}",
-                     self.name, self.arg_names[i],
-                     try_print_output(&arg.evaluate(runtime)));
+            println!(
+                "Function Call: {} Argument: {} Value: {}",
+                self.name,
+                self.arg_names[i],
+                try_print_output(&arg.evaluate(runtime))
+            );
             runtime.set_value(self.arg_names[i].clone(), arg.clone());
         }
         for statement in &self.statements {
-            statement.execute(runtime);
-            if runtime.has_return() {
-                break;
+            match statement.execute(runtime) {
+                Ok(_) => (),
+                Err(error) => return error.expr.evaluate(runtime)
             }
-        }
-        if runtime.has_return() {
-            return runtime.get_return();
         }
         Box::new(())
     }

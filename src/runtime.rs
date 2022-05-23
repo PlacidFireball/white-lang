@@ -33,7 +33,12 @@ impl Runtime {
             if self.scopes[i].contains_key(&name) {
                 let val = self.scopes[i].remove(&name).unwrap();
                 self.scopes[i].insert(name.clone(), val.clone());
-                println!("[RUNTIME]: Name: {}\tValue: {}\t Scope: {}", name, val.debug(), i);
+                println!(
+                    "[RUNTIME]: Name: {}\tValue: {}\t Scope: {}",
+                    name,
+                    val.debug(),
+                    i
+                );
                 return Some(val.evaluate(self));
             }
         }
@@ -93,8 +98,8 @@ impl Runtime {
     }
 
     pub fn get_return(&mut self) -> Box<dyn Any> {
-        let ret = self.ret.clone();          // get the return value
-        self.ret = Box::new(SyntaxErrorExpression::new());      // clear the return slot
+        let ret = self.ret.clone(); // get the return value
+        self.ret = Box::new(SyntaxErrorExpression::new()); // clear the return slot
         ret.evaluate(self)
     }
 

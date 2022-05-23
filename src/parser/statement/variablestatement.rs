@@ -1,11 +1,11 @@
-use crate::parser::parser_traits::default_expr;
-use crate::parser::parser_traits::{Expression, Statement, ToAny};
+use crate::parser::parser_traits::*;
 use crate::parser::symbol_table::SymbolTable;
 use crate::parser::whitetypes::Type;
 use crate::parser::ParserErrorType;
 use crate::parser::ParserErrorType::SymbolDefinitionError;
 use crate::runtime::Runtime;
 use std::any::Any;
+use crate::parser::expression::syntaxerrorexpression::SyntaxErrorExpression;
 
 #[derive(Clone)]
 pub(crate) struct VariableStatement {
@@ -22,8 +22,9 @@ impl ToAny for VariableStatement {
 }
 
 impl Statement for VariableStatement {
-    fn execute(&self, runtime: &mut Runtime) {
+    fn execute(&self, runtime: &mut Runtime) -> Result<Box<dyn Expression>> {
         runtime.set_value(self.name.clone(), self.expr.clone());
+        Ok(Box::new(SyntaxErrorExpression::new()))
     }
 
     fn compile(&self) {

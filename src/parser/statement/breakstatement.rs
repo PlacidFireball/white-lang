@@ -3,11 +3,10 @@ use crate::parser::symbol_table::SymbolTable;
 use crate::runtime::Runtime;
 
 use std::any::Any;
+use crate::parser::expression::syntaxerrorexpression::SyntaxErrorExpression;
 
 #[derive(Clone)]
-pub(crate) struct BreakStatement {
-
-}
+pub(crate) struct BreakStatement {}
 
 impl ToAny for BreakStatement {
     fn to_any(&self) -> &dyn Any {
@@ -16,8 +15,8 @@ impl ToAny for BreakStatement {
 }
 
 impl Statement for BreakStatement {
-    fn execute(&self, runtime: &mut Runtime) {
-
+    fn execute(&self, runtime: &mut Runtime)  -> Result<Box<dyn Expression>> {
+        Ok(Box::new(SyntaxErrorExpression::new()))
     }
 
     fn compile(&self) {
@@ -28,7 +27,7 @@ impl Statement for BreakStatement {
         todo!()
     }
 
-    fn validate(&mut self, _st: &mut SymbolTable) { }
+    fn validate(&mut self, _st: &mut SymbolTable) {}
 
     fn get_expr(&self) -> &Box<dyn Expression> {
         panic!("Break statement does not have an expression");
@@ -45,6 +44,6 @@ impl Statement for BreakStatement {
 
 impl BreakStatement {
     pub fn new() -> Self {
-        BreakStatement { }
+        BreakStatement {}
     }
 }

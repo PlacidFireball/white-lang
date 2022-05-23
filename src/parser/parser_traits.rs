@@ -1,3 +1,4 @@
+use crate::config::{WhiteLangBool, WhiteLangFloat, WhiteLangInt, WhiteLangList, WhiteLangString};
 use crate::parser::expression::additiveexpression::AdditiveExpression;
 use crate::parser::expression::booleanliteralexpression::BooleanLiteralExpression;
 use crate::parser::expression::comparisonexpression::ComparisonExpression;
@@ -20,7 +21,6 @@ use crate::parser::statement::forstatement::ForStatement;
 use crate::parser::symbol_table::SymbolTable;
 use crate::parser::whitetypes::Type;
 use std::any::Any;
-use crate::config::{WhiteLangBool, WhiteLangFloat, WhiteLangInt, WhiteLangList, WhiteLangString};
 
 use crate::parser::statement::functioncallstatement::FunctionCallStatement;
 use crate::parser::statement::functiondefinitionstatement::FunctionDefinitionStatement;
@@ -40,28 +40,28 @@ pub fn default_expr() -> Box<dyn Expression> {
     Box::new(SyntaxErrorExpression::new())
 }
 
-pub fn any_into_int_literal(any : &Box<dyn Any>) -> Option<IntegerLiteralExpression> {
+pub fn any_into_int_literal(any: &Box<dyn Any>) -> Option<IntegerLiteralExpression> {
     if let Some(integer) = any.downcast_ref::<WhiteLangInt>() {
         return Some(IntegerLiteralExpression::new(*integer));
     }
     None
 }
 
-pub fn any_into_f64_literal(any : &Box<dyn Any>) -> Option<FloatLiteralExpression> {
+pub fn any_into_f64_literal(any: &Box<dyn Any>) -> Option<FloatLiteralExpression> {
     if let Some(float) = any.downcast_ref::<WhiteLangFloat>() {
         return Some(FloatLiteralExpression::new(*float));
     }
     None
 }
 
-pub fn any_into_bool_literal(any : &Box<dyn Any>) -> Option<BooleanLiteralExpression> {
+pub fn any_into_bool_literal(any: &Box<dyn Any>) -> Option<BooleanLiteralExpression> {
     if let Some(bool) = any.downcast_ref::<WhiteLangBool>() {
         return Some(BooleanLiteralExpression::new(*bool));
     }
     None
 }
 
-pub fn any_into_string_literal(any : &Box<dyn Any>) -> Option<StringLiteralExpression> {
+pub fn any_into_string_literal(any: &Box<dyn Any>) -> Option<StringLiteralExpression> {
     if let Some(string) = any.downcast_ref::<WhiteLangString>() {
         return Some(StringLiteralExpression::new(string.to_string()));
     }
@@ -150,9 +150,16 @@ impl Clone for Box<dyn Expression> {
     }
 }
 
+#[derive(Clone)]
+pub struct ReturnException {
+    pub(crate) expr: Box<dyn Expression>
+}
+
+pub type Result<T> = std::result::Result<T, ReturnException>;
+
 #[allow(dead_code)]
 pub trait Statement: ToAny {
-    fn execute(&self, runtime: &mut Runtime); // execute the statement
+    fn execute(&self, runtime: &mut Runtime) -> Result<Box<dyn Expression>>; // execute the statement
     fn compile(&self); // compile the statement to nasm
     fn transpile(&self) -> String; // transpile the statement to Javascript
     fn validate(&mut self, st: &mut SymbolTable); // validate the statement via the symbol table
@@ -183,10 +190,9 @@ impl Clone for Box<dyn Statement> {
             return Box::new(stmt.clone());
         } else if let Some(stmt) = self.to_any().downcast_ref::<WhileStatement>() {
             return Box::new(stmt.clone());
-        }
-        else if let Some(stmt) = self.to_any().downcast_ref::<BreakStatement>() {
+        } else if let Some(stmt) = self.to_any().downcast_ref::<BreakStatement>() {
             return Box::new(stmt.clone());
-        }        
+        }
         panic!("Didn't cover statements exhaustively");
     }
 }

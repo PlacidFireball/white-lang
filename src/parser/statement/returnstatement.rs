@@ -1,4 +1,4 @@
-use crate::parser::parser_traits::{Expression, Statement, ToAny};
+use crate::parser::parser_traits::*;
 use crate::parser::symbol_table::SymbolTable;
 use crate::parser::*;
 use crate::runtime::Runtime;
@@ -18,8 +18,11 @@ impl ToAny for ReturnStatement {
 }
 
 impl Statement for ReturnStatement {
-    fn execute(&self, runtime: &mut Runtime) {
+    fn execute(&self, runtime: &mut Runtime) -> Result<Box<dyn Expression>> {
         runtime.set_return(self.expr.clone());
+        Err(ReturnException {
+            expr: self.expr.clone()
+        })
     }
 
     fn compile(&self) {

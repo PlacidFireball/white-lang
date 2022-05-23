@@ -21,7 +21,7 @@ impl ToAny for AssignmentStatement {
 }
 
 impl Statement for AssignmentStatement {
-    fn execute(&self, runtime: &mut Runtime) {
+    fn execute(&self, runtime: &mut Runtime) -> Result<Box<dyn Expression>> {
         let ident = self
             .variable
             .to_any()
@@ -36,6 +36,7 @@ impl Statement for AssignmentStatement {
         } else {
             runtime.set_value(ident.debug(), self.expr.clone());
         }
+        Ok(Box::new(SyntaxErrorExpression::new()))
     }
 
     fn compile(&self) {
