@@ -1,6 +1,6 @@
 use crate::config::*;
 use crate::parser::expression::syntaxerrorexpression::SyntaxErrorExpression;
-use crate::parser::parser_traits::{Expression, Statement, ToAny};
+use crate::parser::parser_traits::*;
 use crate::parser::symbol_table::SymbolTable;
 use crate::parser::whitetypes::Type;
 use crate::parser::ParserErrorType;
@@ -22,7 +22,7 @@ impl ToAny for IfStatement {
     }
 }
 impl Statement for IfStatement {
-    fn execute(&self, runtime: &mut Runtime) {
+    fn execute(&self, runtime: &mut Runtime) -> Result<Box<dyn Expression>> {
         let eval = self.expr.evaluate(runtime);
         let downcast = *eval.downcast_ref::<WhiteLangBool>().unwrap();
         runtime.push_scope(String::from("if"));
@@ -36,6 +36,7 @@ impl Statement for IfStatement {
             }
         }
         runtime.pop_scope();
+        Ok(Box::new(SyntaxErrorExpression::new()))
     }
 
     fn compile(&self) {

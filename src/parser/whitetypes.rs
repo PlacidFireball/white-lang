@@ -76,7 +76,7 @@ impl Type {
             ListInteger => true,
             ListBoolean => true,
             ListFloat => true,
-            _ => false
+            _ => false,
         }
     }
 }

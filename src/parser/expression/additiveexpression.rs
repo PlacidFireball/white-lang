@@ -2,7 +2,7 @@ use crate::parser::whitetypes::Type;
 use crate::parser::ParserErrorType;
 
 use crate::config::{WhiteLangFloat, WhiteLangInt};
-use crate::parser::parser_traits::{Expression, ToAny, try_print_output};
+use crate::parser::parser_traits::{try_print_output, Expression, ToAny};
 use crate::parser::symbol_table::SymbolTable;
 use crate::runtime::Runtime;
 use std::any::Any;
@@ -32,14 +32,16 @@ impl Expression for AdditiveExpression {
         let rhs_eval = self.rhs.evaluate(runtime);
         // debug info
         if self.is_add {
-            println!("[ADD_EXPR]: {} + {}",
-                     try_print_output(&lhs_eval),
-                     try_print_output(&rhs_eval)
+            println!(
+                "[ADD_EXPR]: {} + {}",
+                try_print_output(&lhs_eval),
+                try_print_output(&rhs_eval)
             );
         } else {
-            println!("[ADDITIVE_EXPR]: {} - {}",
-                     try_print_output(&lhs_eval),
-                     try_print_output(&rhs_eval)
+            println!(
+                "[ADDITIVE_EXPR]: {} - {}",
+                try_print_output(&lhs_eval),
+                try_print_output(&rhs_eval)
             );
         }
         if let Some(lhs_float) = lhs_eval.downcast_ref::<WhiteLangFloat>() {

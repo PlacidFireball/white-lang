@@ -1,8 +1,9 @@
 use crate::parser::expression::functioncallexpression::FunctionCallExpression;
-use crate::parser::parser_traits::{Expression, Statement, ToAny};
+use crate::parser::parser_traits::*;
 use crate::parser::symbol_table::SymbolTable;
 use crate::runtime::Runtime;
 use std::any::Any;
+use crate::parser::expression::syntaxerrorexpression::SyntaxErrorExpression;
 
 #[derive(Clone)]
 pub struct FunctionCallStatement {
@@ -18,8 +19,9 @@ impl ToAny for FunctionCallStatement {
 }
 
 impl Statement for FunctionCallStatement {
-    fn execute(&self, runtime: &mut Runtime) {
+    fn execute(&self, runtime: &mut Runtime)  -> Result<Box<dyn Expression>> {
         self.expr.evaluate(runtime);
+        Ok(Box::new(SyntaxErrorExpression::new()))
     }
 
     fn compile(&self) {

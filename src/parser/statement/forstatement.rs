@@ -23,7 +23,7 @@ impl ToAny for ForStatement {
 }
 
 impl Statement for ForStatement {
-    fn execute(&self, runtime: &mut Runtime) {
+    fn execute(&self, runtime: &mut Runtime)  -> Result<Box<dyn Expression>> {
         runtime.push_scope(String::from("for"));
         let any = self.iterator.evaluate(runtime);
         let list = any.downcast_ref::<Vec<Box<dyn Any>>>().unwrap();
@@ -51,8 +51,9 @@ impl Statement for ForStatement {
             if is_broken {
                 break;
             }
-        }        
+        }
         runtime.pop_scope();
+        Ok(Box::new(SyntaxErrorExpression::new()))
     }
 
     fn compile(&self) {
@@ -96,7 +97,7 @@ impl Statement for ForStatement {
             let typ = self.iterator.get_white_type().get_type_from_list();
             st.register_symbol(self.variable.debug(), typ);
         }
-    
+
         for stmt in &mut self.statements {
             stmt.validate(st);
         }

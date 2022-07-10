@@ -39,9 +39,9 @@ use statement::printstatement::PrintStatement;
 
 use crate::config::WhiteLangFloat;
 use crate::parser::parser_traits::{Expression, Statement};
+use crate::parser::statement::breakstatement::BreakStatement;
 use statement::variablestatement::VariableStatement;
 use symbol_table::SymbolTable;
-use crate::parser::statement::breakstatement::BreakStatement;
 
 // Parsing Errors
 #[derive(Clone, Copy, Debug, PartialOrd, PartialEq)]
@@ -113,11 +113,18 @@ impl Parser {
 
     fn check_for_parse_errors(&self) {
         if !self.errors.is_empty() {
-            panic!("Parse error occurred at token `{}`, with error type: {:?}", self.get_curr_tok().get_string_value(), self.errors[0]);
+            panic!(
+                "Parse error occurred at token `{}`, with error type: {:?}",
+                self.get_curr_tok().get_string_value(),
+                self.errors[0]
+            );
         }
         for statement in &self.statement_list {
             if let Some(_) = statement.to_any().downcast_ref::<SyntaxErrorExpression>() {
-                panic!("Parse error occurred at token `{}`", self.get_curr_tok().get_string_value());
+                panic!(
+                    "Parse error occurred at token `{}`",
+                    self.get_curr_tok().get_string_value()
+                );
             }
         }
     }
@@ -279,7 +286,10 @@ impl Parser {
         if break_stmt.is_some() {
             return Box::new(break_stmt.unwrap());
         }
-        panic!("Parse error occurred at token {}", self.get_curr_tok().get_string_value());
+        panic!(
+            "Parse error occurred at token {}",
+            self.get_curr_tok().get_string_value()
+        );
     }
 
     fn parse_function_definition_statement(&mut self) -> Option<FunctionDefinitionStatement> {

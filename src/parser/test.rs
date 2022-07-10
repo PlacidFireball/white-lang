@@ -26,9 +26,9 @@ mod test {
     use crate::parser::statement::functiondefinitionstatement::FunctionDefinitionStatement;
     use crate::parser::statement::ifstatement::IfStatement;
     use crate::parser::statement::variablestatement::VariableStatement;
+    use crate::parser::statement::whilestatement::WhileStatement;
     use crate::parser::symbol_table::SymbolTable;
     use crate::parser::whitetypes::Type;
-    use crate::parser::statement::whilestatement::WhileStatement;
     use crate::TokenType::*;
     use crate::{Parser, Tokenizer};
 
@@ -492,10 +492,7 @@ mod test {
         let mut st = SymbolTable::new();
         let mut stmt = parser.parse_statement();
         stmt.validate(&mut st);
-        assert!(stmt
-            .to_any()
-            .downcast_ref::<WhileStatement>()
-            .is_some());
+        assert!(stmt.to_any().downcast_ref::<WhileStatement>().is_some());
         assert!(!stmt.has_errors());
         assert!(!parser.has_errors());
     }
@@ -506,14 +503,18 @@ mod test {
         let x = [1, 2, 3];
         for (y in x) {
             print(y);
-        }".to_string();
+        }"
+        .to_string();
         let mut parser = init_parser(src);
         let mut st = SymbolTable::new();
         let mut variable = parser.parse_statement();
         let mut for_stmt = parser.parse_statement();
         variable.validate(&mut st);
         for_stmt.validate(&mut st);
-        assert!(variable.to_any().downcast_ref::<VariableStatement>().is_some());
+        assert!(variable
+            .to_any()
+            .downcast_ref::<VariableStatement>()
+            .is_some());
         assert!(for_stmt.to_any().downcast_ref::<ForStatement>().is_some());
         assert!(!variable.has_errors());
         assert!(!parser.has_errors());
