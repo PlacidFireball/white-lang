@@ -45,7 +45,7 @@ use crate::parser::statement::breakstatement::BreakStatement;
 
 // Parsing Errors
 #[derive(Clone, Copy, Debug, PartialOrd, PartialEq)]
-pub(crate) enum ParserErrorType {
+pub enum ParserErrorType {
     UnexpectedToken,       // we've encountered some unexpected token
     UnterminatedArgList,   // function has unterminated argument list
     UnterminatedList,      // list literal is unterminated
@@ -141,6 +141,10 @@ impl Parser {
     // tells us if parsing is done or not
     fn has_tokens(&self) -> bool {
         !(self.get_curr_tok().get_type() == Eof)
+    }
+
+    pub fn add_error(&mut self, error: ParserErrorType) {
+        self.errors.push(error);
     }
 
     // tells us if we have errors

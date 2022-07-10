@@ -4,35 +4,33 @@ mod parser;
 use crate::program::Program;
 use parser::Parser;
 
+use std::cell::RefCell;
+use std::ops::DerefMut;
+
 mod config;
 mod program;
 mod runtime;
+mod core;
+use crate::core::Core;
+
+thread_local! {
+    static CORE: RefCell<Core> = RefCell::new(
+        Core::new(
+            "\
+            fn foo(x : int) { \
+                print(x);\
+            } \
+            foo(1);"
+        )
+    );
+}
 
 #[allow(unused_variables)]
 fn main() {
-    let src = "
-    // returns the nth fibonacci number
-    fn fib(n : int) : int {
-        if (n == 0) {
-            print(\"Returned 0\");
-            return 0;
-        }
-        if (n == 1) {
-            print(\"Returned 0\");
-            return 0;
-        }
-        if (n == 2) {
-            print(\"Returned 1\");
-            return 1;
-        }
-        else {
-            let a : int = fib(n-1);
-            let b : int = fib(n-2);
-            return a + b;
-        }
-    }
-    print(fib(5));";
-    let mut program: Program = Program::from_src(String::from(src));
-    program.execute();
-    print!("{}", program.stdout);
+    CORE.with(|core| {
+        core.borrow_mut()
+            .deref_mut()
+            .get_program()
+            .execute();
+    })
 }

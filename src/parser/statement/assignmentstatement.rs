@@ -7,6 +7,8 @@ use crate::runtime::Runtime;
 
 use std::any::Any;
 
+use crate::CORE;
+
 #[derive(Clone)]
 pub(crate) struct AssignmentStatement {
     variable: Box<dyn Expression>,
@@ -55,10 +57,10 @@ impl Statement for AssignmentStatement {
             .downcast_ref::<IdentifierExpression>()
             .is_none()
         {
-            self.errors.push(ParserErrorType::UnexpectedToken);
+            add_parser_error(ParserErrorType::UnexpectedToken);
         }
         if self.expr.get_white_type() != self.variable.get_white_type() {
-            self.errors.push(ParserErrorType::IncompatibleTypes);
+            add_parser_error(ParserErrorType::IncompatibleTypes);
         }
     }
 

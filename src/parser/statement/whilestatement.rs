@@ -1,5 +1,5 @@
 use crate::parser::expression::syntaxerrorexpression::SyntaxErrorExpression;
-use crate::parser::parser_traits::{Expression, Statement, ToAny};
+use crate::parser::parser_traits::{add_parser_error, Expression, Statement, ToAny};
 use crate::parser::symbol_table::SymbolTable;
 use crate::parser::whitetypes::Type;
 use crate::parser::ParserErrorType;
@@ -7,6 +7,9 @@ use crate::parser::ParserErrorType::UnexpectedToken;
 use crate::runtime::Runtime;
 use crate::parser::statement::breakstatement::BreakStatement;
 use std::any::Any;
+use std::ops::DerefMut;
+
+use crate::CORE;
 
 #[derive(Clone)]
 pub struct WhileStatement {
@@ -29,8 +32,9 @@ impl Statement for WhileStatement {
         while cond {
             for statement in self.body.iter() {
                 statement.execute(runtime);
-                if let Some(brk) = statement.to_any().downcast_ref::<BreakStatement>() {
-                    is_broken = true;
+                if runtime.get_break() {
+                    is_broken = true; // interrogate break state
+                    runtime.set_break(false); // set break state back to false
                     break;
                 }
             }
@@ -57,7 +61,7 @@ impl Statement for WhileStatement {
     fn validate(&mut self, st: &mut SymbolTable) {
         self.expr.validate(st);
         if self.expr.get_white_type() != Type::Boolean {
-            self.errors.push(UnexpectedToken);
+            add_parser_error(ParserErrorType::UnexpectedToken);
         }
         st.push_scope();
         if !self.body.is_empty() {

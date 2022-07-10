@@ -67,6 +67,7 @@ pub enum TokenType {
     Struct, // struct
     As,     // as
     Arrow,  // ->
+    GoTo,
 }
 #[allow(dead_code)]
 #[derive(PartialEq, Debug, Clone, Copy)]
@@ -155,6 +156,7 @@ fn init_keywords() -> HashMap<String, TokenType> {
     keywords.insert("else".to_string(), TokenType::Else);
     keywords.insert("in".to_string(), TokenType::In);
     keywords.insert("struct".to_string(), TokenType::Struct);
+    keywords.insert("goto".to_string(), TokenType::GoTo);
     keywords
 }
 

@@ -28,6 +28,7 @@ impl Statement for ForStatement {
         let any = self.iterator.evaluate(runtime);
         let list = any.downcast_ref::<Vec<Box<dyn Any>>>().unwrap();
         for item in list.iter() {
+            let mut is_broken = false;
             if let Some(integer) = any_into_int_literal(item) {
                 runtime.set_value(self.variable.debug(), Box::new(integer));
             } else if let Some(float) = any_into_f64_literal(item) {
@@ -41,6 +42,14 @@ impl Statement for ForStatement {
             }
             for statement in self.statements.iter() {
                 statement.execute(runtime);
+                if runtime.get_break() {
+                    runtime.set_break(false);
+                    is_broken = true;
+                    break;
+                }
+            }
+            if is_broken {
+                break;
             }
         }        
         runtime.pop_scope();
@@ -63,7 +72,7 @@ impl Statement for ForStatement {
         {
             let name = id_expr.debug();
             if st.has_symbol(name.clone()) {
-                self.errors.push(ParserErrorType::DuplicateName);
+                add_parser_error(ParserErrorType::DuplicateName);
             }
         }
         if let Some(lle) = self

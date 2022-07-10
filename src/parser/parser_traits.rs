@@ -32,12 +32,21 @@ use crate::parser::statement::variablestatement::VariableStatement;
 use crate::parser::statement::whilestatement::WhileStatement;
 use crate::runtime::Runtime;
 
+use crate::CORE;
+use crate::parser::ParserErrorType;
+
 pub trait ToAny: 'static {
     fn to_any(&self) -> &dyn Any;
 }
 
 pub fn default_expr() -> Box<dyn Expression> {
     Box::new(SyntaxErrorExpression::new())
+}
+
+pub fn add_parser_error(error: ParserErrorType) {
+    CORE.with(|core| {
+        core.borrow_mut().get_parser().add_error(error)
+    })
 }
 
 pub fn any_into_int_literal(any : &Box<dyn Any>) -> Option<IntegerLiteralExpression> {

@@ -269,4 +269,17 @@ mod test {
         }";
         test_execute(src, "1\n2\n3\n");
     }
+    
+    #[test]
+    fn test_while_statement_break() {
+        let src = "
+        while(true) { break; }";
+        test_execute(src, "");
+    }
+
+    #[test]
+    fn test_for_statement_break() {
+        let src = "for(x in [1,2,3]) { print(x); break; }";
+        test_execute(src, "1\n");
+    }
 }

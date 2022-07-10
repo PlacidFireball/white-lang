@@ -12,6 +12,7 @@ pub struct Runtime {
     functions: HashMap<String, FunctionDefinitionStatement>,
     ret: Box<dyn Expression>,
     pub(crate) output: String,
+    brk: bool,
 }
 impl Runtime {
     pub fn new() -> Self {
@@ -21,6 +22,7 @@ impl Runtime {
             functions: HashMap::new(),
             ret: Box::new(SyntaxErrorExpression::new()),
             output: String::new(),
+            brk: false
         }
     }
 
@@ -113,5 +115,12 @@ impl Runtime {
             }
         }
         false
+    }
+
+    pub fn set_break(&mut self, brk: bool) {
+        self.brk = brk;
+    }
+    pub fn get_break(&self) -> bool {
+        self.brk
     }
 }

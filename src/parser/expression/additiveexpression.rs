@@ -6,9 +6,6 @@ use crate::parser::parser_traits::{Expression, ToAny, try_print_output};
 use crate::parser::symbol_table::SymbolTable;
 use crate::runtime::Runtime;
 use std::any::Any;
-
-use super::integerliteralexpression::IntegerLiteralExpression;
-
 #[derive(Clone)]
 pub(crate) struct AdditiveExpression {
     lhs: Box<dyn Expression>,
@@ -33,6 +30,7 @@ impl Expression for AdditiveExpression {
         // abstracted it to make my life easier in the future
         let lhs_eval = self.lhs.evaluate(runtime);
         let rhs_eval = self.rhs.evaluate(runtime);
+        // debug info
         if self.is_add {
             println!("[ADD_EXPR]: {} + {}",
                      try_print_output(&lhs_eval),
