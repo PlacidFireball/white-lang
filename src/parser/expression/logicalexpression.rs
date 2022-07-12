@@ -1,9 +1,10 @@
-use crate::parser::parser_traits::{Expression, ToAny};
+use crate::parser::parser_traits::{add_parser_error, Expression, ToAny};
 use crate::parser::symbol_table::SymbolTable;
 use crate::parser::whitetypes::Type;
 use crate::parser::ParserErrorType;
 use crate::runtime::Runtime;
 use std::any::Any;
+use crate::parser::ParserErrorType::MismatchedTypes;
 
 #[derive(Clone)]
 pub(crate) struct LogicalExpression {
@@ -42,12 +43,12 @@ impl Expression for LogicalExpression {
 
     fn validate(&mut self, _st: &SymbolTable) {
         if self.operator.ne("&&") && self.operator.ne("||") {
-            self.errors.push(ParserErrorType::BadOperator);
+            add_parser_error(ParserErrorType::BadOperator);
         }
         if self.lhs.get_white_type() != self.rhs.get_white_type()
             && self.lhs.get_white_type() != Type::Boolean
         {
-            self.errors.push(ParserErrorType::MismatchedTypes)
+            add_parser_error(MismatchedTypes);
         }
     }
 

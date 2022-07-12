@@ -32,7 +32,7 @@ use crate::parser::statement::variablestatement::VariableStatement;
 use crate::parser::statement::whilestatement::WhileStatement;
 use crate::runtime::Runtime;
 
-use crate::CORE;
+use crate::CORE_OBJECTS;
 use crate::parser::ParserErrorType;
 
 pub trait ToAny: 'static {
@@ -44,7 +44,7 @@ pub fn default_expr() -> Box<dyn Expression> {
 }
 
 pub fn add_parser_error(error: ParserErrorType) {
-    CORE.with(|core| {
+    CORE_OBJECTS.with(|core| {
         core.borrow_mut().get_parser().add_error(error)
     })
 }

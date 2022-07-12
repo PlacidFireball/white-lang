@@ -1,5 +1,5 @@
 use crate::config::{WhiteLangFloat, WhiteLangInt};
-use crate::parser::parser_traits::{Expression, ToAny};
+use crate::parser::parser_traits::{add_parser_error, Expression, ToAny};
 use crate::parser::symbol_table::SymbolTable;
 use crate::parser::whitetypes::Type;
 use crate::parser::ParserErrorType;
@@ -67,7 +67,12 @@ impl Expression for FactorExpression {
     fn validate(&mut self, st: &SymbolTable) {
         self.lhs.validate(st);
         self.rhs.validate(st);
-        // TODO: Type Checking
+        if self.lhs.get_white_type().ne(&Type::Float) && self.lhs.get_white_type().ne(&Type::Integer) {
+            add_parser_error(ParserErrorType::IncompatibleTypes);
+        }
+        if self.rhs.get_white_type().ne(&Type::Float) && self.rhs.get_white_type().ne(&Type::Integer) {
+            add_parser_error(ParserErrorType::IncompatibleTypes);
+        }
     }
 
     fn debug(&self) -> String {

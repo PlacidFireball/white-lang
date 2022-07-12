@@ -19,9 +19,8 @@ impl ToAny for FunctionCallStatement {
 }
 
 impl Statement for FunctionCallStatement {
-    fn execute(&self, runtime: &mut Runtime)  -> Result<Box<dyn Expression>> {
+    fn execute(&self, runtime: &mut Runtime) {
         self.expr.evaluate(runtime);
-        Ok(Box::new(SyntaxErrorExpression::new()))
     }
 
     fn compile(&self) {
@@ -45,7 +44,7 @@ impl Statement for FunctionCallStatement {
     }
 
     fn has_errors(&self) -> bool {
-        !self.expr.has_errors()
+        self.expr.has_errors()
     }
 }
 

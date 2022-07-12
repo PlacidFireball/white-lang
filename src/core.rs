@@ -1,15 +1,14 @@
 
 use crate::tokenizer::Tokenizer;
 use crate::parser::Parser;
-use crate::runtime::Runtime;
 use crate::program::Program;
 
-pub struct Core {
+pub struct CoreObjects {
     pub parser: Parser,
     pub tokenizer: Tokenizer,
     pub program: Program
 }
-impl Core {
+impl CoreObjects {
     pub(crate) fn new(src: &str) -> Self {
         let mut tokenizer = Tokenizer::init(src.to_string());
         tokenizer.tokenize();

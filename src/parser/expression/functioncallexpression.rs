@@ -1,11 +1,8 @@
-use crate::parser::parser_traits::{
-    any_into_bool_literal, any_into_f64_literal, any_into_int_literal, try_print_output,
-    Expression, ToAny,
-};
+use crate::parser::parser_traits::{any_into_bool_literal, any_into_f64_literal, any_into_int_literal, try_print_output, Expression, ToAny, add_parser_error};
 use crate::parser::symbol_table::SymbolTable;
 use crate::parser::whitetypes::Type;
 use crate::parser::ParserErrorType;
-use crate::parser::ParserErrorType::{ArgMismatch, UnknownName};
+use crate::parser::ParserErrorType::{ArgMismatch, UnknownName, IncompatibleTypes};
 use crate::runtime::Runtime;
 use std::any::Any;
 
@@ -43,7 +40,8 @@ impl Expression for FunctionCallExpression {
         }
         for (i, arg) in evaluated_args.iter().enumerate() {
             println!(
-                "[FNCALL]: Arg Name: {}\tValue: {}",
+                "[FNCALL: {}]: Arg Name: {}\tValue: {}",
+                self.name,
                 fds.get_arg_names()[i],
                 try_print_output(&arg.evaluate(runtime))
             );
@@ -64,20 +62,20 @@ impl Expression for FunctionCallExpression {
     fn validate(&mut self, st: &SymbolTable) {
         let fds_opt = st.get_function(self.name.clone());
         if fds_opt.is_none() {
-            self.errors.push(UnknownName);
+            add_parser_error(UnknownName);
             self.typ = Type::Null; // TODO: default typing (maybe Object)
         } else {
             let mut fds = fds_opt.unwrap();
             let args = fds.get_args();
             if self.args.len() != args.len() {
-                self.errors.push(ArgMismatch);
+                add_parser_error(ArgMismatch);
             } else {
                 for i in 0..args.len() {
                     let arg = &mut args[i];
                     arg.validate(st);
                     let param_type = self.args[i].get_white_type();
                     if !param_type.is_assignable_from(arg.get_white_type()) {
-                        self.errors.push(ParserErrorType::IncompatibleTypes);
+                        add_parser_error(IncompatibleTypes);
                     }
                 }
             }

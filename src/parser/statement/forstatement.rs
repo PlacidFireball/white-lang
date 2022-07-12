@@ -7,6 +7,7 @@ use crate::parser::whitetypes::Type;
 use crate::parser::ParserErrorType;
 use crate::runtime::Runtime;
 use std::any::Any;
+use crate::parser::ParserErrorType::IncompatibleTypes;
 
 #[derive(Clone)]
 pub(crate) struct ForStatement {
@@ -23,7 +24,7 @@ impl ToAny for ForStatement {
 }
 
 impl Statement for ForStatement {
-    fn execute(&self, runtime: &mut Runtime)  -> Result<Box<dyn Expression>> {
+    fn execute(&self, runtime: &mut Runtime) {
         runtime.push_scope(String::from("for"));
         let any = self.iterator.evaluate(runtime);
         let list = any.downcast_ref::<Vec<Box<dyn Any>>>().unwrap();
@@ -53,7 +54,6 @@ impl Statement for ForStatement {
             }
         }
         runtime.pop_scope();
-        Ok(Box::new(SyntaxErrorExpression::new()))
     }
 
     fn compile(&self) {
@@ -88,7 +88,7 @@ impl Statement for ForStatement {
             if typ != Type::Error {
                 st.register_symbol(self.variable.debug(), typ);
             } else {
-                self.errors.push(ParserErrorType::IncompatibleTypes);
+                add_parser_error(IncompatibleTypes);
                 st.register_symbol(self.variable.debug(), Type::Void); // TODO: Make this Object
             }
         } else if self.iterator.get_white_type().is_list_type() {
@@ -136,7 +136,7 @@ impl ForStatement {
             .downcast_ref::<IdentifierExpression>()
             .is_none()
         {
-            self.errors.push(ParserErrorType::UnexpectedToken);
+            add_parser_error(ParserErrorType::UnexpectedToken);
         } else {
             self.variable = iter_var.clone();
         }
@@ -147,7 +147,7 @@ impl ForStatement {
             .downcast_ref::<ListLiteralExpression>()
             .is_none()
         {
-            self.errors.push(ParserErrorType::UnexpectedToken);
+            add_parser_error(ParserErrorType::UnexpectedToken);
         } else {
             self.iterator = iter.clone();
         }

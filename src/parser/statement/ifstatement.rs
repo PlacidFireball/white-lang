@@ -22,7 +22,7 @@ impl ToAny for IfStatement {
     }
 }
 impl Statement for IfStatement {
-    fn execute(&self, runtime: &mut Runtime) -> Result<Box<dyn Expression>> {
+    fn execute(&self, runtime: &mut Runtime) {
         let eval = self.expr.evaluate(runtime);
         let downcast = *eval.downcast_ref::<WhiteLangBool>().unwrap();
         runtime.push_scope(String::from("if"));
@@ -36,7 +36,6 @@ impl Statement for IfStatement {
             }
         }
         runtime.pop_scope();
-        Ok(Box::new(SyntaxErrorExpression::new()))
     }
 
     fn compile(&self) {
@@ -50,7 +49,7 @@ impl Statement for IfStatement {
     fn validate(&mut self, st: &mut SymbolTable) {
         self.expr.validate(st);
         if self.expr.get_white_type() != Type::Boolean {
-            self.errors.push(UnexpectedToken);
+           add_parser_error(UnexpectedToken);
         }
         st.push_scope();
         if !self.true_stmts.is_empty() {

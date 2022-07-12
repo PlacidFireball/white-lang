@@ -11,11 +11,11 @@ mod config;
 mod program;
 mod runtime;
 mod core;
-use crate::core::Core;
+use crate::core::CoreObjects;
 
 thread_local! {
-    static CORE: RefCell<Core> = RefCell::new(
-        Core::new(
+    static CORE_OBJECTS: RefCell<CoreObjects> = RefCell::new(
+        CoreObjects::new(
             "\
             fn foo(x : int) { \
                 print(x);\
@@ -27,9 +27,8 @@ thread_local! {
 
 #[allow(unused_variables)]
 fn main() {
-    CORE.with(|core| {
+    CORE_OBJECTS.with(|core| {
         core.borrow_mut()
-            .deref_mut()
             .get_program()
             .execute();
     })

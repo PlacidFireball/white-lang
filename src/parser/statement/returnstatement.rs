@@ -18,11 +18,8 @@ impl ToAny for ReturnStatement {
 }
 
 impl Statement for ReturnStatement {
-    fn execute(&self, runtime: &mut Runtime) -> Result<Box<dyn Expression>> {
+    fn execute(&self, runtime: &mut Runtime) {
         runtime.set_return(self.expr.clone());
-        Err(ReturnException {
-            expr: self.expr.clone()
-        })
     }
 
     fn compile(&self) {
@@ -36,7 +33,7 @@ impl Statement for ReturnStatement {
     fn validate(&mut self, st: &mut SymbolTable) {
         let fds = st.get_function(self.function.clone()).unwrap();
         if self.return_type != fds.get_return_type() {
-            self.errors.push(ParserErrorType::BadReturnType);
+            add_parser_error(ParserErrorType::BadReturnType);
         }
     }
 

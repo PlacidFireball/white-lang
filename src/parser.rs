@@ -42,6 +42,8 @@ use crate::parser::parser_traits::{Expression, Statement};
 use crate::parser::statement::breakstatement::BreakStatement;
 use statement::variablestatement::VariableStatement;
 use symbol_table::SymbolTable;
+use crate::parser::ParserErrorType::UnterminatedArgList;
+use crate::parser::test::IS_TESTING;
 
 // Parsing Errors
 #[derive(Clone, Copy, Debug, PartialOrd, PartialEq)]
@@ -58,6 +60,25 @@ pub enum ParserErrorType {
     UnknownName,           // trying to assign to a variable that whitelang doesn't know about
     ArgMismatch,           //
     IncompatibleTypes,     //
+}
+impl ParserErrorType {
+    fn to_error_msg(&self) -> String {
+        use ParserErrorType::*;
+        match self {
+            UnexpectedToken         => "Unexpected token: {}".to_string(),
+            UnterminatedArgList     => "Unterminated argument list: {}".to_string(),
+            UnterminatedList        => "Unterminated list: {}".to_string(),
+            BadOperator             => "Bad operator: {}".to_string(),
+            MismatchedTypes         => "Mismatched types: {}".to_string(),
+            SymbolDefinitionError   => "Symbol definition error: {}".to_string(),
+            DuplicateName           => "Duplicate name: {}".to_string(),
+            BadReturnType           => "Bad return type: {}".to_string(),
+            BadVariableType         => "Bad variable name: {}".to_string(),
+            UnknownName             => "Unknown name: {}".to_string(),
+            ArgMismatch             => "Argument mismatch: {}".to_string(),
+            IncompatibleTypes       => "Incompatible types: {}".to_string(),
+        }
+    }
 }
 
 // The White-lang parser
@@ -91,6 +112,9 @@ impl Parser {
 
     // main loop
     pub fn parse(&mut self) {
+        if !self.statement_list.is_empty() || !self.expr.get_white_type().eq(&Type::Error){
+            return;
+        }
         let expr = self.parse_expression(); // try to parse an expression
                                             // check if the parser got a good expression, and if all tokens are consumed
         if expr
@@ -102,7 +126,10 @@ impl Parser {
             // if we've got more stuff to do, parse statements
             self.curr_idx = 0;
             while self.has_tokens() {
-                let stmt = self.parse_statement();
+                let mut stmt = self.parse_statement();
+                if !IS_TESTING.with(|t| t.get()) {
+                    stmt.validate(&mut self.st)
+                }
                 self.statement_list.push(stmt);
                 self.check_for_parse_errors();
             }
@@ -116,7 +143,7 @@ impl Parser {
             panic!(
                 "Parse error occurred at token `{}`, with error type: {:?}",
                 self.get_curr_tok().get_string_value(),
-                self.errors[0]
+                self.errors[0].to_error_msg()
             );
         }
         for statement in &self.statement_list {
@@ -147,7 +174,8 @@ impl Parser {
 
     // tells us if parsing is done or not
     fn has_tokens(&self) -> bool {
-        !(self.get_curr_tok().get_type() == Eof)
+        println!("current index: {} has_tokens: {}", self.curr_idx, self.get_curr_tok().get_type().ne(&Eof));
+        self.get_curr_tok().get_type().ne(&Eof)
     }
 
     pub fn add_error(&mut self, error: ParserErrorType) {
@@ -165,7 +193,7 @@ impl Parser {
 
     // consumes the token unconditionally
     fn consume_token(&mut self) {
-        //println!("-->{}<--", self.get_curr_tok().get_string_value());
+        println!("-->{}<--", self.get_curr_tok().get_string_value());
         self.curr_idx += 1;
     }
 
@@ -176,7 +204,12 @@ impl Parser {
 
     // will match and a token at token_list[curr_idx] if its type = typ
     fn match_token(&self, typ: TokenType) -> bool {
-        self.token_list[self.curr_idx].get_type() == typ
+        println!("{} == {} -> {}",
+            self.token_list[self.curr_idx].get_type(),
+            typ,
+            self.token_list[self.curr_idx].get_type().eq(&typ)
+        );
+        self.token_list[self.curr_idx].get_type().eq(&typ)
     }
 
     // will match and consume a token at token_list[curr_idx] if type = typ
@@ -198,6 +231,7 @@ impl Parser {
         use self::ParserErrorType::*;
         if !self.match_token(typ) {
             self.errors.push(UnexpectedToken);
+            self.check_for_parse_errors();
         }
         self.consume_token();
     }
@@ -307,7 +341,7 @@ impl Parser {
                 let typ = self.require_a_type();
                 fds.add_arg_type(typ);
                 if !self.has_tokens() {
-                    self.errors.push(ParserErrorType::UnterminatedArgList);
+                    self.errors.push(UnterminatedArgList);
                     break;
                 }
             }
@@ -382,9 +416,9 @@ impl Parser {
             self.require_token(Equal);
             assignmentstatement.set_expr(self.parse_expression());
             self.require_token(SemiColon);
-            return Option::Some(assignmentstatement);
+            return Some(assignmentstatement);
         }
-        Option::None
+        None
     }
 
     fn parse_print_statement(&mut self) -> Option<PrintStatement> {
@@ -487,7 +521,9 @@ impl Parser {
 
     fn parse_expression(&mut self) -> Box<dyn Expression> {
         let mut expr = self.parse_additive_expression();
-        expr.validate(&self.st);
+        if !IS_TESTING.with(|t| t.get()) {
+            expr.validate(&self.st);
+        }
         expr
     }
 
@@ -575,7 +611,7 @@ impl Parser {
                     // while the arg list hasn't terminated
                     break;
                 }
-                let arg = self.parse_expression(); // parse some expression
+                let arg = self.parse_list_literal_expression(); // parse some expression
                 expr.add_arg(arg); // add the argument to the argument vector
                 self.match_and_consume(Comma); // consume a comma if we have one
                 if !self.has_tokens() {
@@ -625,7 +661,7 @@ impl Parser {
             // match either not or -
             let operator = self.get_curr_tok().get_string_value(); // get the op sign
             self.consume_token(); // consume the token
-            let expr = self.parse_integer_literal_expression(); // parse some lower level expression
+            let expr = self.parse_expression(); // parse some other expression
             let unary_expr = UnaryExpression::new(operator, expr); // create the new expr
             return Box::new(unary_expr); // return a box wrapper
         }
@@ -649,8 +685,11 @@ impl Parser {
     }
 
     fn parse_string_literal_expression(&mut self) -> Box<dyn Expression> {
+        println!("curr_idx: {}: {}", self.curr_idx, self.token_list[self.curr_idx].get_type());
+        println!("will match: {}", self.match_token(Str));
         return if self.match_token(Str) {
             // parse string
+            println!("Parsed a string literal!");
             let expr = StringLiteralExpression::new(self.get_curr_tok().get_string_value());
             self.consume_token();
             Box::new(expr)

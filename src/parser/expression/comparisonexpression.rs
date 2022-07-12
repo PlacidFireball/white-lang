@@ -1,5 +1,5 @@
 use crate::config::*;
-use crate::parser::parser_traits::{Expression, ToAny};
+use crate::parser::parser_traits::{add_parser_error, Expression, ToAny};
 use crate::parser::symbol_table::SymbolTable;
 use crate::parser::whitetypes::Type;
 use crate::parser::ParserErrorType;
@@ -90,7 +90,7 @@ impl Expression for ComparisonExpression {
         self.lhs.validate(st);
         self.rhs.validate(st);
         if self.lhs.get_white_type() != self.rhs.get_white_type() {
-            self.errors.push(ParserErrorType::MismatchedTypes);
+            add_parser_error(ParserErrorType::MismatchedTypes);
         }
         // TODO: When developing std, comparable might be a cool thing to implement
     }

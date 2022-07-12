@@ -1,4 +1,4 @@
-use crate::parser::parser_traits::{Expression, ToAny};
+use crate::parser::parser_traits::{add_parser_error, Expression, ToAny};
 use crate::parser::symbol_table::SymbolTable;
 use crate::parser::whitetypes::Type;
 use crate::parser::ParserErrorType;
@@ -46,7 +46,7 @@ impl Expression for IdentifierExpression {
         }
         if opt_typ.is_none() {
             self.typ = Type::Error;
-            self.errors.push(UnknownName);
+            add_parser_error(UnknownName);
         }
     }
 

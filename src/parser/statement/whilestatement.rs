@@ -9,8 +9,6 @@ use crate::parser::statement::breakstatement::BreakStatement;
 use std::any::Any;
 use std::ops::DerefMut;
 
-use crate::CORE;
-
 #[derive(Clone)]
 pub struct WhileStatement {
     body: Vec<Box<dyn Statement>>,
@@ -61,7 +59,7 @@ impl Statement for WhileStatement {
     fn validate(&mut self, st: &mut SymbolTable) {
         self.expr.validate(st);
         if self.expr.get_white_type() != Type::Boolean {
-            add_parser_error(ParserErrorType::UnexpectedToken);
+            add_parser_error(UnexpectedToken);
         }
         st.push_scope();
         if !self.body.is_empty() {

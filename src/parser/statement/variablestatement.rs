@@ -2,10 +2,11 @@ use crate::parser::parser_traits::*;
 use crate::parser::symbol_table::SymbolTable;
 use crate::parser::whitetypes::Type;
 use crate::parser::ParserErrorType;
-use crate::parser::ParserErrorType::SymbolDefinitionError;
+use crate::parser::ParserErrorType::{MismatchedTypes, SymbolDefinitionError, UnexpectedToken};
 use crate::runtime::Runtime;
 use std::any::Any;
 use crate::parser::expression::syntaxerrorexpression::SyntaxErrorExpression;
+use crate::parser::test::IS_TESTING;
 
 #[derive(Clone)]
 pub(crate) struct VariableStatement {
@@ -22,9 +23,8 @@ impl ToAny for VariableStatement {
 }
 
 impl Statement for VariableStatement {
-    fn execute(&self, runtime: &mut Runtime) -> Result<Box<dyn Expression>> {
+    fn execute(&self, runtime: &mut Runtime) {
         runtime.set_value(self.name.clone(), self.expr.clone());
-        Ok(Box::new(SyntaxErrorExpression::new()))
     }
 
     fn compile(&self) {
@@ -38,10 +38,10 @@ impl Statement for VariableStatement {
     fn validate(&mut self, st: &mut SymbolTable) {
         self.expr.validate(st);
         if st.has_symbol(self.name.clone()) {
-            self.errors.push(SymbolDefinitionError);
+            add_parser_error(SymbolDefinitionError);
         }
         if self.typ == Type::Error {
-            self.errors.push(ParserErrorType::UnexpectedToken);
+            add_parser_error(UnexpectedToken);
         }
         if !self.has_errors() {
             st.register_symbol(self.name.clone(), self.typ);
@@ -74,7 +74,9 @@ impl VariableStatement {
         if self.typ == Type::Initialized {
             self.typ = typ;
         } else if self.typ != typ {
-            self.errors.push(ParserErrorType::MismatchedTypes);
+            if !IS_TESTING.with(|test| test.get()) {
+                add_parser_error(MismatchedTypes);
+            }
         }
     }
 

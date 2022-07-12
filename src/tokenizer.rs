@@ -4,7 +4,7 @@ use std::fmt;
 use std::fmt::Display;
 
 #[allow(dead_code)]
-#[derive(PartialEq, Debug, Clone, Copy)]
+#[derive(PartialEq, Eq, Debug, Clone, Copy)]
 pub enum TokenType {
     // all token types that White-Lang implements
     // Types
@@ -712,7 +712,15 @@ mod test {
     #[test]
     fn test_multiline_comment() {
         let mut tokenizer = Tokenizer::init(
-            "/* fasdfkjas;ldfkjas;ldkgfjas;lhkgjnas;lfgkjasjmfl;askjesmf;laskjmfe;asjf */"
+            "/* fasdfkjas;ldfkjas;ldkgfjas;lhkgjnas;lfgkjasjmfl;askjesmf;laskjmfe;asjf
+
+
+
+
+
+
+
+            */"
                 .to_string(),
         );
         tokenizer.tokenize();

@@ -1,5 +1,5 @@
 use crate::config::{WhiteLangFloat, WhiteLangInt};
-use crate::parser::parser_traits::{Expression, ToAny};
+use crate::parser::parser_traits::{add_parser_error, Expression, ToAny};
 use crate::parser::symbol_table::SymbolTable;
 use crate::parser::whitetypes::Type;
 use crate::parser::ParserErrorType;
@@ -52,10 +52,10 @@ impl Expression for UnaryExpression {
             && (self.expr.get_white_type() == Type::Integer
                 || self.expr.get_white_type() == Type::Float)
         {
-            self.errors.push(ParserErrorType::BadOperator);
+            add_parser_error(ParserErrorType::BadOperator);
         }
         if self.operator == "-" && self.expr.get_white_type() == Type::Boolean {
-            self.errors.push(ParserErrorType::BadOperator);
+            add_parser_error(ParserErrorType::BadOperator);
         }
     }
 

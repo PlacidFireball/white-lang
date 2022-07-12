@@ -2,7 +2,7 @@ use crate::parser::whitetypes::Type;
 use crate::parser::ParserErrorType;
 
 use crate::config::{WhiteLangFloat, WhiteLangInt};
-use crate::parser::parser_traits::{try_print_output, Expression, ToAny};
+use crate::parser::parser_traits::{try_print_output, Expression, ToAny, add_parser_error};
 use crate::parser::symbol_table::SymbolTable;
 use crate::runtime::Runtime;
 use std::any::Any;
@@ -85,10 +85,10 @@ impl Expression for AdditiveExpression {
         self.lhs.validate(st);
         self.rhs.validate(st);
         if self.lhs.get_white_type() != Type::Integer && self.lhs.get_white_type() != Type::Float {
-            self.errors.push(ParserErrorType::IncompatibleTypes);
+            add_parser_error(ParserErrorType::IncompatibleTypes);
         }
         if self.rhs.get_white_type() != Type::Integer && self.rhs.get_white_type() != Type::Float {
-            self.errors.push(ParserErrorType::IncompatibleTypes);
+            add_parser_error(ParserErrorType::IncompatibleTypes);
         }
     }
 

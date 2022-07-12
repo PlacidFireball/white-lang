@@ -1,9 +1,10 @@
-use crate::parser::parser_traits::{Expression, ToAny};
+use crate::parser::parser_traits::{add_parser_error, Expression, ToAny};
 use crate::parser::symbol_table::SymbolTable;
 use crate::parser::whitetypes::Type;
 use crate::parser::ParserErrorType;
 use crate::runtime::Runtime;
 use std::any::Any;
+use crate::parser::ParserErrorType::MismatchedTypes;
 
 #[derive(Clone)]
 pub(crate) struct ListLiteralExpression {
@@ -43,7 +44,7 @@ impl Expression for ListLiteralExpression {
         for expr in &mut self.exprs {
             expr.validate(st);
             if expr.get_white_type() != self.inferred_type {
-                self.errors.push(ParserErrorType::MismatchedTypes);
+                add_parser_error(MismatchedTypes);
             }
         }
     }

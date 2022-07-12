@@ -7,7 +7,7 @@ use crate::runtime::Runtime;
 
 use std::any::Any;
 
-use crate::CORE;
+use crate::CORE_OBJECTS;
 
 #[derive(Clone)]
 pub(crate) struct AssignmentStatement {
@@ -23,7 +23,7 @@ impl ToAny for AssignmentStatement {
 }
 
 impl Statement for AssignmentStatement {
-    fn execute(&self, runtime: &mut Runtime) -> Result<Box<dyn Expression>> {
+    fn execute(&self, runtime: &mut Runtime) {
         let ident = self
             .variable
             .to_any()
@@ -38,7 +38,6 @@ impl Statement for AssignmentStatement {
         } else {
             runtime.set_value(ident.debug(), self.expr.clone());
         }
-        Ok(Box::new(SyntaxErrorExpression::new()))
     }
 
     fn compile(&self) {

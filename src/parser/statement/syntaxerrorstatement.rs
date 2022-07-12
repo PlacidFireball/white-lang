@@ -13,7 +13,7 @@ impl ToAny for SyntaxErrorStatement {
 }
 
 impl Statement for SyntaxErrorStatement {
-    fn execute(&self, runtime: &mut Runtime) -> Result<Box<dyn Expression>>  {
+    fn execute(&self, runtime: &mut Runtime) {
         panic!("Evaluated a syntax error")
     }
 

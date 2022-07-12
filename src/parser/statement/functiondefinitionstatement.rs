@@ -4,6 +4,8 @@ use crate::parser::symbol_table::SymbolTable;
 use crate::parser::*;
 use crate::runtime::Runtime;
 use log::info;
+use crate::parser::ParserErrorType::MismatchedTypes;
+use crate::parser::test::IS_TESTING;
 
 #[derive(Clone)]
 pub struct FunctionDefinitionStatement {
@@ -37,9 +39,8 @@ impl Default for FunctionDefinitionStatement {
 }
 
 impl Statement for FunctionDefinitionStatement {
-    fn execute(&self, runtime: &mut Runtime) -> Result<Box<dyn Expression>> {
+    fn execute(&self, runtime: &mut Runtime) {
         runtime.set_function(self.name.clone(), self.clone());
-        Ok(Box::new(SyntaxErrorExpression::new()))
     }
 
     fn compile(&self) {
@@ -58,7 +59,9 @@ impl Statement for FunctionDefinitionStatement {
             if opt_rs.is_some() {
                 let rs = opt_rs.unwrap();
                 if rs.get_expr().get_white_type() != self.return_type {
-                    self.errors.push(ParserErrorType::MismatchedTypes);
+                    if !IS_TESTING.with(|test| test.get()) {
+                        add_parser_error(MismatchedTypes);
+                    }
                 }
             }
         }
@@ -128,9 +131,9 @@ impl FunctionDefinitionStatement {
             runtime.set_value(self.arg_names[i].clone(), arg.clone());
         }
         for statement in &self.statements {
-            match statement.execute(runtime) {
-                Ok(_) => (),
-                Err(error) => return error.expr.evaluate(runtime)
+            statement.execute(runtime);
+            if runtime.has_return() {
+                return runtime.get_return();
             }
         }
         Box::new(())
