@@ -1,11 +1,11 @@
 use crate::parser::expression::functioncallexpression::FunctionCallExpression;
+use crate::parser::expression::syntaxerrorexpression::SyntaxErrorExpression;
 use crate::parser::parser_traits::*;
 use crate::parser::symbol_table::SymbolTable;
 use crate::runtime::Runtime;
 use std::any::Any;
-use crate::parser::expression::syntaxerrorexpression::SyntaxErrorExpression;
 
-#[derive(Clone,Debug)]
+#[derive(Clone, Debug)]
 pub struct FunctionCallStatement {
     name: String,
     expr: Box<dyn Expression>,

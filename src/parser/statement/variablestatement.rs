@@ -1,14 +1,14 @@
+use crate::parser::expression::syntaxerrorexpression::SyntaxErrorExpression;
 use crate::parser::parser_traits::*;
 use crate::parser::symbol_table::SymbolTable;
 use crate::parser::whitetypes::Type;
 use crate::parser::ParserErrorType;
 use crate::parser::ParserErrorType::{MismatchedTypes, SymbolDefinitionError, UnexpectedToken};
 use crate::runtime::Runtime;
-use std::any::Any;
-use crate::parser::expression::syntaxerrorexpression::SyntaxErrorExpression;
 use crate::IS_TESTING;
+use std::any::Any;
 
-#[derive(Clone,Debug)]
+#[derive(Clone, Debug)]
 pub(crate) struct VariableStatement {
     name: String,
     expr: Box<dyn Expression>,

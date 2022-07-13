@@ -4,7 +4,7 @@ use crate::parser::whitetypes::Type;
 use crate::runtime::Runtime;
 use std::any::Any;
 
-#[derive(Clone,Debug)]
+#[derive(Clone, Debug)]
 pub(crate) struct ParenthesizedExpression {
     expr: Box<dyn Expression>,
 }

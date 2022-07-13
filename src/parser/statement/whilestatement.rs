@@ -1,15 +1,15 @@
 use crate::parser::expression::syntaxerrorexpression::SyntaxErrorExpression;
 use crate::parser::parser_traits::{add_parser_error, Expression, Statement, ToAny};
+use crate::parser::statement::breakstatement::BreakStatement;
 use crate::parser::symbol_table::SymbolTable;
 use crate::parser::whitetypes::Type;
 use crate::parser::ParserErrorType;
 use crate::parser::ParserErrorType::UnexpectedToken;
 use crate::runtime::Runtime;
-use crate::parser::statement::breakstatement::BreakStatement;
 use std::any::Any;
 use std::ops::DerefMut;
 
-#[derive(Clone,Debug)]
+#[derive(Clone, Debug)]
 pub struct WhileStatement {
     body: Vec<Box<dyn Statement>>,
     expr: Box<dyn Expression>,
@@ -24,9 +24,9 @@ impl ToAny for WhileStatement {
 impl Statement for WhileStatement {
     fn execute(&self, runtime: &mut Runtime) {
         runtime.push_scope(String::from("while"));
-        let mut iterations : usize = 0;
+        let mut iterations: usize = 0;
         let mut is_broken = false;
-        let mut cond : bool = *self.expr.evaluate(runtime).downcast_ref::<bool>().unwrap();
+        let mut cond: bool = *self.expr.evaluate(runtime).downcast_ref::<bool>().unwrap();
         while cond {
             for statement in self.body.iter() {
                 statement.execute(runtime);
@@ -97,5 +97,7 @@ impl WhileStatement {
     pub(crate) fn add_body_statement(&mut self, stmt: Box<dyn Statement>) {
         self.body.push(stmt);
     }
-    pub(crate) fn get_body(&self) -> &Vec<Box<dyn Statement>> { &self.body }
+    pub(crate) fn get_body(&self) -> &Vec<Box<dyn Statement>> {
+        &self.body
+    }
 }

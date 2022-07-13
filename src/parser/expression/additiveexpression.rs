@@ -2,7 +2,7 @@ use crate::parser::whitetypes::Type;
 use crate::parser::ParserErrorType;
 
 use crate::config::{WhiteLangFloat, WhiteLangInt};
-use crate::parser::parser_traits::{try_print_output, Expression, ToAny, add_parser_error};
+use crate::parser::parser_traits::{add_parser_error, try_print_output, Expression, ToAny};
 use crate::parser::symbol_table::SymbolTable;
 use crate::runtime::Runtime;
 use std::any::Any;

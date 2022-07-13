@@ -1,13 +1,13 @@
 use crate::parser::parser_traits::*;
 use crate::parser::statement::returnstatement::ReturnStatement;
 use crate::parser::symbol_table::SymbolTable;
+use crate::parser::ParserErrorType::MismatchedTypes;
 use crate::parser::*;
 use crate::runtime::Runtime;
-use log::info;
-use crate::parser::ParserErrorType::MismatchedTypes;
 use crate::IS_TESTING;
+use log::info;
 
-#[derive(Clone,Debug)]
+#[derive(Clone, Debug)]
 pub struct FunctionDefinitionStatement {
     name: String,
     return_type: Type,

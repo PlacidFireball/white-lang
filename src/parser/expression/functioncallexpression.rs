@@ -1,12 +1,15 @@
-use crate::parser::parser_traits::{any_into_bool_literal, any_into_f64_literal, any_into_int_literal, try_print_output, Expression, ToAny, add_parser_error};
+use crate::parser::parser_traits::{
+    add_parser_error, any_into_bool_literal, any_into_f64_literal, any_into_int_literal,
+    try_print_output, Expression, ToAny,
+};
 use crate::parser::symbol_table::SymbolTable;
 use crate::parser::whitetypes::Type;
 use crate::parser::ParserErrorType;
-use crate::parser::ParserErrorType::{ArgMismatch, UnknownName, IncompatibleTypes};
+use crate::parser::ParserErrorType::{ArgMismatch, IncompatibleTypes, UnknownName};
 use crate::runtime::Runtime;
 use std::any::Any;
 
-#[derive(Clone,Debug)]
+#[derive(Clone, Debug)]
 pub(crate) struct FunctionCallExpression {
     name: String,
     args: Vec<Box<dyn Expression>>,
@@ -48,7 +51,8 @@ impl Expression for FunctionCallExpression {
             );
         }*/
         println!(
-            "[FUNCTION CALL] invoking {}...\n| args: {:?}", self.name, self.args
+            "[FUNCTION CALL] invoking {}...\n| args: {:?}",
+            self.name, self.args
         );
         let value = fds.invoke(runtime, evaluated_args);
         runtime.pop_scope();

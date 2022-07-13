@@ -180,7 +180,7 @@ impl std::fmt::Display for Tokenizer {
     }
 }
 impl Tokenizer {
-    pub fn init(src: String) -> Tokenizer {
+    pub fn new(src: String) -> Tokenizer {
         // the constructor
         let char_vec: Vec<char> = src.chars().collect();
         Tokenizer {
@@ -193,6 +193,29 @@ impl Tokenizer {
             position: 0,
             line: 1,
             line_offset: 0,
+        }
+    }
+
+    pub fn new_uninit() -> Tokenizer {
+        Tokenizer {
+            token_list: vec![],
+            errors: vec![],
+            keywords: init_keywords(),
+            src: "".to_string(),
+            char_vec: vec![],
+            curr_char: '\0',
+            position: 0,
+            line: 1,
+            line_offset: 0,
+        }
+    }
+
+    pub fn set_source(&mut self, src: String) {
+        if self.src.eq("") {
+            self.src = src.clone();
+            self.char_vec = src.chars().collect()
+        } else {
+            panic!("Do not set the source if you have already initialized it!")
         }
     }
 
@@ -554,7 +577,7 @@ mod test {
     use super::*;
 
     fn init_test(test_src: String) -> Tokenizer {
-        let mut tokenizer = Tokenizer::init(test_src);
+        let mut tokenizer = Tokenizer::new(test_src);
         tokenizer.tokenize();
         tokenizer
     }
@@ -567,7 +590,7 @@ mod test {
     }
     #[test]
     fn test_consume_char() {
-        let mut tokenizer = Tokenizer::init("abc".to_string());
+        let mut tokenizer = Tokenizer::new("abc".to_string());
         assert_eq!('a', tokenizer.consume_char());
         assert_eq!('b', tokenizer.consume_char());
         assert_eq!('c', tokenizer.consume_char());
@@ -621,7 +644,7 @@ mod test {
 
     #[test]
     fn test_tokenize_string() {
-        let mut tokenizer = Tokenizer::init("\"abc\" \"\"".to_string());
+        let mut tokenizer = Tokenizer::new("\"abc\" \"\"".to_string());
         tokenizer.tokenize();
         let abc = tokenizer.get_token(0);
         let empty = tokenizer.get_token(1);
@@ -654,7 +677,7 @@ mod test {
 
     #[test]
     fn test_syntax_tokenization() {
-        let mut tokenizer = Tokenizer::init(String::from(
+        let mut tokenizer = Tokenizer::new(String::from(
             "{ } [ ] ( ) , . ; : + ++ += - -- -= = == != ! > >= < <= & && | || ~ ^",
         ));
         tokenizer.tokenize();
@@ -699,7 +722,7 @@ mod test {
 
     #[test]
     fn test_list_literal_tokenization() {
-        let mut tokenizer = Tokenizer::init("[1, 2, 3]".to_string());
+        let mut tokenizer = Tokenizer::new("[1, 2, 3]".to_string());
         tokenizer.tokenize();
         use TokenType::*;
         let tok_l = tokenizer.token_list.clone();
@@ -711,7 +734,7 @@ mod test {
 
     #[test]
     fn test_multiline_comment() {
-        let mut tokenizer = Tokenizer::init(
+        let mut tokenizer = Tokenizer::new(
             "/* fasdfkjas;ldfkjas;ldkgfjas;lhkgjnas;lfgkjasjmfl;askjesmf;laskjmfe;asjf
 
 
@@ -721,7 +744,7 @@ mod test {
 
 
             */"
-                .to_string(),
+            .to_string(),
         );
         tokenizer.tokenize();
         assert_eq!(tokenizer.token_list.len(), 1);

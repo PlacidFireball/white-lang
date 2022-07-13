@@ -40,10 +40,10 @@ use statement::printstatement::PrintStatement;
 use crate::config::WhiteLangFloat;
 use crate::parser::parser_traits::{Expression, Statement};
 use crate::parser::statement::breakstatement::BreakStatement;
-use statement::variablestatement::VariableStatement;
-use symbol_table::SymbolTable;
 use crate::parser::ParserErrorType::UnterminatedArgList;
 use crate::IS_TESTING;
+use statement::variablestatement::VariableStatement;
+use symbol_table::SymbolTable;
 
 // Parsing Errors
 #[derive(Clone, Copy, Debug, PartialOrd, PartialEq)]
@@ -65,18 +65,18 @@ impl ParserErrorType {
     fn to_error_msg(&self) -> String {
         use ParserErrorType::*;
         match self {
-            UnexpectedToken         => "Unexpected token: {}".to_string(),
-            UnterminatedArgList     => "Unterminated argument list: {}".to_string(),
-            UnterminatedList        => "Unterminated list: {}".to_string(),
-            BadOperator             => "Bad operator: {}".to_string(),
-            MismatchedTypes         => "Mismatched types: {}".to_string(),
-            SymbolDefinitionError   => "Symbol definition error: {}".to_string(),
-            DuplicateName           => "Duplicate name: {}".to_string(),
-            BadReturnType           => "Bad return type: {}".to_string(),
-            BadVariableType         => "Bad variable name: {}".to_string(),
-            UnknownName             => "Unknown name: {}".to_string(),
-            ArgMismatch             => "Argument mismatch: {}".to_string(),
-            IncompatibleTypes       => "Incompatible types: {}".to_string(),
+            UnexpectedToken => "Unexpected token: {}".to_string(),
+            UnterminatedArgList => "Unterminated argument list: {}".to_string(),
+            UnterminatedList => "Unterminated list: {}".to_string(),
+            BadOperator => "Bad operator: {}".to_string(),
+            MismatchedTypes => "Mismatched types: {}".to_string(),
+            SymbolDefinitionError => "Symbol definition error: {}".to_string(),
+            DuplicateName => "Duplicate name: {}".to_string(),
+            BadReturnType => "Bad return type: {}".to_string(),
+            BadVariableType => "Bad variable name: {}".to_string(),
+            UnknownName => "Unknown name: {}".to_string(),
+            ArgMismatch => "Argument mismatch: {}".to_string(),
+            IncompatibleTypes => "Incompatible types: {}".to_string(),
         }
     }
 }
@@ -110,9 +110,29 @@ impl Parser {
         }
     }
 
+    pub fn new_uninit() -> Parser {
+        Parser {
+            token_list: vec![],
+            statement_list: vec![],
+            st: SymbolTable::new(),
+            expr: Box::new(SyntaxErrorExpression::new()),
+            curr_idx: 0,
+            curr_fn_def: "".to_string(),
+            errors: vec![],
+        }
+    }
+
+    pub fn set_token_list(&mut self, token_list: &Vec<Token>) {
+        if self.token_list.is_empty() {
+            self.token_list = token_list.clone();
+        } else {
+            panic!("Do not set token list if the token list is already init!");
+        }
+    }
+
     // main loop
     pub fn parse(&mut self) {
-        if !self.statement_list.is_empty() || !self.expr.get_white_type().eq(&Type::Error){
+        if !self.statement_list.is_empty() || !self.expr.get_white_type().eq(&Type::Error) {
             return;
         }
         let expr = self.parse_expression(); // try to parse an expression
@@ -357,7 +377,9 @@ impl Parser {
             self.curr_fn_def = String::new();
             self.st.register_function(name.clone(), fds.clone());
             println!(
-                "[PARSE DEBUG] Parsed a function definition\n| name: {}\n| arg names: {:?}", name, fds.get_arg_names()
+                "[PARSE DEBUG] Parsed a function definition\n| name: {}\n| arg names: {:?}",
+                name,
+                fds.get_arg_names()
             );
             return Option::Some(fds);
         }
@@ -688,7 +710,11 @@ impl Parser {
     }
 
     fn parse_string_literal_expression(&mut self) -> Box<dyn Expression> {
-        println!("curr_idx: {}: {}", self.curr_idx, self.token_list[self.curr_idx].get_type());
+        println!(
+            "curr_idx: {}: {}",
+            self.curr_idx,
+            self.token_list[self.curr_idx].get_type()
+        );
         println!("will match: {}", self.match_token(Str));
         return if self.match_token(Str) {
             // parse string

@@ -5,11 +5,11 @@ use crate::parser::parser_traits::*;
 use crate::parser::symbol_table::SymbolTable;
 use crate::parser::whitetypes::Type;
 use crate::parser::ParserErrorType;
+use crate::parser::ParserErrorType::IncompatibleTypes;
 use crate::runtime::Runtime;
 use std::any::Any;
-use crate::parser::ParserErrorType::IncompatibleTypes;
 
-#[derive(Clone,Debug)]
+#[derive(Clone, Debug)]
 pub(crate) struct ForStatement {
     errors: Vec<ParserErrorType>,
     statements: Vec<Box<dyn Statement>>,

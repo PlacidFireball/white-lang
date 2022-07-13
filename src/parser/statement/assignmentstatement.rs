@@ -9,7 +9,7 @@ use std::any::Any;
 
 use crate::CORE_OBJECTS;
 
-#[derive(Clone,Debug)]
+#[derive(Clone, Debug)]
 pub(crate) struct AssignmentStatement {
     variable: Box<dyn Expression>,
     expr: Box<dyn Expression>,

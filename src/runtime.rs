@@ -22,7 +22,7 @@ impl Runtime {
             functions: HashMap::new(),
             ret: Box::new(SyntaxErrorExpression::new()),
             output: String::new(),
-            brk: false
+            brk: false,
         }
     }
 

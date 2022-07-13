@@ -4,7 +4,6 @@
 
 #[cfg(test)]
 mod test {
-    use std::any::Any;
     use crate::parser::expression::additiveexpression::AdditiveExpression;
     use crate::parser::expression::booleanliteralexpression::BooleanLiteralExpression;
     use crate::parser::expression::comparisonexpression::ComparisonExpression;
@@ -19,8 +18,8 @@ mod test {
     use crate::parser::expression::nullliteralexpression::NullLiteralExpression;
     use crate::parser::expression::parenthesizedexpression::ParenthesizedExpression;
     use crate::parser::expression::stringliteralexpression::StringLiteralExpression;
-    use crate::parser::expression::unaryexpression::UnaryExpression;
     use crate::parser::expression::syntaxerrorexpression::SyntaxErrorExpression;
+    use crate::parser::expression::unaryexpression::UnaryExpression;
     use crate::parser::parser_traits::Expression;
     use crate::parser::parser_traits::Statement;
     use crate::parser::statement::assignmentstatement::AssignmentStatement;
@@ -32,11 +31,12 @@ mod test {
     use crate::parser::statement::whilestatement::WhileStatement;
     use crate::parser::symbol_table::SymbolTable;
     use crate::parser::whitetypes::Type;
+    use crate::tokenizer::Token;
     use crate::TokenType::*;
     use crate::Tokenizer;
-    use crate::tokenizer::Token;
-    use crate::{CoreObjects, Parser};
     use crate::IS_TESTING;
+    use crate::{CoreObjects, Parser};
+    use std::any::Any;
 
     fn init_parser(src: String) -> Parser {
         IS_TESTING.with(|test| test.set(true));
@@ -54,7 +54,7 @@ mod test {
     #[test]
     /// Make sure that token consuming is working properly
     fn test_match_and_consume() {
-        let mut parser = Parser::new(&mut Tokenizer::init(String::from("1")));
+        let mut parser = Parser::new(&mut Tokenizer::new(String::from("1")));
         assert_eq!(parser.curr_idx, 0);
         assert!(parser.match_and_consume(Int));
         assert_eq!(parser.curr_idx, 1);
@@ -72,7 +72,8 @@ mod test {
     /// Test parsing an integer literal
     fn test_parse_integer_expression() {
         let mut parser = init_parser("1".to_string());
-        assert!(parser.expr
+        assert!(parser
+            .expr
             .to_any()
             .downcast_ref::<IntegerLiteralExpression>()
             .is_some());
@@ -82,7 +83,11 @@ mod test {
     /// Test parsing a string literal
     fn test_parse_string_expression() {
         let mut parser = init_parser("\"Hello World\"".to_string());
-        if let None = parser.expr.to_any().downcast_ref::<StringLiteralExpression>() {
+        if let None = parser
+            .expr
+            .to_any()
+            .downcast_ref::<StringLiteralExpression>()
+        {
             panic!()
         }
     }
@@ -91,7 +96,8 @@ mod test {
     /// Test parsing a float literal
     fn test_parse_float_expression() {
         let mut parser = init_parser("1.1".to_string());
-        assert!(parser.expr
+        assert!(parser
+            .expr
             .to_any()
             .downcast_ref::<FloatLiteralExpression>()
             .is_some());
@@ -102,7 +108,8 @@ mod test {
     /// Test parsing a null literal expression
     fn test_null_literal_expression() {
         let mut parser = init_parser("null".to_string());
-        assert!(parser.expr
+        assert!(parser
+            .expr
             .to_any()
             .downcast_ref::<NullLiteralExpression>()
             .is_some());
@@ -142,7 +149,7 @@ mod test {
     #[test]
     /// test parsing a function call expression, this time with args
     fn test_function_call_args_expression() {
-        let mut parser = Parser::new(&mut Tokenizer::init("x(1,2)".to_string()));
+        let mut parser = Parser::new(&mut Tokenizer::new("x(1,2)".to_string()));
         let expr = parser.parse_function_call_expression();
         if let None = expr.to_any().downcast_ref::<FunctionCallExpression>() {
             panic!("failure");
@@ -153,7 +160,7 @@ mod test {
     #[test]
     /// test for errors when the function call doesn't have a closed paren
     fn test_fn_unterminated_args() {
-        let mut parser = Parser::new(&mut Tokenizer::init("x(".to_string()));
+        let mut parser = Parser::new(&mut Tokenizer::new("x(".to_string()));
         let expr = parser.parse_function_call_expression();
         assert!(expr
             .to_any()
@@ -242,7 +249,7 @@ mod test {
     #[test]
     /// test parsing identifiers
     fn test_parse_identifier_expression() {
-        let mut parser = Parser::new(&mut Tokenizer::init("x".to_string()));
+        let mut parser = Parser::new(&mut Tokenizer::new("x".to_string()));
         let expr = parser.parse_identifier_expression();
         assert!(expr
             .to_any()
@@ -344,7 +351,7 @@ mod test {
 
     #[test]
     fn test_parse_variable_statement_bad_assignment_type() {
-        let mut parser = Parser::new(&mut Tokenizer::init(String::from("let x : string = 10;")));
+        let mut parser = Parser::new(&mut Tokenizer::new(String::from("let x : string = 10;")));
         IS_TESTING.with(|t| t.set(true));
         let stmt = parser.parse_variable_statement().unwrap();
         assert!(!parser.has_errors()); // in reality the parser will have errors but we need CORE_OBJECTS to add an error
@@ -420,8 +427,14 @@ mod test {
     fn test_assign_statement_parses() {
         let mut parser = init_parser("let x : int = 10; x = 5;".to_string());
         let mut st = SymbolTable::new();
-        let mut var_stmt = parser.statement_list[0].to_any().downcast_ref::<VariableStatement>().unwrap();
-        let mut stmt = parser.statement_list[1].to_any().downcast_ref::<AssignmentStatement>().unwrap();
+        let mut var_stmt = parser.statement_list[0]
+            .to_any()
+            .downcast_ref::<VariableStatement>()
+            .unwrap();
+        let mut stmt = parser.statement_list[1]
+            .to_any()
+            .downcast_ref::<AssignmentStatement>()
+            .unwrap();
         assert!(!parser.has_errors());
     }
 
@@ -467,7 +480,10 @@ mod test {
             init_parser("fn foo() : string { return \"Hello World!\\n\"; } foo();".to_string());
         let mut st = SymbolTable::new();
         let mut stmt = parser.statement_list[1].clone();
-        let fcs = stmt.to_any().downcast_ref::<FunctionCallStatement>().unwrap();
+        let fcs = stmt
+            .to_any()
+            .downcast_ref::<FunctionCallStatement>()
+            .unwrap();
         assert!(stmt
             .to_any()
             .downcast_ref::<FunctionCallStatement>()
@@ -522,10 +538,23 @@ mod test {
     */
     fn test_subtractive_expression_parses_correctly() {
         let parser = init_parser("x-1".to_string());
-        assert!(parser.expr.clone().to_any().downcast_ref::<AdditiveExpression>().is_some());
-        let expr= parser.expr.clone();
+        assert!(parser
+            .expr
+            .clone()
+            .to_any()
+            .downcast_ref::<AdditiveExpression>()
+            .is_some());
+        let expr = parser.expr.clone();
         let additive_expr = expr.to_any().downcast_ref::<AdditiveExpression>().unwrap();
-        assert!(additive_expr.get_lhs().to_any().downcast_ref::<IdentifierExpression>().is_some());
-        assert!(additive_expr.get_rhs().to_any().downcast_ref::<IntegerLiteralExpression>().is_some());
+        assert!(additive_expr
+            .get_lhs()
+            .to_any()
+            .downcast_ref::<IdentifierExpression>()
+            .is_some());
+        assert!(additive_expr
+            .get_rhs()
+            .to_any()
+            .downcast_ref::<IntegerLiteralExpression>()
+            .is_some());
     }
 }

@@ -4,7 +4,7 @@ mod test {
     use std::cell::Cell;
 
     fn init_parser(src: String) -> Parser {
-        let tokenizer: Tokenizer = Tokenizer::init(src);
+        let tokenizer: Tokenizer = Tokenizer::new(src);
         Parser::new(&mut tokenizer.clone())
     }
 
@@ -268,7 +268,7 @@ mod test {
         }";
         test_execute(src, "1\n2\n3\n");
     }
-    
+
     #[test]
     fn test_while_statement_break() {
         let src = "

@@ -8,7 +8,7 @@ use crate::parser::ParserErrorType::UnexpectedToken;
 use crate::runtime::Runtime;
 use std::any::Any;
 
-#[derive(Clone,Debug)]
+#[derive(Clone, Debug)]
 pub struct IfStatement {
     true_stmts: Vec<Box<dyn Statement>>,
     false_stmts: Vec<Box<dyn Statement>>,
@@ -49,7 +49,7 @@ impl Statement for IfStatement {
     fn validate(&mut self, st: &mut SymbolTable) {
         self.expr.validate(st);
         if self.expr.get_white_type() != Type::Boolean {
-           add_parser_error(UnexpectedToken);
+            add_parser_error(UnexpectedToken);
         }
         st.push_scope();
         if !self.true_stmts.is_empty() {

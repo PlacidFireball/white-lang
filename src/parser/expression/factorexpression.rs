@@ -6,7 +6,7 @@ use crate::parser::ParserErrorType;
 use crate::runtime::Runtime;
 use std::any::Any;
 
-#[derive(Clone,Debug)]
+#[derive(Clone, Debug)]
 pub(crate) struct FactorExpression {
     lhs: Box<dyn Expression>,
     operator: String,
@@ -67,10 +67,14 @@ impl Expression for FactorExpression {
     fn validate(&mut self, st: &SymbolTable) {
         self.lhs.validate(st);
         self.rhs.validate(st);
-        if self.lhs.get_white_type().ne(&Type::Float) && self.lhs.get_white_type().ne(&Type::Integer) {
+        if self.lhs.get_white_type().ne(&Type::Float)
+            && self.lhs.get_white_type().ne(&Type::Integer)
+        {
             add_parser_error(ParserErrorType::IncompatibleTypes);
         }
-        if self.rhs.get_white_type().ne(&Type::Float) && self.rhs.get_white_type().ne(&Type::Integer) {
+        if self.rhs.get_white_type().ne(&Type::Float)
+            && self.rhs.get_white_type().ne(&Type::Integer)
+        {
             add_parser_error(ParserErrorType::IncompatibleTypes);
         }
     }

@@ -2,11 +2,11 @@ use crate::parser::parser_traits::{add_parser_error, Expression, ToAny};
 use crate::parser::symbol_table::SymbolTable;
 use crate::parser::whitetypes::Type;
 use crate::parser::ParserErrorType;
+use crate::parser::ParserErrorType::MismatchedTypes;
 use crate::runtime::Runtime;
 use std::any::Any;
-use crate::parser::ParserErrorType::MismatchedTypes;
 
-#[derive(Clone,Debug)]
+#[derive(Clone, Debug)]
 pub(crate) struct LogicalExpression {
     lhs: Box<dyn Expression>,
     rhs: Box<dyn Expression>,

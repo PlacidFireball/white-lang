@@ -18,7 +18,7 @@ pub struct Program {
 }
 impl Program {
     pub fn from_src(src: String) -> Self {
-        let mut tokenizer: Tokenizer = Tokenizer::init(src);
+        let mut tokenizer: Tokenizer = Tokenizer::new(src);
         let mut parser: Parser = Parser::new(&mut tokenizer);
         parser.parse();
         Program::from_parser(&mut parser)
@@ -45,6 +45,30 @@ impl Program {
             };
         }
         panic!("Uncaught parser error...")
+    }
+    pub fn new_uninit() -> Program {
+        Program {
+            statements: vec![],
+            expr: Box::new(SyntaxErrorExpression::new()),
+            runtime: Runtime::new(),
+            stdout: "".to_string(),
+            stderr: "".to_string(),
+            errors: vec![],
+        }
+    }
+
+    pub fn set_statements_or_expr(
+        &mut self,
+        statements: &Vec<Box<dyn Statement>>,
+        expr: Option<&Box<dyn Expression>>,
+    ) {
+        if statements.is_empty() {
+            self.expr = expr.unwrap().clone();
+        } else if expr.is_none() {
+            self.statements = statements.clone();
+        } else {
+            panic!("Must have statements or an expression!")
+        }
     }
 
     pub fn execute(&mut self) {

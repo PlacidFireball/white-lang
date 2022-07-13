@@ -4,10 +4,8 @@ use crate::runtime::Runtime;
 
 use std::any::Any;
 
-#[derive(Clone,Debug)]
-pub(crate) struct BreakStatement {
-
-}
+#[derive(Clone, Debug)]
+pub(crate) struct BreakStatement {}
 
 impl ToAny for BreakStatement {
     fn to_any(&self) -> &dyn Any {
@@ -28,7 +26,7 @@ impl Statement for BreakStatement {
         todo!()
     }
 
-    fn validate(&mut self, _st: &mut SymbolTable) { }
+    fn validate(&mut self, _st: &mut SymbolTable) {}
 
     fn get_expr(&self) -> &Box<dyn Expression> {
         panic!("Break statement does not have an expression");
@@ -45,6 +43,6 @@ impl Statement for BreakStatement {
 
 impl BreakStatement {
     pub fn new() -> Self {
-        BreakStatement { }
+        BreakStatement {}
     }
 }
