@@ -10,3 +10,4 @@ pub(crate) mod returnstatement;
 pub(crate) mod syntaxerrorstatement;
 pub(crate) mod variablestatement;
 pub(crate) mod whilestatement;
+pub(crate) mod structstatement;

@@ -63,11 +63,13 @@ pub enum TokenType {
     True,       // true
     False,      // false
     Break,      // break
+    Struct,     // struct
     /* Future Tokens */
-    Struct, // struct
     As,     // as
     Arrow,  // ->
     GoTo,
+    Extends,
+    Implements
 }
 #[allow(dead_code)]
 #[derive(PartialEq, Debug, Clone, Copy)]
@@ -138,25 +140,31 @@ impl Token {
 
 fn init_keywords() -> HashMap<String, TokenType> {
     let mut keywords = HashMap::new();
+    // intrinsics
+    keywords.insert("print".to_string(), TokenType::Print);
+    // function related
     keywords.insert("fn".to_string(), TokenType::Function);
     keywords.insert("return".to_string(), TokenType::Return);
-    keywords.insert("break".to_string(), TokenType::Break);
-
+    // boolean operators
     keywords.insert("and".to_string(), TokenType::And);
     keywords.insert("not".to_string(), TokenType::Not);
     keywords.insert("false".to_string(), TokenType::False);
     keywords.insert("true".to_string(), TokenType::True);
-
+    // variables
     keywords.insert("null".to_string(), TokenType::Null);
+    keywords.insert("let".to_string(), TokenType::Let);
+    // loops and branching
     keywords.insert("if".to_string(), TokenType::If);
     keywords.insert("while".to_string(), TokenType::While);
     keywords.insert("for".to_string(), TokenType::For);
-    keywords.insert("let".to_string(), TokenType::Let);
-    keywords.insert("print".to_string(), TokenType::Print);
+    keywords.insert("break".to_string(), TokenType::Break);
     keywords.insert("else".to_string(), TokenType::Else);
     keywords.insert("in".to_string(), TokenType::In);
-    keywords.insert("struct".to_string(), TokenType::Struct);
     keywords.insert("goto".to_string(), TokenType::GoTo);
+    // objects
+    keywords.insert("struct".to_string(), TokenType::Struct);
+    keywords.insert("extends".to_string(), TokenType::Extends);
+    keywords.insert("implements".to_string(), TokenType::Implements);
     keywords
 }
 
@@ -574,6 +582,7 @@ impl Tokenizer {
 // Tests!
 #[cfg(test)]
 mod test {
+    use crate::TokenType::{Eof, Identifier, LeftBrace, LeftParen, RightBrace, RightParen, Struct};
     use super::*;
 
     fn init_test(test_src: String) -> Tokenizer {
@@ -748,5 +757,16 @@ mod test {
         );
         tokenizer.tokenize();
         assert_eq!(tokenizer.token_list.len(), 1);
+    }
+
+    #[test]
+    fn tokenize_struct() {
+        let mut tokenizer = Tokenizer::new(String::from("struct X () {}"));
+        tokenizer.tokenize();
+        assert_eq!(tokenizer.token_list.len(), 7);
+        let token_types = vec![Struct, Identifier, LeftParen, RightParen, LeftBrace, RightBrace, Eof];
+        for i in 0..tokenizer.token_list.len() - 1 {
+            assert_eq!(tokenizer.token_list[i].get_type(), token_types[i]);
+        }
     }
 }

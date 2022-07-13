@@ -15,3 +15,4 @@ pub(crate) mod parenthesizedexpression;
 pub(crate) mod stringliteralexpression;
 pub(crate) mod syntaxerrorexpression;
 pub(crate) mod unaryexpression;
+pub(crate) mod structexpression;
