@@ -113,7 +113,8 @@ pub trait Expression: ToAny + Debug {
     fn validate(&mut self, st: &SymbolTable); // validate the expression via the symbol table
     fn debug(&self) -> String; // for retrieving information about the expression
     fn get_white_type(&self) -> Type; // getting the type of the expression
-    fn has_errors(&self) -> bool; // check if the expression has errors
+    #[deprecated]
+    fn has_errors(&self) -> bool; // DEPRECATED: check if the expression has errors
     fn get_expr_type(&self) -> String; // get the rust type of the expression
 }
 

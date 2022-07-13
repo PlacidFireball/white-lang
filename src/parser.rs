@@ -5,6 +5,8 @@ use crate::parser::whitetypes::*;
 use crate::tokenizer::TokenType::*;
 use crate::tokenizer::*;
 use std::any::Any;
+use std::cell::Cell;
+use std::fmt::format;
 
 mod symbol_table;
 mod test;
@@ -41,9 +43,11 @@ use crate::config::WhiteLangFloat;
 use crate::parser::parser_traits::{Expression, Statement};
 use crate::parser::statement::breakstatement::BreakStatement;
 use crate::parser::ParserErrorType::UnterminatedArgList;
-use crate::IS_TESTING;
+use crate::{IS_TESTING, Logger};
 use statement::variablestatement::VariableStatement;
 use symbol_table::SymbolTable;
+
+const LOGGER: Logger = Logger { enabled: Cell::new(true) };
 
 // Parsing Errors
 #[derive(Clone, Copy, Debug, PartialOrd, PartialEq)]
@@ -288,6 +292,7 @@ impl Parser {
             self.match_and_consume(Less); // <
             let typ = self.require_a_type().get_list_type(); // make sure we are parsing some type
             self.match_and_consume(Greater); // >
+            LOGGER.info(format!("parsed a type: {:?}", typ));
             if typ != Type::Error {
                 return Option::Some(typ);
             }
@@ -376,11 +381,7 @@ impl Parser {
             }
             self.curr_fn_def = String::new();
             self.st.register_function(name.clone(), fds.clone());
-            println!(
-                "[PARSE DEBUG] Parsed a function definition\n| name: {}\n| arg names: {:?}",
-                name,
-                fds.get_arg_names()
-            );
+            LOGGER.info(format!("Parsed a function definition statement: {:?}", fds));
             return Option::Some(fds);
         }
         Option::None
@@ -391,15 +392,16 @@ impl Parser {
         if self.match_and_consume(Let) {
             let name = self.get_curr_tok().get_string_value();
             self.require_token(Identifier);
-            let mut var_stat = VariableStatement::new(name);
+            let mut var_stmt = VariableStatement::new(name);
             if self.match_and_consume(Colon) {
-                var_stat.set_type(self.require_a_type());
+                var_stmt.set_type(self.require_a_type());
             }
             self.require_token(Equal);
-            var_stat.set_expr(self.parse_expression());
-            var_stat.set_type(var_stat.get_expr().get_white_type());
+            var_stmt.set_expr(self.parse_expression());
+            var_stmt.set_type(var_stmt.get_expr().get_white_type());
             self.require_token(SemiColon);
-            return Option::Some(var_stat);
+            LOGGER.info(format!("Parsed a variable statement: {:?}", var_stmt));
+            return Option::Some(var_stmt);
         }
         Option::None
     }
@@ -410,6 +412,7 @@ impl Parser {
             self.consume_token();
             let rs = ReturnStatement::new(self.parse_expression(), self.curr_fn_def.clone());
             self.require_token(SemiColon);
+            LOGGER.info(format!("Parsed a return statement: {:?}", rs));
             return Option::Some(rs);
         }
         Option::None
@@ -428,6 +431,7 @@ impl Parser {
             while !self.match_and_consume(RightBrace) {
                 fs.add_statement(self.parse_statement());
             }
+            LOGGER.info(format!("Parsed a for statement: {:?}", fs));
             return Option::Some(fs);
         }
         Option::None
@@ -436,12 +440,13 @@ impl Parser {
     fn parse_assignment_statement(&mut self) -> Option<AssignmentStatement> {
         // x = expr;
         if self.match_token(Identifier) && self.peek_next_token(Equal) {
-            let mut assignmentstatement = AssignmentStatement::new();
-            assignmentstatement.set_variable(self.parse_expression());
+            let mut assign_stmt = AssignmentStatement::new();
+            assign_stmt.set_variable(self.parse_expression());
             self.require_token(Equal);
-            assignmentstatement.set_expr(self.parse_expression());
+            assign_stmt.set_expr(self.parse_expression());
             self.require_token(SemiColon);
-            return Some(assignmentstatement);
+            LOGGER.info(format!("Parsed an assignment statement: {:?}", assign_stmt));
+            return Some(assign_stmt);
         }
         None
     }
@@ -455,6 +460,7 @@ impl Parser {
             let print_stmt = PrintStatement::new(expr);
             self.require_token(RightParen);
             self.require_token(SemiColon);
+            LOGGER.info(format!("Parsed a print statement: {:?}", print_stmt));
             return Option::Some(print_stmt);
         }
         Option::None
@@ -487,6 +493,7 @@ impl Parser {
                     }
                 }
             }
+            LOGGER.info(format!("Parsed an if statement: {:?}", if_stmt));
             return Option::Some(if_stmt);
         }
         Option::None
@@ -499,6 +506,7 @@ impl Parser {
             let expr = self.parse_expression(); // retrieve the function call expression
             self.require_token(TokenType::SemiColon);
             let fcs = FunctionCallStatement::new(expr, name.clone());
+            LOGGER.info(format!("Parsed a function call statement: {:?}", fcs));
             return Option::Some(fcs);
         }
         Option::None
@@ -520,6 +528,7 @@ impl Parser {
                     break;
                 }
             }
+            LOGGER.info(format!("Parsed a while statement: {:?}", while_statement));
             return Option::Some(while_statement);
         }
 
@@ -560,6 +569,7 @@ impl Parser {
             self.consume_token();
             let rhs = self.parse_factor_expression(); // get the right hand side
             let additive_expr = AdditiveExpression::new(expr, operator.clone(), rhs);
+            LOGGER.info(format!("Parsed an additive expression: {:?}", additive_expr));
             expr = Box::new(additive_expr);
         }
         expr
@@ -575,6 +585,7 @@ impl Parser {
             self.consume_token();
             let rhs = self.parse_logical_expression();
             let factor_expr = FactorExpression::new(expr, operator.clone(), rhs);
+            LOGGER.info(format!("Parsed a factor expression: {:?}", factor_expr));
             expr = Box::new(factor_expr);
         }
         expr
@@ -588,6 +599,7 @@ impl Parser {
             let rhs = self.parse_comparison_expression();
             let mut logical_expr = LogicalExpression::new(expr, rhs);
             logical_expr.set_operator(operator);
+            LOGGER.info(format!("Parsed a logical expression: {:?}", logical_expr));
             expr = Box::new(logical_expr);
         }
         expr
@@ -606,6 +618,7 @@ impl Parser {
             self.consume_token(); // consume op
             let rhs = self.parse_function_call_expression(); // get the right hand side expression
             let comparison_expr = ComparisonExpression::new(expr, operator.clone(), rhs); // create the expression
+            LOGGER.info(format!("Parsed a comparison expression: {:?}", comparison_expr));
             return Box::new(comparison_expr); // return a box wrapper of the expression
         }
         expr // if we didn't parse a comparison expression, return whatever we parsed earlier
@@ -620,6 +633,7 @@ impl Parser {
             self.consume_token(); // consume the token
             let rhs = self.parse_expression(); // parse some other expression
             let equality_expr = EqualityExpression::new(expr, operator.clone(), rhs);
+            LOGGER.info(format!("Parsed an equality expression: {:?}", equality_expr));
             return Box::new(equality_expr); // return a box wrapper to the expr
         }
         expr
@@ -645,6 +659,7 @@ impl Parser {
                     break;
                 }
             }
+            LOGGER.info(format!("Parsed a function call expression: {:?}", expr));
             return Box::new(expr); // return whatever we have parsed
         }
         self.parse_list_literal_expression() // otherwise parse a list literal
@@ -664,6 +679,7 @@ impl Parser {
                     break;
                 }
             }
+            LOGGER.info(format!("Parsed a list literal: {:?}", lle));
             return Box::new(lle); // return a box wrapper of the lle
         }
         self.parse_parenthesized_expression()
@@ -676,6 +692,7 @@ impl Parser {
             let expr = self.parse_expression();
             let pe = ParenthesizedExpression::new(expr);
             self.require_token(RightParen);
+            LOGGER.info(format!("Parsed a parenthesized expression: {:?}", pe));
             return Box::new(pe);
         }
         self.parse_unary_expression()
@@ -688,6 +705,7 @@ impl Parser {
             self.consume_token(); // consume the token
             let expr = self.parse_float_literal_expression(); // parse some other expression
             let unary_expr = UnaryExpression::new(operator, expr); // create the new expr
+            LOGGER.info(format!("Parsed a unary expression: {:?}", unary_expr));
             return Box::new(unary_expr); // return a box wrapper
         }
         self.parse_float_literal_expression()
@@ -702,6 +720,7 @@ impl Parser {
                     .parse::<WhiteLangFloat>()
                     .unwrap(),
             );
+            LOGGER.info(format!("Parsed a float literal: {:?}", expr));
             self.consume_token();
             Box::new(expr)
         } else {
@@ -710,17 +729,17 @@ impl Parser {
     }
 
     fn parse_string_literal_expression(&mut self) -> Box<dyn Expression> {
-        println!(
-            "curr_idx: {}: {}",
-            self.curr_idx,
-            self.token_list[self.curr_idx].get_type()
-        );
-        println!("will match: {}", self.match_token(Str));
+        // println!(
+        //     "curr_idx: {}: {}",
+        //     self.curr_idx,
+        //     self.token_list[self.curr_idx].get_type()
+        // );
+        // println!("will match: {}", self.match_token(Str));
         return if self.match_token(Str) {
             // parse string
-            println!("Parsed a string literal!");
             let expr = StringLiteralExpression::new(self.get_curr_tok().get_string_value());
             self.consume_token();
+            LOGGER.info(format!("Parsed a string literal: {:?}", expr));
             Box::new(expr)
         } else {
             self.parse_integer_literal_expression()
@@ -737,6 +756,7 @@ impl Parser {
                     .unwrap(),
             );
             self.consume_token();
+            LOGGER.info(format!("Parsed an integer literal: {:?}", expr));
             return Box::new(expr);
         }
         self.parse_identifier_expression()
@@ -747,6 +767,7 @@ impl Parser {
             let name = self.get_curr_tok().get_string_value();
             self.consume_token();
             let expr = IdentifierExpression::new(name);
+            LOGGER.info(format!("Parsed an identifier: {:?}", expr));
             return Box::new(expr);
         }
         return self.parse_boolean_literal_expression();
@@ -762,6 +783,7 @@ impl Parser {
                     .unwrap(),
             );
             self.consume_token();
+            LOGGER.info(format!("Parsed a boolean literal: {:?}", expr));
             return Box::new(expr);
         }
         self.parse_null_literal_expression()
@@ -772,8 +794,10 @@ impl Parser {
             // parse null literals
             let expr = NullLiteralExpression::new();
             self.consume_token();
+            LOGGER.info(format!("Parsed a null literal: {:?}", expr));
             return Box::new(expr);
         }
+        LOGGER.warn(format!("Couldn't parse an expression. Token: {}", self.get_curr_tok()));
         Box::new(SyntaxErrorExpression::new())
     }
 }

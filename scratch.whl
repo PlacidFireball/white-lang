@@ -1,0 +1,19 @@
+
+
+print("Hello World!");
+let x : int = 10;
+if (x==10) {
+    print("x is indeed 10!");
+} else {
+    print("x is not, in fact, 10.");
+}
+
+let y : int = 0;
+while (true) {
+    if (y > 5) {
+        break;
+    } else {
+        y = y + 1;
+        print(y);
+    }
+}

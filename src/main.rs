@@ -5,37 +5,50 @@ use crate::program::Program;
 use parser::Parser;
 
 use std::cell::RefCell;
+use std::cell::Cell;
 use std::ops::DerefMut;
+use std::env;
+use std::env::args;
+use std::fs::File;
+use std::io::Read;
+use std::path::Path;
 
 mod config;
 mod core;
 mod program;
 mod runtime;
+mod logger;
+use crate::logger::Logger;
+
 use crate::core::CoreObjects;
 
 thread_local! {
-    static CORE_OBJECTS: RefCell<CoreObjects> = RefCell::new(
+    pub static CORE_OBJECTS: RefCell<CoreObjects> = RefCell::new(
         CoreObjects::new_uninit()
     );
 
-    pub static IS_TESTING: std::cell::Cell<bool> = std::cell::Cell::new(false);
+    pub static IS_TESTING: Cell<bool> = Cell::new(false);
 }
 
-#[allow(unused_variables)]
 fn main() {
+    let logger = Logger { enabled: Cell::new(true) };
+    // open xxx.whl
+    let args: Vec<String> = args().collect();
+    let path = Path::new(&args[1]);
+    let display = path.display();
+    let mut file = match File::open(&path) {
+        Ok(file) => file,
+        Err(why) => panic!("[FATAL] couldn't read {}: {}", display, why),
+    };
+    let mut source = String::new();
+    match file.read_to_string(&mut source) {
+        Ok(_) => logger.info(format!("opened {} and got:\n{}", display, source.trim())),
+        Err(why) => panic!("[FATAL] couldn't read {}: {}", display, why),
+    };
+    // run xxx.whl
     CORE_OBJECTS.with(|core| {
-        core.borrow_mut().set_src(
-            "
-            print(\"Hello World!\");
-            let x : int = 11;
-            if (x == 10) {
-                print(\"x is 10!\");
-            } else {
-                print(\"x is not 10\");
-            }
-            ",
-        );
+        core.borrow_mut().set_src(source.as_str());
         core.borrow_mut().get_program().execute();
-        println!("{}", core.borrow_mut().get_program().stdout);
+        logger.info(format!("output:\n{}",core.borrow_mut().get_program().stdout.clone()));
     })
 }
