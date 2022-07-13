@@ -11,7 +11,6 @@ pub(crate) struct AdditiveExpression {
     lhs: Box<dyn Expression>,
     operator: String,
     rhs: Box<dyn Expression>,
-    errors: Vec<ParserErrorType>,
     is_add: bool,
 }
 
@@ -108,10 +107,6 @@ impl Expression for AdditiveExpression {
         Type::Integer
     }
 
-    fn has_errors(&self) -> bool {
-        !self.errors.is_empty()
-    }
-
     fn get_expr_type(&self) -> String {
         String::from("AdditiveExpression")
     }
@@ -126,7 +121,6 @@ impl AdditiveExpression {
             lhs,
             operator: operator.clone(),
             rhs,
-            errors: vec![],
             is_add: operator.contains("+"),
         }
     }

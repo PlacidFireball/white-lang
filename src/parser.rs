@@ -6,7 +6,6 @@ use crate::tokenizer::TokenType::*;
 use crate::tokenizer::*;
 use std::any::Any;
 use std::cell::Cell;
-use std::fmt::format;
 
 mod symbol_table;
 mod test;

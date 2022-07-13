@@ -11,7 +11,6 @@ pub(crate) struct LogicalExpression {
     lhs: Box<dyn Expression>,
     rhs: Box<dyn Expression>,
     operator: String,
-    errors: Vec<ParserErrorType>,
 }
 #[allow(unused_variables)]
 impl ToAny for LogicalExpression {
@@ -60,10 +59,6 @@ impl Expression for LogicalExpression {
         Type::Boolean
     }
 
-    fn has_errors(&self) -> bool {
-        !self.errors.is_empty()
-    }
-
     fn get_expr_type(&self) -> String {
         String::from("LogicalExpression")
     }
@@ -74,7 +69,6 @@ impl LogicalExpression {
             lhs,
             rhs,
             operator: String::new(),
-            errors: Vec::new(),
         }
     }
 

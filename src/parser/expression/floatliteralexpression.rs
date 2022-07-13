@@ -39,10 +39,6 @@ impl Expression for FloatLiteralExpression {
         Type::Float
     }
 
-    fn has_errors(&self) -> bool {
-        false
-    }
-
     fn get_expr_type(&self) -> String {
         String::from("FloatLiteralExpression")
     }

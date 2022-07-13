@@ -10,7 +10,6 @@ use std::any::Any;
 pub(crate) struct UnaryExpression {
     operator: String,
     expr: Box<dyn Expression>,
-    errors: Vec<ParserErrorType>,
     is_not: bool,
 }
 
@@ -70,10 +69,6 @@ impl Expression for UnaryExpression {
         self.expr.get_white_type()
     }
 
-    fn has_errors(&self) -> bool {
-        !self.errors.is_empty()
-    }
-
     fn get_expr_type(&self) -> String {
         todo!()
     }
@@ -83,7 +78,6 @@ impl UnaryExpression {
         UnaryExpression {
             operator: operator.clone(),
             expr,
-            errors: vec![],
             is_not: operator.contains("not"),
         }
     }

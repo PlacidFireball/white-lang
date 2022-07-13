@@ -1,4 +1,3 @@
-use crate::parser::expression::syntaxerrorexpression::SyntaxErrorExpression;
 use crate::parser::parser_traits::*;
 use crate::parser::symbol_table::SymbolTable;
 use crate::parser::whitetypes::Type;
@@ -54,10 +53,6 @@ impl Statement for VariableStatement {
 
     fn get_statement_type(&self) -> String {
         String::from("VariableStatement")
-    }
-
-    fn has_errors(&self) -> bool {
-        !self.errors.is_empty()
     }
 }
 

@@ -38,10 +38,6 @@ impl Expression for BooleanLiteralExpression {
         Type::Boolean
     }
 
-    fn has_errors(&self) -> bool {
-        false
-    }
-
     fn get_expr_type(&self) -> String {
         String::from("BooleanLiteralExpression")
     }

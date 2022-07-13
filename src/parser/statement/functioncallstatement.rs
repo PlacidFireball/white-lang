@@ -1,10 +1,10 @@
 use crate::parser::expression::functioncallexpression::FunctionCallExpression;
-use crate::parser::expression::syntaxerrorexpression::SyntaxErrorExpression;
 use crate::parser::parser_traits::*;
 use crate::parser::symbol_table::SymbolTable;
 use crate::runtime::Runtime;
 use std::any::Any;
 
+#[allow(dead_code)]
 #[derive(Clone, Debug)]
 pub struct FunctionCallStatement {
     name: String,
@@ -41,10 +41,6 @@ impl Statement for FunctionCallStatement {
 
     fn get_statement_type(&self) -> String {
         String::from("FunctionCallStatement")
-    }
-
-    fn has_errors(&self) -> bool {
-        self.expr.has_errors()
     }
 }
 

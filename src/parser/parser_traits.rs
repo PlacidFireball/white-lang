@@ -113,8 +113,6 @@ pub trait Expression: ToAny + Debug {
     fn validate(&mut self, st: &SymbolTable); // validate the expression via the symbol table
     fn debug(&self) -> String; // for retrieving information about the expression
     fn get_white_type(&self) -> Type; // getting the type of the expression
-    #[deprecated]
-    fn has_errors(&self) -> bool; // DEPRECATED: check if the expression has errors
     fn get_expr_type(&self) -> String; // get the rust type of the expression
 }
 
@@ -167,7 +165,6 @@ pub trait Statement: ToAny + Debug {
     fn validate(&mut self, st: &mut SymbolTable); // validate the statement via the symbol table
     fn get_expr(&self) -> &Box<dyn Expression>; // retrieve the expression if the statement has one
     fn get_statement_type(&self) -> String; // debug info of the class
-    fn has_errors(&self) -> bool; // tells us if the statement has errors
 }
 
 impl Clone for Box<dyn Statement> {

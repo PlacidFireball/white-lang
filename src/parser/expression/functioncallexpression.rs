@@ -1,10 +1,9 @@
 use crate::parser::parser_traits::{
     add_parser_error, any_into_bool_literal, any_into_f64_literal, any_into_int_literal,
-    try_print_output, Expression, ToAny,
+    Expression, ToAny,
 };
 use crate::parser::symbol_table::SymbolTable;
 use crate::parser::whitetypes::Type;
-use crate::parser::ParserErrorType;
 use crate::parser::ParserErrorType::{ArgMismatch, IncompatibleTypes, UnknownName};
 use crate::runtime::Runtime;
 use std::any::Any;
@@ -14,7 +13,6 @@ pub(crate) struct FunctionCallExpression {
     name: String,
     args: Vec<Box<dyn Expression>>,
     typ: Type,
-    errors: Vec<ParserErrorType>,
 }
 
 impl ToAny for FunctionCallExpression {
@@ -105,9 +103,6 @@ impl Expression for FunctionCallExpression {
         self.typ
     }
 
-    fn has_errors(&self) -> bool {
-        !self.errors.is_empty()
-    }
 
     fn get_expr_type(&self) -> String {
         String::from("FunctionCallExpression")
@@ -119,7 +114,6 @@ impl FunctionCallExpression {
             name,
             args: vec![],
             typ: Type::Initialized,
-            errors: vec![],
         }
     }
 

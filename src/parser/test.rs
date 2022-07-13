@@ -18,9 +18,7 @@ mod test {
     use crate::parser::expression::nullliteralexpression::NullLiteralExpression;
     use crate::parser::expression::parenthesizedexpression::ParenthesizedExpression;
     use crate::parser::expression::stringliteralexpression::StringLiteralExpression;
-    use crate::parser::expression::syntaxerrorexpression::SyntaxErrorExpression;
     use crate::parser::expression::unaryexpression::UnaryExpression;
-    use crate::parser::parser_traits::Expression;
     use crate::parser::parser_traits::Statement;
     use crate::parser::statement::assignmentstatement::AssignmentStatement;
     use crate::parser::statement::forstatement::ForStatement;
@@ -29,14 +27,13 @@ mod test {
     use crate::parser::statement::ifstatement::IfStatement;
     use crate::parser::statement::variablestatement::VariableStatement;
     use crate::parser::statement::whilestatement::WhileStatement;
+    use crate::parser::statement::printstatement::PrintStatement;
     use crate::parser::symbol_table::SymbolTable;
     use crate::parser::whitetypes::Type;
-    use crate::tokenizer::Token;
     use crate::TokenType::*;
     use crate::Tokenizer;
     use crate::IS_TESTING;
     use crate::{CoreObjects, Parser};
-    use std::any::Any;
 
     fn init_parser(src: String) -> Parser {
         IS_TESTING.with(|test| test.set(true));
@@ -71,7 +68,7 @@ mod test {
     #[test]
     /// Test parsing an integer literal
     fn test_parse_integer_expression() {
-        let mut parser = init_parser("1".to_string());
+        let parser = init_parser("1".to_string());
         assert!(parser
             .expr
             .to_any()
@@ -82,7 +79,7 @@ mod test {
     #[test]
     /// Test parsing a string literal
     fn test_parse_string_expression() {
-        let mut parser = init_parser("\"Hello World\"".to_string());
+        let parser = init_parser("\"Hello World\"".to_string());
         if let None = parser
             .expr
             .to_any()
@@ -95,7 +92,7 @@ mod test {
     #[test]
     /// Test parsing a float literal
     fn test_parse_float_expression() {
-        let mut parser = init_parser("1.1".to_string());
+        let parser = init_parser("1.1".to_string());
         assert!(parser
             .expr
             .to_any()
@@ -107,7 +104,7 @@ mod test {
     #[test]
     /// Test parsing a null literal expression
     fn test_null_literal_expression() {
-        let mut parser = init_parser("null".to_string());
+        let parser = init_parser("null".to_string());
         assert!(parser
             .expr
             .to_any()
@@ -137,7 +134,7 @@ mod test {
     #[test]
     /// test parsing a function call expression
     fn test_function_call_expression() {
-        let mut parser = init_parser("fn x(){} x();".to_string()); // had to modify this test with the core changes
+        let parser = init_parser("fn x(){} x();".to_string()); // had to modify this test with the core changes
         let expr = parser.statement_list[1].clone();
         assert!(expr
             .to_any()
@@ -172,7 +169,7 @@ mod test {
     #[test]
     /// test parsing a comparison expression
     fn test_parse_comparison_expression() {
-        let mut parser = init_parser("2 > 1".to_string());
+        let parser = init_parser("2 > 1".to_string());
         let expr = parser.expr.clone();
         assert!(expr
             .to_any()
@@ -188,18 +185,16 @@ mod test {
         let mut expr = parser.expr.clone();
         assert!(expr.to_any().downcast_ref::<AdditiveExpression>().is_some());
         assert_eq!(expr.debug(), "1 + 1");
-        assert!(!expr.has_errors());
         parser = init_parser("1 - 1".to_string());
         expr = parser.expr.clone();
         assert!(expr.to_any().downcast_ref::<AdditiveExpression>().is_some());
         assert_eq!(expr.debug(), "1 - 1");
-        assert!(!expr.has_errors());
     }
 
     #[test]
     /// test parsing associativity of additive expressions
     fn additive_expressions_are_associative() {
-        let mut parser = init_parser("1 + 1 - 1".to_string());
+        let parser = init_parser("1 + 1 - 1".to_string());
         let expr = parser.expr.clone();
         let additive_expression = expr.to_any().downcast_ref::<AdditiveExpression>().unwrap();
         let lhs = additive_expression
@@ -210,7 +205,6 @@ mod test {
             .get_rhs()
             .to_any()
             .downcast_ref::<IntegerLiteralExpression>();
-        assert!(!additive_expression.has_errors());
         assert!(lhs.is_some());
         assert!(rhs.is_some());
     }
@@ -218,7 +212,7 @@ mod test {
     #[test]
     /// test parsing a factor expression
     fn test_parse_factor_expression() {
-        let mut parser = init_parser("1 * 1".to_string());
+        let parser = init_parser("1 * 1".to_string());
         let expr = parser.expr.clone();
         assert!(expr.to_any().downcast_ref::<FactorExpression>().is_some());
         assert_eq!(expr.debug(), "1 * 1");
@@ -227,7 +221,7 @@ mod test {
     #[test]
     /// test parsing equality expressions
     fn test_parse_equality_expression() {
-        let mut parser = init_parser("1 == 1".to_string());
+        let parser = init_parser("1 == 1".to_string());
         let expr = parser.expr.clone();
         assert!(expr.to_any().downcast_ref::<EqualityExpression>().is_some());
         assert_eq!(expr.debug(), "1 == 1");
@@ -236,14 +230,13 @@ mod test {
     #[test]
     /// test parsing list literal expressions
     fn test_parse_list_expression() {
-        let mut parser = init_parser("[1, 2, 3, 4]".to_string());
+        let parser = init_parser("[1, 2, 3, 4]".to_string());
         let expr = parser.expr.clone();
         assert!(expr
             .to_any()
             .downcast_ref::<ListLiteralExpression>()
             .is_some());
         assert_eq!(expr.debug(), "[1, 2, 3, 4]");
-        assert!(!expr.has_errors())
     }
 
     #[test]
@@ -261,7 +254,7 @@ mod test {
     #[test]
     /// test parsing parenthesized expressions
     fn test_parse_parenthesized_expression() {
-        let mut parser = init_parser("(1+1)".to_string());
+        let parser = init_parser("(1+1)".to_string());
         let expr = parser.expr.clone();
         assert!(expr
             .to_any()
@@ -321,7 +314,7 @@ mod test {
 
     #[test]
     fn test_parse_variable_statement() {
-        let mut parser = init_parser("let x = 10;".to_string());
+        let parser = init_parser("let x = 10;".to_string());
         let stmt = parser.statement_list.first().unwrap();
         assert!(!parser.has_errors());
         let variable_statement = stmt.to_any().downcast_ref::<VariableStatement>().unwrap();
@@ -336,7 +329,7 @@ mod test {
 
     #[test]
     fn test_parse_variable_statement_explicit_type() {
-        let mut parser = init_parser("let x : string = \"Hello World\";".to_string());
+        let parser = init_parser("let x : string = \"Hello World\";".to_string());
         let stmt = parser.statement_list.first().unwrap();
         assert!(!parser.has_errors());
         let variable_statement = stmt.to_any().downcast_ref::<VariableStatement>().unwrap();
@@ -360,45 +353,42 @@ mod test {
 
     #[test]
     fn test_parse_function_definition() {
-        let mut parser = init_parser("fn foo() {}".to_string());
+        let parser = init_parser("fn foo() {}".to_string());
         let stmt = parser.statement_list.first().unwrap();
         assert!(!parser.has_errors());
-        let fds = stmt
+        let _ = stmt
             .to_any()
             .downcast_ref::<FunctionDefinitionStatement>()
             .unwrap();
-        assert!(!fds.has_errors());
     }
 
     #[test]
     fn test_parse_function_definition_with_args() {
-        let mut parser = init_parser("fn foo(x : int) {}".to_string());
+        let parser = init_parser("fn foo(x : int) {}".to_string());
         let stmt = parser.statement_list.first().unwrap();
         assert!(!parser.has_errors());
-        let fds = stmt
+        let _ = stmt
             .to_any()
             .downcast_ref::<FunctionDefinitionStatement>()
             .unwrap();
-        assert!(!fds.has_errors());
     }
     #[test]
     fn test_parse_function_definition_with_stmts() {
-        let mut parser = init_parser("fn foo() : int { let x = 10; return x; }".to_string());
+        let parser = init_parser("fn foo() : int { let x = 10; return x; }".to_string());
         let stmt = parser.statement_list.first().unwrap();
         assert!(!parser.has_errors());
-        let fds = stmt
+        let _ = stmt
             .to_any()
             .downcast_ref::<FunctionDefinitionStatement>()
             .unwrap();
-        assert!(!fds.has_errors());
     }
 
     #[test]
     fn test_parse_function_definition_mismatched_return() {
-        let mut parser = init_parser("fn foo() : string { let x = 10; return x; }".to_string());
-        let mut stmt = parser.statement_list.first().unwrap();
+        let parser = init_parser("fn foo() : string { let x = 10; return x; }".to_string());
+        let stmt = parser.statement_list.first().unwrap();
         assert!(!parser.has_errors()); // parser will actually have errors and panic for reals
-        let fds = stmt
+        let _ = stmt
             .to_any()
             .downcast_ref::<FunctionDefinitionStatement>()
             .unwrap();
@@ -406,10 +396,10 @@ mod test {
 
     #[test]
     fn test_fn_returns_list() {
-        let mut parser = init_parser("fn foo() : list<int> { return [1, 2, 3]; }".to_string());
-        let mut stmt = parser.statement_list.first().unwrap();
+        let parser = init_parser("fn foo() : list<int> { return [1, 2, 3]; }".to_string());
+        let stmt = parser.statement_list.first().unwrap();
         assert!(!parser.has_errors());
-        let fds = stmt
+        let _ = stmt
             .to_any()
             .downcast_ref::<FunctionDefinitionStatement>()
             .unwrap();
@@ -417,21 +407,20 @@ mod test {
 
     #[test]
     fn test_for_statement_parses() {
-        let mut parser = init_parser("for (x in [1, 2, 3]) { let y = x; }".to_string());
-        let mut stmt = parser.statement_list.first().unwrap();
+        let parser = init_parser("for (x in [1, 2, 3]) { let y = x; }".to_string());
+        let stmt = parser.statement_list.first().unwrap();
         assert!(!parser.has_errors());
-        let for_stmt = stmt.to_any().downcast_ref::<ForStatement>().unwrap();
+        let _ = stmt.to_any().downcast_ref::<ForStatement>().unwrap();
     }
 
     #[test]
     fn test_assign_statement_parses() {
-        let mut parser = init_parser("let x : int = 10; x = 5;".to_string());
-        let mut st = SymbolTable::new();
-        let mut var_stmt = parser.statement_list[0]
+        let parser = init_parser("let x : int = 10; x = 5;".to_string());
+        let _ = parser.statement_list[0]
             .to_any()
             .downcast_ref::<VariableStatement>()
             .unwrap();
-        let mut stmt = parser.statement_list[1]
+        let _ = parser.statement_list[1]
             .to_any()
             .downcast_ref::<AssignmentStatement>()
             .unwrap();
@@ -440,73 +429,61 @@ mod test {
 
     #[test]
     fn test_print_statement_parse() {
-        let mut parser = init_parser("print(1);".to_string());
-        let mut print_stmt = parser.statement_list.first().unwrap();
-        assert!(!print_stmt.has_errors());
+        let parser = init_parser("print(1);".to_string());
+        let _ = parser.statement_list.first().unwrap().to_any().downcast_ref::<PrintStatement>().unwrap();
     }
 
     #[test]
     fn test_if_statement_with_else_parses() {
-        let mut parser = init_parser(
+        let parser = init_parser(
             "if (1 < 2) { print(\"Hello World\"); } else { print(\"Goodbye!\"); }".to_string(),
         );
-        let mut stmt = parser.statement_list.first().unwrap();
+        let stmt = parser.statement_list.first().unwrap();
         assert!(stmt.to_any().downcast_ref::<IfStatement>().is_some());
-        assert!(!stmt.has_errors());
         assert!(!parser.has_errors());
     }
 
     #[test]
     fn test_if_statement_no_else_parses() {
-        let mut parser = init_parser("if (1 < 2) { print(\"Hello World!\\n\"); }".to_string());
-        let mut stmt = parser.statement_list.first().unwrap();
+        let parser = init_parser("if (1 < 2) { print(\"Hello World!\\n\"); }".to_string());
+        let stmt = parser.statement_list.first().unwrap();
         assert!(stmt.to_any().downcast_ref::<IfStatement>().is_some());
-        assert!(!stmt.has_errors());
         assert!(!parser.has_errors());
     }
 
     #[test]
     fn test_if_statement_empty_parses() {
-        let mut parser = init_parser("if (1 < 2) { }".to_string());
-        let mut stmt = parser.statement_list.first().unwrap();
+        let parser = init_parser("if (1 < 2) { }".to_string());
+        let stmt = parser.statement_list.first().unwrap();
         assert!(stmt.to_any().downcast_ref::<IfStatement>().is_some());
-        assert!(!stmt.has_errors());
         assert!(!parser.has_errors());
     }
 
     #[test]
     fn test_function_call_statement_parses() {
-        let mut parser =
+        let parser =
             init_parser("fn foo() : string { return \"Hello World!\\n\"; } foo();".to_string());
-        let mut st = SymbolTable::new();
-        let mut stmt = parser.statement_list[1].clone();
-        let fcs = stmt
-            .to_any()
-            .downcast_ref::<FunctionCallStatement>()
-            .unwrap();
+        let stmt = parser.statement_list[1].clone();
         assert!(stmt
             .to_any()
             .downcast_ref::<FunctionCallStatement>()
             .is_some());
-        assert!(!stmt.has_errors());
         assert!(!parser.has_errors());
     }
 
     #[test]
     fn test_logical_expression_parses() {
-        let mut parser = init_parser("true && false".to_string());
-        let mut expr = parser.expr.clone();
-        let le = expr.to_any().downcast_ref::<LogicalExpression>().unwrap();
-        assert!(!le.has_errors());
+        let parser = init_parser("true && false".to_string());
+        let expr = parser.expr.clone();
+        assert!(expr.to_any().downcast_ref::<LogicalExpression>().is_some());
         assert!(!parser.has_errors());
     }
 
     #[test]
     fn test_while_statement_parses() {
-        let mut parser = init_parser("while (true) { print(1); }".to_string());
+        let parser = init_parser("while (true) { print(1); }".to_string());
         let stmt = parser.statement_list.first().unwrap();
         assert!(stmt.to_any().downcast_ref::<WhileStatement>().is_some());
-        assert!(!stmt.has_errors());
         assert!(!parser.has_errors());
     }
 
@@ -518,17 +495,15 @@ mod test {
             print(y);
         }"
         .to_string();
-        let mut parser = init_parser(src);
-        let mut variable = parser.statement_list[0].clone();
-        let mut for_stmt = parser.statement_list[1].clone();
+        let parser = init_parser(src);
+        let variable = parser.statement_list[0].clone();
+        let for_stmt = parser.statement_list[1].clone();
         assert!(variable
             .to_any()
             .downcast_ref::<VariableStatement>()
             .is_some());
         assert!(for_stmt.to_any().downcast_ref::<ForStatement>().is_some());
-        assert!(!variable.has_errors());
         assert!(!parser.has_errors());
-        assert!(!for_stmt.has_errors());
     }
 
     #[test]

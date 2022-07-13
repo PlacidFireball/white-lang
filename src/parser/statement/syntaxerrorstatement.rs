@@ -13,7 +13,7 @@ impl ToAny for SyntaxErrorStatement {
 }
 
 impl Statement for SyntaxErrorStatement {
-    fn execute(&self, runtime: &mut Runtime) {
+    fn execute(&self, _: &mut Runtime) {
         panic!("Evaluated a syntax error")
     }
 
@@ -35,10 +35,6 @@ impl Statement for SyntaxErrorStatement {
 
     fn get_statement_type(&self) -> String {
         String::from("SyntaxErrorStatement")
-    }
-
-    fn has_errors(&self) -> bool {
-        true
     }
 }
 #[allow(dead_code)]

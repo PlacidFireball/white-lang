@@ -1,12 +1,13 @@
 use std::any::Any;
 use std::collections::HashMap;
-use std::fmt::{Debug, Formatter};
-use crate::parser::parser_traits::{Expression, Statement, ToAny};
+use std::fmt::{Debug};
+use crate::parser::parser_traits::{Expression, ToAny};
 use crate::parser::statement::functiondefinitionstatement::FunctionDefinitionStatement;
 use crate::parser::symbol_table::SymbolTable;
 use crate::parser::whitetypes::Type;
 use crate::runtime::Runtime;
 
+#[allow(dead_code)]
 #[derive(Clone, Debug)]
 struct StructExpression {
     name: String,
@@ -19,6 +20,8 @@ impl ToAny for StructExpression {
         self
     }
 }
+
+#[allow(dead_code, unused_variables)]
 impl Expression for StructExpression {
     fn evaluate(&self, runtime: &mut Runtime) -> Box<dyn Any> {
         todo!()
@@ -44,14 +47,12 @@ impl Expression for StructExpression {
         todo!()
     }
 
-    fn has_errors(&self) -> bool {
-        todo!()
-    }
-
     fn get_expr_type(&self) -> String {
         todo!()
     }
 }
+
+#[allow(dead_code)]
 impl StructExpression {
     pub fn new(name: String, typ: String) -> StructExpression {
         Self {

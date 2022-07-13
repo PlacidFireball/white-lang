@@ -1,4 +1,3 @@
-use crate::parser::expression::syntaxerrorexpression::SyntaxErrorExpression;
 use crate::parser::Parser;
 use crate::program::Program;
 use crate::tokenizer::Tokenizer;
@@ -9,12 +8,13 @@ pub struct CoreObjects {
     pub program: Program,
 }
 impl CoreObjects {
+    #[allow(dead_code)]
     pub(crate) fn new(src: &str) -> Self {
         let mut tokenizer = Tokenizer::new(src.to_string());
         tokenizer.tokenize();
         let mut parser = Parser::new(&mut tokenizer);
         parser.parse();
-        let mut program = Program::from_parser(&mut parser);
+        let program = Program::from_parser(&mut parser);
         Self {
             parser,
             tokenizer,
@@ -23,9 +23,9 @@ impl CoreObjects {
     }
 
     pub(crate) fn new_uninit() -> Self {
-        let mut tokenizer = Tokenizer::new_uninit();
-        let mut parser = Parser::new_uninit();
-        let mut program = Program::new_uninit();
+        let tokenizer = Tokenizer::new_uninit();
+        let parser = Parser::new_uninit();
+        let program = Program::new_uninit();
         Self {
             parser,
             tokenizer,

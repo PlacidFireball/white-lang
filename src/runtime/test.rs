@@ -1,12 +1,6 @@
 #[cfg(test)]
 mod test {
     use crate::*;
-    use std::cell::Cell;
-
-    fn init_parser(src: String) -> Parser {
-        let tokenizer: Tokenizer = Tokenizer::new(src);
-        Parser::new(&mut tokenizer.clone())
-    }
 
     fn test_execute(src: &str, expected: &str) {
         IS_TESTING.with(|t| t.set(true));

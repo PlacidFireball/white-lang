@@ -1,7 +1,6 @@
 use crate::parser::parser_traits::{add_parser_error, Expression, ToAny};
 use crate::parser::symbol_table::SymbolTable;
 use crate::parser::whitetypes::Type;
-use crate::parser::ParserErrorType;
 use crate::parser::ParserErrorType::UnknownName;
 use crate::runtime::Runtime;
 use std::any::Any;
@@ -10,7 +9,6 @@ use std::any::Any;
 pub(crate) struct IdentifierExpression {
     name: String,
     typ: Type,
-    errors: Vec<ParserErrorType>,
 }
 
 impl ToAny for IdentifierExpression {
@@ -58,10 +56,6 @@ impl Expression for IdentifierExpression {
         self.typ
     }
 
-    fn has_errors(&self) -> bool {
-        !self.errors.is_empty()
-    }
-
     fn get_expr_type(&self) -> String {
         String::from("IdentifierExpression")
     }
@@ -71,7 +65,6 @@ impl IdentifierExpression {
         IdentifierExpression {
             name,
             typ: Type::Initialized,
-            errors: vec![],
         }
     }
 }

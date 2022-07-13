@@ -1,4 +1,3 @@
-use crate::parser::expression::syntaxerrorexpression::SyntaxErrorExpression;
 use crate::parser::parser_traits::*;
 use crate::parser::symbol_table::SymbolTable;
 use crate::program::Program;
@@ -41,10 +40,6 @@ impl Statement for PrintStatement {
 
     fn get_statement_type(&self) -> String {
         String::from("PrintStatement")
-    }
-
-    fn has_errors(&self) -> bool {
-        self.expr.has_errors()
     }
 }
 

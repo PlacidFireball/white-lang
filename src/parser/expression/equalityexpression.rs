@@ -3,7 +3,6 @@ use crate::parser::parser_traits::{try_print_output, Expression, ToAny};
 use crate::parser::symbol_table::SymbolTable;
 use crate::parser::whitetypes::Type;
 use crate::parser::whitetypes::Type::Null;
-use crate::parser::ParserErrorType;
 use crate::runtime::Runtime;
 use std::any::Any;
 
@@ -12,7 +11,6 @@ pub(crate) struct EqualityExpression {
     lhs: Box<dyn Expression>,
     operator: String,
     rhs: Box<dyn Expression>,
-    errors: Vec<ParserErrorType>,
 }
 
 impl ToAny for EqualityExpression {
@@ -129,10 +127,6 @@ impl Expression for EqualityExpression {
         Type::Boolean
     }
 
-    fn has_errors(&self) -> bool {
-        !self.errors.is_empty()
-    }
-
     fn get_expr_type(&self) -> String {
         String::from("EqualityExpression")
     }
@@ -148,7 +142,6 @@ impl EqualityExpression {
             lhs,
             operator,
             rhs,
-            errors: vec![],
         }
     }
 

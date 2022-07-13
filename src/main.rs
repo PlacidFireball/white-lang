@@ -1,13 +1,10 @@
 mod tokenizer;
 use tokenizer::*;
 mod parser;
-use crate::program::Program;
 use parser::Parser;
 
 use std::cell::RefCell;
 use std::cell::Cell;
-use std::ops::DerefMut;
-use std::env;
 use std::env::args;
 use std::fs::File;
 use std::io::Read;
@@ -34,6 +31,7 @@ fn main() {
     let logger = Logger { enabled: Cell::new(true) };
     // open xxx.whl
     let args: Vec<String> = args().collect();
+    if args.len() < 2 { panic!("[FATAL] must supply a valid path to a .whl file") }
     let path = Path::new(&args[1]);
     let display = path.display();
     let mut file = match File::open(&path) {

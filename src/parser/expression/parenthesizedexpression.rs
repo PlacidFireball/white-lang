@@ -40,10 +40,6 @@ impl Expression for ParenthesizedExpression {
         self.expr.get_white_type()
     }
 
-    fn has_errors(&self) -> bool {
-        self.expr.has_errors()
-    }
-
     fn get_expr_type(&self) -> String {
         String::from("ParenthesizedExpression")
     }

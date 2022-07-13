@@ -11,7 +11,6 @@ pub(crate) struct FactorExpression {
     lhs: Box<dyn Expression>,
     operator: String,
     rhs: Box<dyn Expression>,
-    errors: Vec<ParserErrorType>,
     is_mult: bool,
 }
 
@@ -94,10 +93,6 @@ impl Expression for FactorExpression {
         Type::Integer
     }
 
-    fn has_errors(&self) -> bool {
-        !self.errors.is_empty()
-    }
-
     fn get_expr_type(&self) -> String {
         String::from("FactorExpression")
     }
@@ -113,7 +108,6 @@ impl FactorExpression {
             lhs,
             operator: operator.clone(),
             rhs,
-            errors: vec![],
             is_mult: operator.contains("*"),
         }
     }

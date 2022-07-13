@@ -7,13 +7,10 @@ use crate::runtime::Runtime;
 
 use std::any::Any;
 
-use crate::CORE_OBJECTS;
-
 #[derive(Clone, Debug)]
 pub(crate) struct AssignmentStatement {
     variable: Box<dyn Expression>,
     expr: Box<dyn Expression>,
-    errors: Vec<ParserErrorType>,
 }
 
 impl ToAny for AssignmentStatement {
@@ -72,9 +69,6 @@ impl Statement for AssignmentStatement {
         String::from("AssignmentStatement")
     }
 
-    fn has_errors(&self) -> bool {
-        !self.errors.is_empty()
-    }
 }
 
 impl AssignmentStatement {
@@ -82,7 +76,6 @@ impl AssignmentStatement {
         AssignmentStatement {
             variable: Box::new(SyntaxErrorExpression::new()),
             expr: Box::new(SyntaxErrorExpression::new()),
-            errors: vec![],
         }
     }
 

@@ -8,7 +8,6 @@ pub(crate) struct ReturnStatement {
     expr: Box<dyn Expression>,
     return_type: Type,
     function: String,
-    errors: Vec<ParserErrorType>,
 }
 
 impl ToAny for ReturnStatement {
@@ -44,10 +43,6 @@ impl Statement for ReturnStatement {
     fn get_statement_type(&self) -> String {
         String::from("ReturnStatement")
     }
-
-    fn has_errors(&self) -> bool {
-        !self.errors.is_empty()
-    }
 }
 impl ReturnStatement {
     pub fn new(expr: Box<dyn Expression>, function: String) -> ReturnStatement {
@@ -56,7 +51,6 @@ impl ReturnStatement {
             expr,
             return_type,
             function,
-            errors: vec![],
         }
     }
 }

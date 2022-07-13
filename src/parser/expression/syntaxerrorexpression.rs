@@ -36,10 +36,6 @@ impl Expression for SyntaxErrorExpression {
         Type::Error
     }
 
-    fn has_errors(&self) -> bool {
-        todo!()
-    }
-
     fn get_expr_type(&self) -> String {
         todo!()
     }

@@ -36,9 +36,6 @@ impl Statement for BreakStatement {
         String::from("BreakStatement")
     }
 
-    fn has_errors(&self) -> bool {
-        false
-    }
 }
 
 impl BreakStatement {

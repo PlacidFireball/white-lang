@@ -11,7 +11,6 @@ use std::any::Any;
 
 #[derive(Clone, Debug)]
 pub(crate) struct ForStatement {
-    errors: Vec<ParserErrorType>,
     statements: Vec<Box<dyn Statement>>,
     variable: Box<dyn Expression>, // list literal expression
     iterator: Box<dyn Expression>, // identifier expression
@@ -112,15 +111,11 @@ impl Statement for ForStatement {
         String::from("ForStatement")
     }
 
-    fn has_errors(&self) -> bool {
-        !self.errors.is_empty()
-    }
 }
 
 impl ForStatement {
     pub fn new() -> Self {
         ForStatement {
-            errors: vec![],
             statements: vec![],
             variable: Box::new(SyntaxErrorExpression::new()),
             iterator: Box::new(SyntaxErrorExpression::new()),

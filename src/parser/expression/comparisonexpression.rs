@@ -11,7 +11,6 @@ pub(crate) struct ComparisonExpression {
     lhs: Box<dyn Expression>,
     operator: String,
     rhs: Box<dyn Expression>,
-    errors: Vec<ParserErrorType>,
     is_greater: bool,
     is_less: bool,
     is_equal: bool,
@@ -107,9 +106,7 @@ impl Expression for ComparisonExpression {
         Type::Boolean
     }
 
-    fn has_errors(&self) -> bool {
-        !self.errors.is_empty()
-    }
+
 
     fn get_expr_type(&self) -> String {
         String::from("ComparisonExpression")
@@ -126,7 +123,6 @@ impl ComparisonExpression {
             lhs,
             operator: operator.clone(),
             rhs,
-            errors: vec![],
             is_greater: operator.contains(">"),
             is_less: operator.contains("<"),
             is_equal: operator.contains("="),

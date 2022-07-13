@@ -36,10 +36,6 @@ impl Expression for NullLiteralExpression {
         Type::Null
     }
 
-    fn has_errors(&self) -> bool {
-        todo!()
-    }
-
     fn get_expr_type(&self) -> String {
         String::from("NullLiteralExpression")
     }

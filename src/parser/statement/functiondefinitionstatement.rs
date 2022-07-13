@@ -5,7 +5,6 @@ use crate::parser::ParserErrorType::MismatchedTypes;
 use crate::parser::*;
 use crate::runtime::Runtime;
 use crate::IS_TESTING;
-use log::info;
 
 #[derive(Clone, Debug)]
 pub struct FunctionDefinitionStatement {
@@ -15,7 +14,6 @@ pub struct FunctionDefinitionStatement {
     arg_names: Vec<String>,
     arg_types: Vec<Type>,
     statements: Vec<Box<dyn Statement>>,
-    errors: Vec<ParserErrorType>,
 }
 
 impl ToAny for FunctionDefinitionStatement {
@@ -33,7 +31,6 @@ impl Default for FunctionDefinitionStatement {
             arg_names: vec![],
             arg_types: vec![],
             statements: vec![],
-            errors: vec![],
         }
     }
 }
@@ -78,9 +75,6 @@ impl Statement for FunctionDefinitionStatement {
         String::from("FunctionDefinitionStatement")
     }
 
-    fn has_errors(&self) -> bool {
-        !self.errors.is_empty()
-    }
 }
 impl FunctionDefinitionStatement {
     pub fn new(name: String) -> FunctionDefinitionStatement {
@@ -91,7 +85,6 @@ impl FunctionDefinitionStatement {
             arg_types: vec![],
             arg_names: vec![],
             statements: vec![],
-            errors: vec![],
         }
     }
 

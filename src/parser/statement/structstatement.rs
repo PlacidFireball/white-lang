@@ -1,12 +1,13 @@
 use std::any::Any;
 use std::collections::HashMap;
-use std::fmt::{Debug, Formatter};
+use std::fmt::{Debug};
 use crate::parser::parser_traits::{Expression, Statement, ToAny};
 use crate::parser::statement::functiondefinitionstatement::FunctionDefinitionStatement;
 use crate::parser::symbol_table::SymbolTable;
 use crate::parser::whitetypes::Type;
 use crate::runtime::Runtime;
 
+#[allow(dead_code)]
 #[derive(Clone, Debug)]
 struct StructStatement {
     name: String,
@@ -19,6 +20,7 @@ impl ToAny for StructStatement {
         self
     }
 }
+#[allow(dead_code, unused_variables)]
 impl Statement for StructStatement {
     fn execute(&self, runtime: &mut Runtime) {
         todo!()
@@ -43,11 +45,8 @@ impl Statement for StructStatement {
     fn get_statement_type(&self) -> String {
         todo!()
     }
-
-    fn has_errors(&self) -> bool {
-        todo!()
-    }
 }
+#[allow(dead_code)]
 impl StructStatement {
     pub fn new(name: String, typ: String) -> StructStatement {
         Self {
