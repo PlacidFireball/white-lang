@@ -13,6 +13,6 @@ pub(crate) mod logicalexpression;
 pub(crate) mod nullliteralexpression;
 pub(crate) mod parenthesizedexpression;
 pub(crate) mod stringliteralexpression;
+pub(crate) mod structexpression;
 pub(crate) mod syntaxerrorexpression;
 pub(crate) mod unaryexpression;
-pub(crate) mod structexpression;

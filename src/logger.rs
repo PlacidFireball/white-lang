@@ -1,7 +1,7 @@
 use std::cell::Cell;
 
 pub struct Logger {
-    pub enabled: Cell<bool>
+    pub enabled: Cell<bool>,
 }
 #[allow(dead_code)]
 impl Logger {
@@ -25,5 +25,4 @@ impl Logger {
             panic!("[ERROR] {}", msg);
         }
     }
-
 }

@@ -25,9 +25,9 @@ mod test {
     use crate::parser::statement::functioncallstatement::FunctionCallStatement;
     use crate::parser::statement::functiondefinitionstatement::FunctionDefinitionStatement;
     use crate::parser::statement::ifstatement::IfStatement;
+    use crate::parser::statement::printstatement::PrintStatement;
     use crate::parser::statement::variablestatement::VariableStatement;
     use crate::parser::statement::whilestatement::WhileStatement;
-    use crate::parser::statement::printstatement::PrintStatement;
     use crate::parser::symbol_table::SymbolTable;
     use crate::parser::whitetypes::Type;
     use crate::TokenType::*;
@@ -430,7 +430,13 @@ mod test {
     #[test]
     fn test_print_statement_parse() {
         let parser = init_parser("print(1);".to_string());
-        let _ = parser.statement_list.first().unwrap().to_any().downcast_ref::<PrintStatement>().unwrap();
+        let _ = parser
+            .statement_list
+            .first()
+            .unwrap()
+            .to_any()
+            .downcast_ref::<PrintStatement>()
+            .unwrap();
     }
 
     #[test]

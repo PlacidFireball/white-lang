@@ -65,11 +65,11 @@ pub enum TokenType {
     Break,      // break
     Struct,     // struct
     /* Future Tokens */
-    As,     // as
-    Arrow,  // ->
+    As,    // as
+    Arrow, // ->
     GoTo,
     Extends,
-    Implements
+    Implements,
 }
 #[allow(dead_code)]
 #[derive(PartialEq, Debug, Clone, Copy)]
@@ -582,8 +582,8 @@ impl Tokenizer {
 // Tests!
 #[cfg(test)]
 mod test {
-    use crate::TokenType::{Eof, Identifier, LeftBrace, LeftParen, RightBrace, RightParen, Struct};
     use super::*;
+    use crate::TokenType::{Eof, Identifier, LeftBrace, LeftParen, RightBrace, RightParen, Struct};
 
     fn init_test(test_src: String) -> Tokenizer {
         let mut tokenizer = Tokenizer::new(test_src);
@@ -764,7 +764,9 @@ mod test {
         let mut tokenizer = Tokenizer::new(String::from("struct X () {}"));
         tokenizer.tokenize();
         assert_eq!(tokenizer.token_list.len(), 7);
-        let token_types = vec![Struct, Identifier, LeftParen, RightParen, LeftBrace, RightBrace, Eof];
+        let token_types = vec![
+            Struct, Identifier, LeftParen, RightParen, LeftBrace, RightBrace, Eof,
+        ];
         for i in 0..tokenizer.token_list.len() - 1 {
             assert_eq!(tokenizer.token_list[i].get_type(), token_types[i]);
         }

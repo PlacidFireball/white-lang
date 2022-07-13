@@ -1,11 +1,11 @@
-use std::any::Any;
-use std::collections::HashMap;
-use std::fmt::{Debug};
 use crate::parser::parser_traits::{Expression, ToAny};
 use crate::parser::statement::functiondefinitionstatement::FunctionDefinitionStatement;
 use crate::parser::symbol_table::SymbolTable;
 use crate::parser::whitetypes::Type;
 use crate::runtime::Runtime;
+use std::any::Any;
+use std::collections::HashMap;
+use std::fmt::Debug;
 
 #[allow(dead_code)]
 #[derive(Clone, Debug)]
@@ -59,7 +59,7 @@ impl StructExpression {
             name,
             typ,
             fields: HashMap::new(),
-            methods: HashMap::new()
+            methods: HashMap::new(),
         }
     }
 

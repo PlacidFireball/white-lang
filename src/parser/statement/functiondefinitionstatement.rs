@@ -74,7 +74,6 @@ impl Statement for FunctionDefinitionStatement {
     fn get_statement_type(&self) -> String {
         String::from("FunctionDefinitionStatement")
     }
-
 }
 impl FunctionDefinitionStatement {
     pub fn new(name: String) -> FunctionDefinitionStatement {

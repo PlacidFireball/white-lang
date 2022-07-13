@@ -103,7 +103,6 @@ impl Expression for FunctionCallExpression {
         self.typ
     }
 
-
     fn get_expr_type(&self) -> String {
         String::from("FunctionCallExpression")
     }

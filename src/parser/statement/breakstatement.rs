@@ -35,7 +35,6 @@ impl Statement for BreakStatement {
     fn get_statement_type(&self) -> String {
         String::from("BreakStatement")
     }
-
 }
 
 impl BreakStatement {

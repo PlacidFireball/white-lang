@@ -138,11 +138,7 @@ impl EqualityExpression {
         operator: String,
         rhs: Box<dyn Expression>,
     ) -> EqualityExpression {
-        EqualityExpression {
-            lhs,
-            operator,
-            rhs,
-        }
+        EqualityExpression { lhs, operator, rhs }
     }
 
     fn get_lhs(&self) -> &Box<dyn Expression> {

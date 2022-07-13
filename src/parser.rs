@@ -42,11 +42,13 @@ use crate::config::WhiteLangFloat;
 use crate::parser::parser_traits::{Expression, Statement};
 use crate::parser::statement::breakstatement::BreakStatement;
 use crate::parser::ParserErrorType::UnterminatedArgList;
-use crate::{IS_TESTING, Logger};
+use crate::{Logger, IS_TESTING};
 use statement::variablestatement::VariableStatement;
 use symbol_table::SymbolTable;
 
-const LOGGER: Logger = Logger { enabled: Cell::new(true) };
+const LOGGER: Logger = Logger {
+    enabled: Cell::new(true),
+};
 
 // Parsing Errors
 #[derive(Clone, Copy, Debug, PartialOrd, PartialEq)]
@@ -568,7 +570,10 @@ impl Parser {
             self.consume_token();
             let rhs = self.parse_factor_expression(); // get the right hand side
             let additive_expr = AdditiveExpression::new(expr, operator.clone(), rhs);
-            LOGGER.info(format!("Parsed an additive expression: {:?}", additive_expr));
+            LOGGER.info(format!(
+                "Parsed an additive expression: {:?}",
+                additive_expr
+            ));
             expr = Box::new(additive_expr);
         }
         expr
@@ -617,7 +622,10 @@ impl Parser {
             self.consume_token(); // consume op
             let rhs = self.parse_function_call_expression(); // get the right hand side expression
             let comparison_expr = ComparisonExpression::new(expr, operator.clone(), rhs); // create the expression
-            LOGGER.info(format!("Parsed a comparison expression: {:?}", comparison_expr));
+            LOGGER.info(format!(
+                "Parsed a comparison expression: {:?}",
+                comparison_expr
+            ));
             return Box::new(comparison_expr); // return a box wrapper of the expression
         }
         expr // if we didn't parse a comparison expression, return whatever we parsed earlier
@@ -632,7 +640,10 @@ impl Parser {
             self.consume_token(); // consume the token
             let rhs = self.parse_expression(); // parse some other expression
             let equality_expr = EqualityExpression::new(expr, operator.clone(), rhs);
-            LOGGER.info(format!("Parsed an equality expression: {:?}", equality_expr));
+            LOGGER.info(format!(
+                "Parsed an equality expression: {:?}",
+                equality_expr
+            ));
             return Box::new(equality_expr); // return a box wrapper to the expr
         }
         expr
@@ -796,7 +807,10 @@ impl Parser {
             LOGGER.info(format!("Parsed a null literal: {:?}", expr));
             return Box::new(expr);
         }
-        LOGGER.warn(format!("Couldn't parse an expression. Token: {}", self.get_curr_tok()));
+        LOGGER.warn(format!(
+            "Couldn't parse an expression. Token: {}",
+            self.get_curr_tok()
+        ));
         Box::new(SyntaxErrorExpression::new())
     }
 }

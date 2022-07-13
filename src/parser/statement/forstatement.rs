@@ -110,7 +110,6 @@ impl Statement for ForStatement {
     fn get_statement_type(&self) -> String {
         String::from("ForStatement")
     }
-
 }
 
 impl ForStatement {

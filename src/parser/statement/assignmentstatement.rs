@@ -68,7 +68,6 @@ impl Statement for AssignmentStatement {
     fn get_statement_type(&self) -> String {
         String::from("AssignmentStatement")
     }
-
 }
 
 impl AssignmentStatement {

@@ -106,8 +106,6 @@ impl Expression for ComparisonExpression {
         Type::Boolean
     }
 
-
-
     fn get_expr_type(&self) -> String {
         String::from("ComparisonExpression")
     }
