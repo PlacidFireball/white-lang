@@ -25,8 +25,14 @@ thread_local! {
 fn main() {
     CORE_OBJECTS.with(|core| {
         core.borrow_mut().set_src(
-            "\
-            print(\"Hello World!\");\
+            "
+            print(\"Hello World!\");
+            let x : int = 11;
+            if (x == 10) {
+                print(\"x is 10!\");
+            } else {
+                print(\"x is not 10\");
+            }
             ",
         );
         core.borrow_mut().get_program().execute();
