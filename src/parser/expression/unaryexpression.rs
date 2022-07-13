@@ -6,7 +6,7 @@ use crate::parser::ParserErrorType;
 use crate::runtime::Runtime;
 use std::any::Any;
 
-#[derive(Clone)]
+#[derive(Clone,Debug)]
 pub(crate) struct UnaryExpression {
     operator: String,
     expr: Box<dyn Expression>,
@@ -22,6 +22,7 @@ impl ToAny for UnaryExpression {
 
 impl Expression for UnaryExpression {
     fn evaluate(&self, runtime: &mut Runtime) -> Box<dyn Any> {
+        println!("[UNARY EXPR] eval: {:?}", self);
         if self.is_not {
             let eval = self.expr.evaluate(runtime);
             if let Some(eval_bool) = eval.downcast_ref::<bool>() {

@@ -6,7 +6,7 @@ use crate::parser::parser_traits::{try_print_output, Expression, ToAny, add_pars
 use crate::parser::symbol_table::SymbolTable;
 use crate::runtime::Runtime;
 use std::any::Any;
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub(crate) struct AdditiveExpression {
     lhs: Box<dyn Expression>,
     operator: String,

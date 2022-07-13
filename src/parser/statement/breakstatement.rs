@@ -4,7 +4,7 @@ use crate::runtime::Runtime;
 
 use std::any::Any;
 
-#[derive(Clone)]
+#[derive(Clone,Debug)]
 pub(crate) struct BreakStatement {
 
 }

@@ -7,7 +7,7 @@ use crate::parser::ParserErrorType;
 use crate::runtime::Runtime;
 use std::any::Any;
 
-#[derive(Clone)]
+#[derive(Clone,Debug)]
 pub(crate) struct EqualityExpression {
     lhs: Box<dyn Expression>,
     operator: String,

@@ -9,7 +9,7 @@ use crate::parser::statement::breakstatement::BreakStatement;
 use std::any::Any;
 use std::ops::DerefMut;
 
-#[derive(Clone)]
+#[derive(Clone,Debug)]
 pub struct WhileStatement {
     body: Vec<Box<dyn Statement>>,
     expr: Box<dyn Expression>,

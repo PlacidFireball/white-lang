@@ -20,6 +20,7 @@ use crate::parser::statement::forstatement::ForStatement;
 use crate::parser::symbol_table::SymbolTable;
 use crate::parser::whitetypes::Type;
 use std::any::Any;
+use std::fmt::Debug;
 use crate::config::{WhiteLangBool, WhiteLangFloat, WhiteLangInt, WhiteLangList, WhiteLangString};
 
 use crate::parser::statement::functioncallstatement::FunctionCallStatement;
@@ -107,7 +108,7 @@ pub fn try_print_output(evaluated: &Box<dyn Any>) -> String {
 }
 
 #[allow(dead_code)]
-pub trait Expression: ToAny {
+pub trait Expression: ToAny + Debug {
     fn evaluate(&self, runtime: &mut Runtime) -> Box<dyn Any>; // evaluate the expression
     fn compile(&self); // compile the expression to nasm
     fn transpile(&self); // transpile the expression to javascript
@@ -160,7 +161,7 @@ impl Clone for Box<dyn Expression> {
 }
 
 #[allow(dead_code)]
-pub trait Statement: ToAny {
+pub trait Statement: ToAny + Debug {
     fn execute(&self, runtime: &mut Runtime); // execute the statement
     fn compile(&self); // compile the statement to nasm
     fn transpile(&self) -> String; // transpile the statement to Javascript

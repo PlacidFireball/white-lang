@@ -5,7 +5,7 @@ use crate::runtime::Runtime;
 use std::any::Any;
 use crate::parser::expression::syntaxerrorexpression::SyntaxErrorExpression;
 
-#[derive(Clone)]
+#[derive(Clone,Debug)]
 pub struct FunctionCallStatement {
     name: String,
     expr: Box<dyn Expression>,

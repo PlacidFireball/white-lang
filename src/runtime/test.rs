@@ -1,6 +1,7 @@
 #[cfg(test)]
 mod test {
     use crate::*;
+    use std::cell::Cell;
 
     fn init_parser(src: String) -> Parser {
         let tokenizer: Tokenizer = Tokenizer::init(src);
@@ -8,11 +9,10 @@ mod test {
     }
 
     fn test_execute(src: &str, expected: &str) {
-        let mut parser = init_parser(src.to_string());
-        parser.parse();
-        let mut program = Program::from_parser(&mut parser);
-        program.execute();
-        assert_eq!(program.stdout.as_str(), expected);
+        IS_TESTING.with(|t| t.set(true));
+        let mut core: CoreObjects = CoreObjects::new(src);
+        core.get_program().execute();
+        assert_eq!(core.get_program().stdout.as_str(), expected);
     }
 
     #[test]

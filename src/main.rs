@@ -23,6 +23,8 @@ thread_local! {
             foo(1);"
         )
     );
+
+    pub static IS_TESTING: std::cell::Cell<bool> = std::cell::Cell::new(false);
 }
 
 #[allow(unused_variables)]

@@ -6,9 +6,9 @@ use crate::parser::ParserErrorType::{MismatchedTypes, SymbolDefinitionError, Une
 use crate::runtime::Runtime;
 use std::any::Any;
 use crate::parser::expression::syntaxerrorexpression::SyntaxErrorExpression;
-use crate::parser::test::IS_TESTING;
+use crate::IS_TESTING;
 
-#[derive(Clone)]
+#[derive(Clone,Debug)]
 pub(crate) struct VariableStatement {
     name: String,
     expr: Box<dyn Expression>,

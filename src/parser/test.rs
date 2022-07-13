@@ -2,12 +2,6 @@
 /// WhiteLang Parser Tests
 ///
 
-use std::cell::Cell;
-
-thread_local! {
-    pub static IS_TESTING: Cell<bool> = Cell::new(false);
-}
-
 #[cfg(test)]
 mod test {
     use std::any::Any;
@@ -42,7 +36,7 @@ mod test {
     use crate::Tokenizer;
     use crate::tokenizer::Token;
     use crate::{CoreObjects, Parser};
-    use crate::parser::test::IS_TESTING;
+    use crate::IS_TESTING;
 
     fn init_parser(src: String) -> Parser {
         IS_TESTING.with(|test| test.set(true));
@@ -281,15 +275,19 @@ mod test {
     #[test]
     /// beefy test for parsing unary expressions
     fn test_unary_expressions() {
-        let mut parser = init_parser("not not true".to_string()); // not not true is valid WhiteLang :)
+        let mut parser = init_parser("not true".to_string());
         let mut expr = parser.expr.clone();
         assert!(expr.to_any().downcast_ref::<UnaryExpression>().is_some());
-        parser = init_parser("-(-1)".to_string());
+        parser = init_parser("-1".to_string());
         expr = parser.expr.clone();
         assert!(expr.to_any().downcast_ref::<UnaryExpression>().is_some());
-        parser = init_parser("not 2 > 3".to_string()); // negation of larger expressions
+        parser = init_parser("-1.1314".to_string());
         expr = parser.expr.clone();
         assert!(expr.to_any().downcast_ref::<UnaryExpression>().is_some());
+        // TODO: maybe support this later?
+        //parser = init_parser("not (2 > 3)".to_string()); // negation of larger expressions
+        //expr = parser.expr.clone();
+        //assert!(expr.to_any().downcast_ref::<UnaryExpression>().is_some());
         /*
         // TODO: potentially make not do bitwise negation instead of throwing an error
         // commented this part of the test out because the program will panic on parse errors now
@@ -505,7 +503,6 @@ mod test {
         }"
         .to_string();
         let mut parser = init_parser(src);
-        let mut st = SymbolTable::new();
         let mut variable = parser.statement_list[0].clone();
         let mut for_stmt = parser.statement_list[1].clone();
         assert!(variable
@@ -516,5 +513,19 @@ mod test {
         assert!(!variable.has_errors());
         assert!(!parser.has_errors());
         assert!(!for_stmt.has_errors());
+    }
+
+    #[test]
+    /*
+    This test comes from recursion adventures with the fibonacci sequence
+    fib(x-1) -> fib(x, -1) somehow
+    */
+    fn test_subtractive_expression_parses_correctly() {
+        let parser = init_parser("x-1".to_string());
+        assert!(parser.expr.clone().to_any().downcast_ref::<AdditiveExpression>().is_some());
+        let expr= parser.expr.clone();
+        let additive_expr = expr.to_any().downcast_ref::<AdditiveExpression>().unwrap();
+        assert!(additive_expr.get_lhs().to_any().downcast_ref::<IdentifierExpression>().is_some());
+        assert!(additive_expr.get_rhs().to_any().downcast_ref::<IntegerLiteralExpression>().is_some());
     }
 }

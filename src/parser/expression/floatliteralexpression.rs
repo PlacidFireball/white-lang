@@ -5,7 +5,7 @@ use crate::parser::whitetypes::Type;
 use crate::runtime::Runtime;
 use std::any::Any;
 
-#[derive(Clone)]
+#[derive(Clone,Debug)]
 pub struct FloatLiteralExpression {
     value: WhiteLangFloat,
 }

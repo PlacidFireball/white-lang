@@ -9,7 +9,7 @@ use crate::runtime::Runtime;
 use std::any::Any;
 use crate::parser::ParserErrorType::IncompatibleTypes;
 
-#[derive(Clone)]
+#[derive(Clone,Debug)]
 pub(crate) struct ForStatement {
     errors: Vec<ParserErrorType>,
     statements: Vec<Box<dyn Statement>>,

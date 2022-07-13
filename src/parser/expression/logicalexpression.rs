@@ -6,7 +6,7 @@ use crate::runtime::Runtime;
 use std::any::Any;
 use crate::parser::ParserErrorType::MismatchedTypes;
 
-#[derive(Clone)]
+#[derive(Clone,Debug)]
 pub(crate) struct LogicalExpression {
     lhs: Box<dyn Expression>,
     rhs: Box<dyn Expression>,

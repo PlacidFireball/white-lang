@@ -3,7 +3,7 @@ use crate::parser::symbol_table::SymbolTable;
 use crate::parser::*;
 use crate::runtime::Runtime;
 
-#[derive(Clone)]
+#[derive(Clone,Debug)]
 pub(crate) struct ReturnStatement {
     expr: Box<dyn Expression>,
     return_type: Type,

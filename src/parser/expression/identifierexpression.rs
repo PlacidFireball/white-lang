@@ -6,7 +6,7 @@ use crate::parser::ParserErrorType::UnknownName;
 use crate::runtime::Runtime;
 use std::any::Any;
 
-#[derive(Clone)]
+#[derive(Clone,Debug)]
 pub(crate) struct IdentifierExpression {
     name: String,
     typ: Type,

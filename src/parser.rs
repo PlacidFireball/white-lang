@@ -43,7 +43,7 @@ use crate::parser::statement::breakstatement::BreakStatement;
 use statement::variablestatement::VariableStatement;
 use symbol_table::SymbolTable;
 use crate::parser::ParserErrorType::UnterminatedArgList;
-use crate::parser::test::IS_TESTING;
+use crate::IS_TESTING;
 
 // Parsing Errors
 #[derive(Clone, Copy, Debug, PartialOrd, PartialEq)]
@@ -174,7 +174,7 @@ impl Parser {
 
     // tells us if parsing is done or not
     fn has_tokens(&self) -> bool {
-        println!("current index: {} has_tokens: {}", self.curr_idx, self.get_curr_tok().get_type().ne(&Eof));
+        //println!("current index: {} has_tokens: {}", self.curr_idx, self.get_curr_tok().get_type().ne(&Eof));
         self.get_curr_tok().get_type().ne(&Eof)
     }
 
@@ -193,7 +193,7 @@ impl Parser {
 
     // consumes the token unconditionally
     fn consume_token(&mut self) {
-        println!("-->{}<--", self.get_curr_tok().get_string_value());
+        //println!("-->{}<--", self.get_curr_tok().get_string_value());
         self.curr_idx += 1;
     }
 
@@ -204,11 +204,11 @@ impl Parser {
 
     // will match and a token at token_list[curr_idx] if its type = typ
     fn match_token(&self, typ: TokenType) -> bool {
-        println!("{} == {} -> {}",
-            self.token_list[self.curr_idx].get_type(),
-            typ,
-            self.token_list[self.curr_idx].get_type().eq(&typ)
-        );
+        // println!("{} == {} -> {}",
+        //     self.token_list[self.curr_idx].get_type(),
+        //     typ,
+        //     self.token_list[self.curr_idx].get_type().eq(&typ)
+        // );
         self.token_list[self.curr_idx].get_type().eq(&typ)
     }
 
@@ -355,7 +355,10 @@ impl Parser {
                 fds.add_statement(stmt);
             }
             self.curr_fn_def = String::new();
-            self.st.register_function(name, fds.clone());
+            self.st.register_function(name.clone(), fds.clone());
+            println!(
+                "[PARSE DEBUG] Parsed a function definition\n| name: {}\n| arg names: {:?}", name, fds.get_arg_names()
+            );
             return Option::Some(fds);
         }
         Option::None
@@ -661,7 +664,7 @@ impl Parser {
             // match either not or -
             let operator = self.get_curr_tok().get_string_value(); // get the op sign
             self.consume_token(); // consume the token
-            let expr = self.parse_expression(); // parse some other expression
+            let expr = self.parse_float_literal_expression(); // parse some other expression
             let unary_expr = UnaryExpression::new(operator, expr); // create the new expr
             return Box::new(unary_expr); // return a box wrapper
         }

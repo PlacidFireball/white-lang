@@ -6,7 +6,7 @@ use crate::parser::ParserErrorType::{ArgMismatch, UnknownName, IncompatibleTypes
 use crate::runtime::Runtime;
 use std::any::Any;
 
-#[derive(Clone)]
+#[derive(Clone,Debug)]
 pub(crate) struct FunctionCallExpression {
     name: String,
     args: Vec<Box<dyn Expression>>,
@@ -38,14 +38,18 @@ impl Expression for FunctionCallExpression {
             }
             evaluated_args.push(tmp);
         }
-        for (i, arg) in evaluated_args.iter().enumerate() {
+        assert_eq!(self.args.len(), evaluated_args.len());
+        /*for (i, arg) in evaluated_args.iter().enumerate() {
             println!(
                 "[FNCALL: {}]: Arg Name: {}\tValue: {}",
                 self.name,
                 fds.get_arg_names()[i],
                 try_print_output(&arg.evaluate(runtime))
             );
-        }
+        }*/
+        println!(
+            "[FUNCTION CALL] invoking {}...\n| args: {:?}", self.name, self.args
+        );
         let value = fds.invoke(runtime, evaluated_args);
         runtime.pop_scope();
         value

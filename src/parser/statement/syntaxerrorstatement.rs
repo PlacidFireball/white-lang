@@ -3,7 +3,7 @@ use crate::parser::symbol_table::SymbolTable;
 use crate::runtime::Runtime;
 use std::any::Any;
 
-#[derive(Clone)]
+#[derive(Clone,Debug)]
 pub(crate) struct SyntaxErrorStatement {}
 
 impl ToAny for SyntaxErrorStatement {

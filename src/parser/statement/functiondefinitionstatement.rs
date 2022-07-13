@@ -5,9 +5,9 @@ use crate::parser::*;
 use crate::runtime::Runtime;
 use log::info;
 use crate::parser::ParserErrorType::MismatchedTypes;
-use crate::parser::test::IS_TESTING;
+use crate::IS_TESTING;
 
-#[derive(Clone)]
+#[derive(Clone,Debug)]
 pub struct FunctionDefinitionStatement {
     name: String,
     return_type: Type,
@@ -122,12 +122,12 @@ impl FunctionDefinitionStatement {
     pub fn invoke(&self, runtime: &mut Runtime, args: Vec<Box<dyn Expression>>) -> Box<dyn Any> {
         runtime.push_scope(String::from("fn"));
         for (i, arg) in args.iter().enumerate() {
-            println!(
+            /*println!(
                 "Function Call: {} Argument: {} Value: {}",
                 self.name,
                 self.arg_names[i],
                 try_print_output(&arg.evaluate(runtime))
-            );
+            );*/
             runtime.set_value(self.arg_names[i].clone(), arg.clone());
         }
         for statement in &self.statements {

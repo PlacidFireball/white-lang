@@ -8,7 +8,7 @@ use crate::parser::ParserErrorType::UnexpectedToken;
 use crate::runtime::Runtime;
 use std::any::Any;
 
-#[derive(Clone)]
+#[derive(Clone,Debug)]
 pub struct IfStatement {
     true_stmts: Vec<Box<dyn Statement>>,
     false_stmts: Vec<Box<dyn Statement>>,

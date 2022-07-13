@@ -6,7 +6,7 @@ use crate::runtime::Runtime;
 use std::any::Any;
 use crate::parser::ParserErrorType::MismatchedTypes;
 
-#[derive(Clone)]
+#[derive(Clone,Debug)]
 pub(crate) struct ListLiteralExpression {
     exprs: Vec<Box<dyn Expression>>,
     inferred_type: Type,
