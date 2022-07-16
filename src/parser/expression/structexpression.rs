@@ -7,9 +7,27 @@ use std::any::Any;
 use std::collections::HashMap;
 use std::fmt::Debug;
 
+
+/*
+// struct definition
+struct __NAME__ {
+    __field__: type,
+    __field__: type,
+    ...
+} implement __NAME__ {
+    fn some_fn(args) {}
+    ...
+} 
+
+// struct expression
+let x : __NAME__ = __NAME__ ( __field__ = value , __field__ = value ... )
+x.some_fn(args)
+*/
+
+
 #[allow(dead_code)]
 #[derive(Clone, Debug)]
-struct StructExpression {
+pub struct StructExpression {
     name: String,
     typ: String,
     fields: HashMap<String, Box<dyn Expression>>,

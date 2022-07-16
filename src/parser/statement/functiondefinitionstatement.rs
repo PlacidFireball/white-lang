@@ -52,7 +52,7 @@ impl Statement for FunctionDefinitionStatement {
     fn validate(&mut self, st: &mut SymbolTable) {
         let mut i = 0;
         for arg in &mut self.args {
-            st.register_symbol(arg.debug(), self.arg_types[i]);
+            st.register_symbol(arg.debug(), self.arg_types[i].clone());
             i += 1;
             arg.validate(st);
         }
@@ -97,7 +97,7 @@ impl FunctionDefinitionStatement {
     }
 
     pub fn get_return_type(&self) -> Type {
-        self.return_type
+        self.return_type.clone()
     }
     pub fn set_return_type(&mut self, return_type: Type) {
         self.return_type = return_type;

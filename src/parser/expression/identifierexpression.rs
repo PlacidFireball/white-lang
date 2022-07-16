@@ -43,7 +43,7 @@ impl Expression for IdentifierExpression {
         if opt_typ.is_some() {
             self.typ = opt_typ.unwrap();
         }
-        if opt_typ.is_none() {
+        else {
             self.typ = Type::Error;
             LOGGER.warn(format!("Couldn't get the type for identifier {:?}", self));
             add_parser_error(
@@ -61,7 +61,7 @@ impl Expression for IdentifierExpression {
     }
 
     fn get_white_type(&self) -> Type {
-        self.typ
+        self.typ.clone()
     }
 
     fn get_expr_type(&self) -> String {

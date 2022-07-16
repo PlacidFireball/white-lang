@@ -118,7 +118,7 @@ impl Expression for FunctionCallExpression {
     }
 
     fn get_white_type(&self) -> Type {
-        self.typ
+        self.typ.clone()
     }
 
     fn get_expr_type(&self) -> String {

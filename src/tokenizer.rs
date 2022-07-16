@@ -64,6 +64,7 @@ pub enum TokenType {
     False,      // false
     Break,      // break
     Struct,     // struct
+    Implement,  // implement
     /* Future Tokens */
     As,    // as
     Arrow, // ->
@@ -163,6 +164,7 @@ fn init_keywords() -> HashMap<String, TokenType> {
     keywords.insert("goto".to_string(), TokenType::GoTo);
     // objects
     keywords.insert("struct".to_string(), TokenType::Struct);
+    keywords.insert("implement".to_string(), TokenType::Implement);
     keywords.insert("extends".to_string(), TokenType::Extends);
     keywords.insert("implements".to_string(), TokenType::Implements);
     keywords

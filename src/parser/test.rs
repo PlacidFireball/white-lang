@@ -26,6 +26,7 @@ mod test {
     use crate::parser::statement::functiondefinitionstatement::FunctionDefinitionStatement;
     use crate::parser::statement::ifstatement::IfStatement;
     use crate::parser::statement::printstatement::PrintStatement;
+    use crate::parser::statement::structdefinitionstatement::StructDefinitionStatement;
     use crate::parser::statement::variablestatement::VariableStatement;
     use crate::parser::statement::whilestatement::WhileStatement;
     use crate::parser::symbol_table::SymbolTable;
@@ -535,5 +536,23 @@ mod test {
             .to_any()
             .downcast_ref::<IntegerLiteralExpression>()
             .is_some());
+    }
+
+    #[test]
+    fn test_struct_definition_no_methods_parses() {
+        let parser = init_parser("
+        struct X { y: string, z: int };
+        ".to_string());
+        crate::LOGGER.info(format!("{:?}", parser.statement_list[0]));
+        assert!(parser.statement_list[0].clone().to_any().downcast_ref::<StructDefinitionStatement>().is_some());
+    }
+
+    #[test]
+    fn test_struct_definition_methods_parses() {
+        let parser = init_parser("
+        struct X { y: string, z: int } implement X { fn foo(xx: string) {} fn bar(xy: int) {} fn baz(xz: float) {} };
+        ".to_string());
+        crate::LOGGER.info(format!("{:?}", parser.statement_list[0]));
+        assert!(parser.statement_list[0].clone().to_any().downcast_ref::<StructDefinitionStatement>().is_some());
     }
 }

@@ -29,7 +29,7 @@ use expression::syntaxerrorexpression::SyntaxErrorExpression;
 use expression::unaryexpression::UnaryExpression;
 use statement::forstatement::ForStatement;
 use statement::whilestatement::WhileStatement;
-
+use statement::structdefinitionstatement::StructDefinitionStatement;
 use statement::functiondefinitionstatement::FunctionDefinitionStatement;
 use statement::returnstatement::ReturnStatement;
 
@@ -273,7 +273,7 @@ impl Parser {
     }
 
     fn require_a_type(&mut self) -> Type {
-        let types = vec!["string", "bool", "float", "int", "void"]; // all the types we can assign to so far
+        let types = vec!["string", "bool", "float", "int", "void"]; // all the primitive types we can assign to so far
         let curr_tok = self.get_curr_tok().get_string_value();
         for i in 0..types.len() - 1 {
             // try to match some type, if we get a good one, return it
@@ -349,6 +349,10 @@ impl Parser {
         let break_stmt = self.parse_break_statement();
         if break_stmt.is_some() {
             return Box::new(break_stmt.unwrap());
+        }
+        let struct_def_stmt = self.parse_struct_definition_statement();
+        if struct_def_stmt.is_some() {
+            return Box::new(struct_def_stmt.unwrap());
         }
         panic!(
             "Parse error occurred at token {}",
@@ -543,6 +547,53 @@ impl Parser {
         if self.match_and_consume(TokenType::Break) {
             self.require_token(TokenType::SemiColon);
             return Option::Some(BreakStatement::new());
+        }
+        None
+    }
+
+    fn parse_struct_definition_statement(&mut self) -> Option<StructDefinitionStatement> {
+        if self.match_and_consume(TokenType::Struct) {
+            let name = self.get_curr_tok().get_string_value();
+            let mut sds = StructDefinitionStatement::new(name.clone());
+            self.consume_token();
+            self.require_token(TokenType::LeftBrace);
+            while !self.match_and_consume(TokenType::RightBrace) {
+                let expr = self.parse_identifier_expression();
+                self.require_token(TokenType::Colon);
+                let typ = self.require_a_type();
+                sds.add_field(expr.debug(), typ);
+                self.match_and_consume(TokenType::Comma);
+                if !self.has_tokens() {
+                    LOGGER.warn(format!("Unexpected token: {:?} while parsing struct definition.", self.get_curr_tok()));
+                    self.errors.push(ParserErrorType::UnexpectedToken);
+                }
+            }
+            if self.match_and_consume(TokenType::Implement) {
+                if self.match_str_val(name.clone()) {
+                    self.consume_token();
+                    self.require_token(TokenType::LeftBrace);
+                    while !self.match_and_consume(TokenType::RightBrace) {
+                        let method_opt = self.parse_function_definition_statement();
+                        if method_opt.is_some() {
+                            let method = method_opt.unwrap();
+                            sds.add_method(method.name.clone(), method.clone());
+                        } else {
+                            self.errors.push(ParserErrorType::UnexpectedToken);
+                            self.check_for_parse_errors();
+                        }
+                        if !self.has_tokens() {
+                            LOGGER.warn(format!("Unexpected token: {:?} while parsing struct definition.", self.get_curr_tok()));
+                            self.errors.push(ParserErrorType::UnexpectedToken);
+                            self.check_for_parse_errors();
+                        }
+                    }
+                } else {
+                    self.errors.push(ParserErrorType::UnexpectedToken);
+                    self.check_for_parse_errors();
+                }
+            }
+            self.require_token(TokenType::SemiColon);
+            return Some(sds);
         }
         None
     }

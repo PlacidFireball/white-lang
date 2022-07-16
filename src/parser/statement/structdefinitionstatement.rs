@@ -1,4 +1,5 @@
-use crate::parser::parser_traits::{Expression, Statement, ToAny};
+use crate::parser::ParserErrorType;
+use crate::parser::parser_traits::{Expression, Statement, ToAny, add_parser_error};
 use crate::parser::statement::functiondefinitionstatement::FunctionDefinitionStatement;
 use crate::parser::symbol_table::SymbolTable;
 use crate::parser::whitetypes::Type;
@@ -9,19 +10,19 @@ use std::fmt::Debug;
 
 #[allow(dead_code)]
 #[derive(Clone, Debug)]
-struct StructStatement {
-    name: String,
-    typ: String,
+pub struct StructDefinitionStatement {
+    pub name: String,
+    typ: Type,
     fields: HashMap<String, Type>,
     methods: HashMap<String, FunctionDefinitionStatement>,
 }
-impl ToAny for StructStatement {
+impl ToAny for StructDefinitionStatement {
     fn to_any(&self) -> &dyn Any {
         self
     }
 }
 #[allow(dead_code, unused_variables)]
-impl Statement for StructStatement {
+impl Statement for StructDefinitionStatement {
     fn execute(&self, runtime: &mut Runtime) {
         todo!()
     }
@@ -35,7 +36,19 @@ impl Statement for StructStatement {
     }
 
     fn validate(&mut self, st: &mut SymbolTable) {
-        todo!()
+        if st.has_symbol(self.name.clone()) {
+            add_parser_error(ParserErrorType::DuplicateName, format!("Duplicate name `{}`", self.name));
+        }
+        st.register_symbol(self.name.clone(), self.typ.clone());
+        for (name, typ) in self.fields.iter() {
+            st.register_symbol(format!("{}.{}", self.name, name), typ.clone());
+        }
+        for (name, method) in self.methods.iter() {
+            let mut func = method.clone();
+            func.name = format!("{}.{}", self.name, name);
+            func.validate(st);
+            st.register_function(func.name.clone(), func);
+        }
     }
 
     fn get_expr(&self) -> &Box<dyn Expression> {
@@ -43,15 +56,15 @@ impl Statement for StructStatement {
     }
 
     fn get_statement_type(&self) -> String {
-        todo!()
+        String::from("StructDefinitionStatement")
     }
 }
 #[allow(dead_code)]
-impl StructStatement {
-    pub fn new(name: String, typ: String) -> StructStatement {
+impl StructDefinitionStatement {
+    pub fn new(name: String) -> StructDefinitionStatement {
         Self {
-            name,
-            typ,
+            name: name.clone(),
+            typ: Type::Struct(name.clone()),
             fields: HashMap::new(),
             methods: HashMap::new(),
         }

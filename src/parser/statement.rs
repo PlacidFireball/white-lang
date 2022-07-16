@@ -7,7 +7,7 @@ pub(crate) mod functiondefinitionstatement;
 pub(crate) mod ifstatement;
 pub(crate) mod printstatement;
 pub(crate) mod returnstatement;
-pub(crate) mod structstatement;
+pub(crate) mod structdefinitionstatement;
 pub(crate) mod syntaxerrorstatement;
 pub(crate) mod variablestatement;
 pub(crate) mod whilestatement;

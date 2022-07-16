@@ -15,13 +15,7 @@ use crate::parser::expression::parenthesizedexpression::ParenthesizedExpression;
 use crate::parser::expression::stringliteralexpression::StringLiteralExpression;
 use crate::parser::expression::syntaxerrorexpression::SyntaxErrorExpression;
 use crate::parser::expression::unaryexpression::UnaryExpression;
-use crate::parser::statement::assignmentstatement::AssignmentStatement;
-use crate::parser::statement::breakstatement::BreakStatement;
-use crate::parser::statement::forstatement::ForStatement;
-use crate::parser::symbol_table::SymbolTable;
-use crate::parser::whitetypes::Type;
-use std::any::Any;
-use std::fmt::Debug;
+use crate::parser::expression::structexpression::StructExpression;
 
 use crate::parser::statement::functioncallstatement::FunctionCallStatement;
 use crate::parser::statement::functiondefinitionstatement::FunctionDefinitionStatement;
@@ -31,12 +25,20 @@ use crate::parser::statement::returnstatement::ReturnStatement;
 use crate::parser::statement::syntaxerrorstatement::SyntaxErrorStatement;
 use crate::parser::statement::variablestatement::VariableStatement;
 use crate::parser::statement::whilestatement::WhileStatement;
+use crate::parser::statement::structdefinitionstatement::StructDefinitionStatement;
+use crate::parser::statement::assignmentstatement::AssignmentStatement;
+use crate::parser::statement::breakstatement::BreakStatement;
+use crate::parser::statement::forstatement::ForStatement;
+
 use crate::runtime::Runtime;
 use crate::Parser;
 use crate::LOGGER;
 
 use crate::parser::ParserErrorType;
-
+use crate::parser::symbol_table::SymbolTable;
+use crate::parser::whitetypes::Type;
+use std::any::Any;
+use std::fmt::Debug;
 use std::panic;
 
 pub trait ToAny: 'static {
@@ -155,6 +157,8 @@ impl Clone for Box<dyn Expression> {
             return Box::new(expr.clone());
         } else if let Some(expr) = self.to_any().downcast_ref::<LogicalExpression>() {
             return Box::new(expr.clone());
+        } else if let Some(expr) = self.to_any().downcast_ref::<StructExpression>() {
+            return Box::new(expr.clone());
         }
         panic!("Didn't cover expressions exhaustively")
     }
@@ -194,7 +198,9 @@ impl Clone for Box<dyn Statement> {
             return Box::new(stmt.clone());
         } else if let Some(stmt) = self.to_any().downcast_ref::<BreakStatement>() {
             return Box::new(stmt.clone());
-        }
+        } else if let Some(stmt) = self.to_any().downcast_ref::<StructDefinitionStatement>() {
+            return Box::new(stmt.clone());
+        } 
         panic!("Didn't cover statements exhaustively");
     }
 }

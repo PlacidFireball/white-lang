@@ -47,7 +47,7 @@ impl Statement for VariableStatement {
             "Registering `{}` with type {:?}",
             self.name, self.typ
         ));
-        st.register_symbol(self.name.clone(), self.typ);
+        st.register_symbol(self.name.clone(), self.typ.clone());
     }
 
     fn get_expr(&self) -> &Box<dyn Expression> {
@@ -81,6 +81,6 @@ impl VariableStatement {
     }
     #[allow(dead_code)]
     pub fn get_type(&self) -> Type {
-        self.typ
+        self.typ.clone()
     }
 }

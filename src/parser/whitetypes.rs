@@ -1,4 +1,4 @@
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum Type {
     Char,
     String,
@@ -13,6 +13,8 @@ pub enum Type {
     ListFloat,
     ListBoolean,
     ListObject,
+    Struct(String),
+    ListStruct(String),
     Initialized,
     Void,
     Error,
@@ -54,6 +56,10 @@ impl Type {
             ListFloat => ListFloat,
             ListBoolean => ListBoolean,
             ListObject => ListObject,
+            Struct(a) => {
+                ListStruct(a.clone())
+            },
+            ListStruct { .. } => self.clone(),
             Initialized => Error,
             Void => Error,
             Error => Error,
@@ -68,7 +74,7 @@ impl Type {
             ListFloat => Float,
             ListBoolean => Boolean,
             ListObject => Object,
-            _ => *self,
+            _ => self.clone(),
         }
     }
     pub fn is_assignable_to(&self, other: Type) -> bool {
