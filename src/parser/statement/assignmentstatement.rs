@@ -65,14 +65,14 @@ impl Statement for AssignmentStatement {
         if !self
             .expr
             .get_white_type()
-            .is_assignable_from(self.variable.get_white_type())
+            .is_assignable_to(self.variable.get_white_type())
         {
             add_parser_error(
                 ParserErrorType::IncompatibleTypes,
                 format!(
                     "You cannot assign {:?} to {:?}",
-                    self.variable.get_white_type(),
-                    self.expr.get_white_type()
+                    self.expr.get_white_type(),
+                    self.variable.get_white_type()
                 ),
             );
         }

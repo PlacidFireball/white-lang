@@ -78,6 +78,7 @@ impl Expression for FunctionCallExpression {
             self.typ = Type::Null; // TODO: default typing (maybe Object)
         } else {
             let mut fds = fds_opt.unwrap();
+            self.typ = fds.get_return_type();
             let args = fds.get_args();
             if self.args.len() != args.len() {
                 add_parser_error(
@@ -88,8 +89,9 @@ impl Expression for FunctionCallExpression {
                 for i in 0..args.len() {
                     let arg = &mut args[i];
                     arg.validate(st);
+                    self.args[i].validate(st);
                     let param_type = self.args[i].get_white_type();
-                    if !param_type.is_assignable_from(arg.get_white_type()) {
+                    if !param_type.is_assignable_to(arg.get_white_type()) {
                         add_parser_error(
                             IncompatibleTypes,
                             format!(

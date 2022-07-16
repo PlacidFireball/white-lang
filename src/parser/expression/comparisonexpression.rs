@@ -4,6 +4,7 @@ use crate::parser::symbol_table::SymbolTable;
 use crate::parser::whitetypes::Type;
 use crate::parser::ParserErrorType;
 use crate::runtime::Runtime;
+use crate::LOGGER;
 use std::any::Any;
 
 #[derive(Clone, Debug)]
@@ -98,6 +99,10 @@ impl Expression for ComparisonExpression {
                 ),
             );
         }
+        LOGGER.info(format!(
+            "Validated a comparison expression. lhs: {:?} rhs: {:?}",
+            self.lhs, self.rhs
+        ));
         // TODO: When developing std, comparable might be a cool thing to implement
     }
 

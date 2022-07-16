@@ -3,7 +3,6 @@ mod test {
     use crate::*;
 
     fn test_execute(src: &str, expected: &str) {
-        IS_TESTING.with(|t| t.set(true));
         let mut core: CoreObjects = CoreObjects::new(src);
         core.get_program_mut().execute();
         assert_eq!(core.get_program_mut().stdout.as_str(), expected);
@@ -112,7 +111,7 @@ mod test {
         let mut src = "\
         let x = 10; \
         if (true) { \
-            let x = 20; \
+            x = 20; \
             print(x); \
         }";
         test_execute(src, "20\n");
@@ -197,7 +196,6 @@ mod test {
 
     #[test]
     fn test_classic_fibonacci() {
-        // TODO: multiple function calls in the return statement cause stack overflow. basic recursion works.
         let src = "
         // returns the nth fibonacci number
         fn fib(n : int) : int { 
@@ -209,8 +207,9 @@ mod test {
             }
             return fib(n-1) + fib(n-2);
         }
+        // 1 1 2 3 5 8 13 21 ...
         print(fib(6));";
-        test_execute(src, "5\n");
+        test_execute(src, "8\n");
     }
 
     #[test]

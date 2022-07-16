@@ -5,6 +5,8 @@ use crate::parser::ParserErrorType::MismatchedTypes;
 use crate::parser::*;
 use crate::runtime::Runtime;
 
+use uuid::Uuid;
+
 #[derive(Clone, Debug)]
 pub struct FunctionDefinitionStatement {
     pub name: String,
@@ -48,7 +50,12 @@ impl Statement for FunctionDefinitionStatement {
     }
 
     fn validate(&mut self, st: &mut SymbolTable) {
-        st.register_function(self.name.clone(), self.clone());
+        let mut i = 0;
+        for arg in &mut self.args {
+            st.register_symbol(arg.debug(), self.arg_types[i]);
+            i += 1;
+            arg.validate(st);
+        }
         for statement in &mut self.statements {
             statement.validate(st);
             let opt_rs = statement.to_any().downcast_ref::<ReturnStatement>();
@@ -59,16 +66,13 @@ impl Statement for FunctionDefinitionStatement {
                         MismatchedTypes,
                         format!(
                             "You cannot return {:?} from [{}], it is defined to return: {:?}",
-                            rs.get_expr().get_expr_type(),
+                            rs.get_expr().get_white_type(),
                             self.name,
                             self.return_type
                         ),
                     );
                 }
             }
-        }
-        for arg in &mut self.args {
-            arg.validate(st);
         }
     }
 
@@ -117,7 +121,8 @@ impl FunctionDefinitionStatement {
     }
 
     pub fn invoke(&self, runtime: &mut Runtime, args: Vec<Box<dyn Expression>>) -> Box<dyn Any> {
-        runtime.push_scope(String::from("fn"));
+        let id = Uuid::new_v4();
+        runtime.push_scope(id.to_string());
         for (i, arg) in args.iter().enumerate() {
             /*println!(
                 "Function Call: {} Argument: {} Value: {}",
@@ -125,7 +130,7 @@ impl FunctionDefinitionStatement {
                 self.arg_names[i],
                 try_print_output(&arg.evaluate(runtime))
             );*/
-            runtime.set_value(self.arg_names[i].clone(), arg.clone());
+            runtime.set_value_in_scope(id.to_string(), self.arg_names[i].clone(), arg.clone());
         }
         for statement in &self.statements {
             statement.execute(runtime);

@@ -8,7 +8,7 @@ use crate::parser::ParserErrorType;
 use crate::parser::ParserErrorType::IncompatibleTypes;
 use crate::runtime::Runtime;
 use std::any::Any;
-
+use uuid::Uuid;
 #[derive(Clone, Debug)]
 pub(crate) struct ForStatement {
     statements: Vec<Box<dyn Statement>>,
@@ -24,7 +24,7 @@ impl ToAny for ForStatement {
 
 impl Statement for ForStatement {
     fn execute(&self, runtime: &mut Runtime) {
-        runtime.push_scope(String::from("for"));
+        runtime.push_scope(String::from(Uuid::new_v4().to_string()));
         let any = self.iterator.evaluate(runtime);
         let list = any.downcast_ref::<Vec<Box<dyn Any>>>().unwrap();
         for item in list.iter() {
@@ -81,7 +81,16 @@ impl Statement for ForStatement {
                 );
             }
         }
-        if let Some(lle) = self
+
+        self.iterator.validate(st);
+        let typ = self.iterator.get_white_type().get_type_from_list();
+        if typ != Type::Error && typ != Type::Initialized {
+            st.register_symbol(self.variable.debug(), typ);
+        } else {
+            add_parser_error(IncompatibleTypes, format!("Unexpected typing error."));
+        }
+
+        /*if let Some(lle) = self
             .iterator
             .to_any()
             .downcast_ref::<ListLiteralExpression>()
@@ -89,7 +98,6 @@ impl Statement for ForStatement {
             let mut lle_cln = lle.clone();
             lle_cln.validate(st);
             let typ = lle_cln.get_white_type().get_type_from_list();
-            //LOGGER.info(format!("Got type: {:?} from lle_cln.get_white_type().get_type_from_list()", typ));
             self.iterator = Box::new(lle_cln);
             if typ != Type::Error {
                 st.register_symbol(self.variable.debug(), typ);
@@ -98,12 +106,11 @@ impl Statement for ForStatement {
                 st.register_symbol(self.variable.debug(), Type::Void); // TODO: Make this Object
             }
         } else if self.iterator.get_white_type().is_list_type() {
-            self.iterator.validate(st);
+            crate::LOGGER.info("Here".to_string());
             let typ = self.iterator.get_white_type().get_type_from_list();
             st.register_symbol(self.variable.debug(), typ);
             self.variable.validate(st);
-        }
-
+        }*/
         for stmt in &mut self.statements {
             stmt.validate(st);
         }

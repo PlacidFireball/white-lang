@@ -1,4 +1,4 @@
-print("Hello World!");
+/*print("Hello World!");
 let x : int = 10;
 if (x==10) {
     print("x is indeed 10!");
@@ -21,4 +21,16 @@ for (z in [1, 2, 3, 4, 5]) {
     if (z == 3) {
         break;
     }
+}*/
+
+// returns the nth fibonacci number
+fn fib(n : int) : int { 
+    if (n == 0) { 
+        return 0; 
+    }
+    if (n == 1) { 
+        return 1; 
+    }
+    return fib(n-1) + fib(n-2);
 }
+print(fib(6));

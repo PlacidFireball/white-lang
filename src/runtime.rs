@@ -8,7 +8,7 @@ mod test;
 
 pub struct Runtime {
     scopes: Vec<HashMap<String, Box<dyn Expression>>>,
-    scope_types: Vec<String>,
+    ids: Vec<String>,
     functions: HashMap<String, FunctionDefinitionStatement>,
     ret: Box<dyn Expression>,
     pub(crate) output: String,
@@ -18,7 +18,7 @@ impl Runtime {
     pub fn new() -> Self {
         Runtime {
             scopes: vec![HashMap::new()],
-            scope_types: vec![String::from("global")],
+            ids: vec![String::from("global")],
             functions: HashMap::new(),
             ret: Box::new(SyntaxErrorExpression::new()),
             output: String::new(),
@@ -56,6 +56,34 @@ impl Runtime {
         self.scopes.last_mut().unwrap().insert(name.clone(), value);
     }
 
+    pub fn set_value_in_scope(&mut self, id: String, name: String, value: Box<dyn Expression>) {
+        let idx = match self.ids.iter().position(|id_| id_.clone() == id) {
+            Some(idx) => idx,
+            None => {
+                crate::LOGGER.warn(format!("[RUNTIME] Did not find scope {}, sending 0", id));
+                0
+            }
+        };
+        self.scopes[idx].insert(name.clone(), value.clone());
+    }
+    // may not be necessary
+    pub fn get_value_in_scope(&mut self, id: String, name: String) -> Option<Box<dyn Any + '_>> {
+        let idx = match self.ids.iter().position(|id_| id_.clone() == id) {
+            Some(idx) => idx,
+            None => {
+                crate::LOGGER.warn(format!("[RUNTIME] Did not find scope {}, sending 0", id));
+                0
+            }
+        };
+        if self.scopes[idx].contains_key(&id) {
+            let val = self.scopes[idx].remove(&name).unwrap();
+            self.scopes[idx].insert(name.clone(), val.clone());
+            Some(val.evaluate(self))
+        } else {
+            None
+        }
+    }
+
     pub fn set_function(&mut self, name: String, fds: FunctionDefinitionStatement) {
         self.functions.insert(name, fds);
     }
@@ -70,19 +98,19 @@ impl Runtime {
     }
 
     pub fn push_scope(&mut self, typ: String) {
-        self.scope_types.push(typ);
+        self.ids.push(typ);
         let last = self.scopes.last().unwrap().clone();
         self.scopes.push(last);
     }
 
     pub fn pop_scope(&mut self) {
         self.scopes.pop();
-        self.scope_types.pop();
+        self.ids.pop();
     }
 
     pub fn pop_nearest_loop(&mut self) {
-        for i in (0..self.scope_types.len()).rev() {
-            if self.scope_types[i].eq("while") {
+        for i in (0..self.ids.len()).rev() {
+            if self.ids[i].eq("while") {
                 // TODO: trying to implement inner break statement
             }
         }

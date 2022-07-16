@@ -68,10 +68,10 @@ impl Type {
             ListFloat => Float,
             ListBoolean => Boolean,
             ListObject => Object,
-            _ => Type::Error,
+            _ => *self,
         }
     }
-    pub fn is_assignable_from(&self, other: Type) -> bool {
+    pub fn is_assignable_to(&self, other: Type) -> bool {
         if other == Type::Void {
             return false;
         } else if other == Type::Null {
@@ -89,6 +89,7 @@ impl Type {
             ListInteger => true,
             ListBoolean => true,
             ListFloat => true,
+            ListObject => true,
             _ => false,
         }
     }

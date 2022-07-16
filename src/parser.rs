@@ -361,7 +361,6 @@ impl Parser {
         if self.match_and_consume(Function) {
             let name = self.get_curr_tok().get_string_value();
             let mut fds = FunctionDefinitionStatement::new(name.clone());
-            self.st.register_function(name.clone(), fds.clone());
             self.consume_token();
             self.require_token(LeftParen);
             while !self.match_and_consume(RightParen) {
@@ -664,7 +663,7 @@ impl Parser {
                     // while the arg list hasn't terminated
                     break;
                 }
-                let arg = self.parse_list_literal_expression(); // parse some expression
+                let arg = self.parse_expression(); // parse some expression
                 expr.add_arg(arg); // add the argument to the argument vector
                 self.match_and_consume(Comma); // consume a comma if we have one
                 if !self.has_tokens() {
@@ -694,6 +693,7 @@ impl Parser {
                 }
             }
             LOGGER.info(format!("Parsed a list literal: {:?}", lle));
+            lle.validate(&mut self.st);
             return Box::new(lle); // return a box wrapper of the lle
         }
         self.parse_parenthesized_expression()

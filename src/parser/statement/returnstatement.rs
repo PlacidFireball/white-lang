@@ -31,12 +31,17 @@ impl Statement for ReturnStatement {
 
     fn validate(&mut self, st: &mut SymbolTable) {
         let fds = st.get_function(self.function.clone()).unwrap();
+        self.expr.validate(st);
+        self.return_type = self.expr.get_white_type();
+        LOGGER.info(format!("Got {:?}", fds));
         if self.return_type != fds.get_return_type() {
             add_parser_error(
                 ParserErrorType::MismatchedTypes,
                 format!(
                     "You cannot return {:?} from [{}], it is defined to return: {:?}",
-                    self.return_type, fds.name, self.return_type
+                    self.return_type,
+                    fds.name,
+                    fds.get_return_type()
                 ),
             );
         }
@@ -52,10 +57,9 @@ impl Statement for ReturnStatement {
 }
 impl ReturnStatement {
     pub fn new(expr: Box<dyn Expression>, function: String) -> ReturnStatement {
-        let return_type = expr.get_white_type();
         ReturnStatement {
             expr,
-            return_type,
+            return_type: Type::Initialized,
             function,
         }
     }

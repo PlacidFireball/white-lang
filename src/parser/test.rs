@@ -318,7 +318,6 @@ mod test {
         let stmt = parser.statement_list.first().unwrap();
         assert!(!parser.has_errors());
         let variable_statement = stmt.to_any().downcast_ref::<VariableStatement>().unwrap();
-        assert!(!variable_statement.has_errors());
         assert!(variable_statement
             .get_expr()
             .to_any()
@@ -333,7 +332,6 @@ mod test {
         let stmt = parser.statement_list.first().unwrap();
         assert!(!parser.has_errors());
         let variable_statement = stmt.to_any().downcast_ref::<VariableStatement>().unwrap();
-        assert!(!variable_statement.has_errors());
         assert!(variable_statement
             .get_expr()
             .to_any()
@@ -347,9 +345,8 @@ mod test {
     fn test_parse_variable_statement_bad_assignment_type() {
         let mut parser = Parser::new(&mut Tokenizer::new(String::from("let x : string = 10;")));
         IS_TESTING.with(|t| t.set(true));
-        let stmt = parser.parse_variable_statement().unwrap();
+        let _ = parser.parse_variable_statement().unwrap();
         assert!(!parser.has_errors()); // in reality the parser will have errors but we need CORE_OBJECTS to add an error
-        assert!(!stmt.has_errors());
     }
 
     #[test]

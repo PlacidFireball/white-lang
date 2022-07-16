@@ -23,7 +23,7 @@ impl Statement for IfStatement {
     fn execute(&self, runtime: &mut Runtime) {
         let eval = self.expr.evaluate(runtime);
         let downcast = *eval.downcast_ref::<WhiteLangBool>().unwrap();
-        runtime.push_scope(String::from("if"));
+        runtime.push_scope(String::from(uuid::Uuid::new_v4().to_string()));
         if downcast {
             for statement in &self.true_stmts {
                 statement.execute(runtime);

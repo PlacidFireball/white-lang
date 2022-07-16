@@ -1,9 +1,9 @@
 use crate::parser::parser_traits::*;
 use crate::parser::symbol_table::SymbolTable;
 use crate::parser::whitetypes::Type;
-use crate::parser::ParserErrorType;
 use crate::parser::ParserErrorType::*;
 use crate::runtime::Runtime;
+use crate::LOGGER;
 use std::any::Any;
 
 #[derive(Clone, Debug)]
@@ -11,7 +11,6 @@ pub(crate) struct VariableStatement {
     name: String,
     expr: Box<dyn Expression>,
     typ: Type,
-    errors: Vec<ParserErrorType>,
 }
 
 impl ToAny for VariableStatement {
@@ -44,9 +43,11 @@ impl Statement for VariableStatement {
         if self.typ == Type::Error {
             add_parser_error(UnexpectedToken, format!("Got error type."));
         }
-        if !self.has_errors() {
-            st.register_symbol(self.name.clone(), self.typ);
-        }
+        LOGGER.info(format!(
+            "Registering `{}` with type {:?}",
+            self.name, self.typ
+        ));
+        st.register_symbol(self.name.clone(), self.typ);
     }
 
     fn get_expr(&self) -> &Box<dyn Expression> {
@@ -64,11 +65,11 @@ impl VariableStatement {
             name,
             expr: default_expr(),
             typ: Type::Initialized,
-            errors: vec![],
         }
     }
     pub fn set_type(&mut self, typ: Type) {
         if self.typ == Type::Initialized {
+            LOGGER.info(format!("Set type of `{}` to {:?}", self.name, self.typ));
             self.typ = typ;
         } else if self.typ != typ {
             add_parser_error(MismatchedTypes, format!("Set bad type"));
@@ -77,9 +78,6 @@ impl VariableStatement {
 
     pub fn set_expr(&mut self, expr: Box<dyn Expression>) {
         self.expr = expr;
-    }
-    pub fn has_errors(&self) -> bool {
-        !self.errors.is_empty()
     }
     #[allow(dead_code)]
     pub fn get_type(&self) -> Type {
