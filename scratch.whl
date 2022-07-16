@@ -1,5 +1,3 @@
-
-
 print("Hello World!");
 let x : int = 10;
 if (x==10) {
@@ -15,5 +13,12 @@ while (true) {
     } else {
         y = y + 1;
         print(y);
+    }
+}
+
+for (z in [1, 2, 3, 4, 5]) {
+    print(z);
+    if (z == 3) {
+        break;
     }
 }

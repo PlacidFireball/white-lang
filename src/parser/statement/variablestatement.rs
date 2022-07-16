@@ -2,9 +2,8 @@ use crate::parser::parser_traits::*;
 use crate::parser::symbol_table::SymbolTable;
 use crate::parser::whitetypes::Type;
 use crate::parser::ParserErrorType;
-use crate::parser::ParserErrorType::{MismatchedTypes, SymbolDefinitionError, UnexpectedToken};
+use crate::parser::ParserErrorType::*;
 use crate::runtime::Runtime;
-use crate::IS_TESTING;
 use std::any::Any;
 
 #[derive(Clone, Debug)]
@@ -37,10 +36,13 @@ impl Statement for VariableStatement {
     fn validate(&mut self, st: &mut SymbolTable) {
         self.expr.validate(st);
         if st.has_symbol(self.name.clone()) {
-            add_parser_error(SymbolDefinitionError);
+            add_parser_error(
+                DuplicateName,
+                format!("Duplicate name: {}", self.name.clone()),
+            );
         }
         if self.typ == Type::Error {
-            add_parser_error(UnexpectedToken);
+            add_parser_error(UnexpectedToken, format!("Got error type."));
         }
         if !self.has_errors() {
             st.register_symbol(self.name.clone(), self.typ);
@@ -69,9 +71,7 @@ impl VariableStatement {
         if self.typ == Type::Initialized {
             self.typ = typ;
         } else if self.typ != typ {
-            if !IS_TESTING.with(|test| test.get()) {
-                add_parser_error(MismatchedTypes);
-            }
+            add_parser_error(MismatchedTypes, format!("Set bad type"));
         }
     }
 

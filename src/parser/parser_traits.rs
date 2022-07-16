@@ -32,9 +32,12 @@ use crate::parser::statement::syntaxerrorstatement::SyntaxErrorStatement;
 use crate::parser::statement::variablestatement::VariableStatement;
 use crate::parser::statement::whilestatement::WhileStatement;
 use crate::runtime::Runtime;
+use crate::Parser;
+use crate::LOGGER;
 
 use crate::parser::ParserErrorType;
-use crate::CORE_OBJECTS;
+
+use std::panic;
 
 pub trait ToAny: 'static {
     fn to_any(&self) -> &dyn Any;
@@ -44,10 +47,10 @@ pub fn default_expr() -> Box<dyn Expression> {
     Box::new(SyntaxErrorExpression::new())
 }
 
-pub fn add_parser_error(error: ParserErrorType) {
-    CORE_OBJECTS.with(|core| core.borrow_mut().get_parser().add_error(error))
+pub fn add_parser_error(error: ParserErrorType, info: String) {
+    LOGGER.warn(info);
+    Parser::error_panic(error);
 }
-
 pub fn any_into_int_literal(any: &Box<dyn Any>) -> Option<IntegerLiteralExpression> {
     if let Some(integer) = any.downcast_ref::<WhiteLangInt>() {
         return Some(IntegerLiteralExpression::new(*integer));

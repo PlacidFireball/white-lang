@@ -89,7 +89,14 @@ impl Expression for ComparisonExpression {
         self.lhs.validate(st);
         self.rhs.validate(st);
         if self.lhs.get_white_type() != self.rhs.get_white_type() {
-            add_parser_error(ParserErrorType::MismatchedTypes);
+            add_parser_error(
+                ParserErrorType::MismatchedTypes,
+                format!(
+                    "Types must be comparable: lhs: {:?} rhs {:?}",
+                    self.lhs.get_white_type(),
+                    self.rhs.get_white_type()
+                ),
+            );
         }
         // TODO: When developing std, comparable might be a cool thing to implement
     }

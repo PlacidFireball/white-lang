@@ -1,4 +1,4 @@
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Type {
     Char,
     String,
@@ -6,11 +6,13 @@ pub enum Type {
     Float,
     Boolean,
     Null,
+    Object,
     ListChar,
     ListString,
     ListInteger,
     ListFloat,
     ListBoolean,
+    ListObject,
     Initialized,
     Void,
     Error,
@@ -44,7 +46,17 @@ impl Type {
             Integer => ListInteger,
             Float => ListFloat,
             Boolean => ListBoolean,
-            _ => Type::Error,
+            Null => ListObject,
+            Object => ListObject,
+            ListChar => ListChar,
+            ListString => ListString,
+            ListInteger => ListInteger,
+            ListFloat => ListFloat,
+            ListBoolean => ListBoolean,
+            ListObject => ListObject,
+            Initialized => Error,
+            Void => Error,
+            Error => Error,
         }
     }
     pub fn get_type_from_list(&self) -> Type {
@@ -55,6 +67,7 @@ impl Type {
             ListInteger => Integer,
             ListFloat => Float,
             ListBoolean => Boolean,
+            ListObject => Object,
             _ => Type::Error,
         }
     }

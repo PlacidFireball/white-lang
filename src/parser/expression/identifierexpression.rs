@@ -3,6 +3,7 @@ use crate::parser::symbol_table::SymbolTable;
 use crate::parser::whitetypes::Type;
 use crate::parser::ParserErrorType::UnknownName;
 use crate::runtime::Runtime;
+use crate::LOGGER;
 use std::any::Any;
 
 #[derive(Clone, Debug)]
@@ -44,7 +45,14 @@ impl Expression for IdentifierExpression {
         }
         if opt_typ.is_none() {
             self.typ = Type::Error;
-            add_parser_error(UnknownName);
+            LOGGER.warn(format!("Couldn't get the type for identifier {:?}", self));
+            add_parser_error(
+                UnknownName,
+                format!(
+                    "You cannot use {} as you have not defined it.\n|Try: let {} = ...",
+                    self.name, self.name
+                ),
+            );
         }
     }
 

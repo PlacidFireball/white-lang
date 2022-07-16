@@ -47,7 +47,13 @@ impl Statement for IfStatement {
     fn validate(&mut self, st: &mut SymbolTable) {
         self.expr.validate(st);
         if self.expr.get_white_type() != Type::Boolean {
-            add_parser_error(UnexpectedToken);
+            add_parser_error(
+                UnexpectedToken,
+                format!(
+                    "You cannot branch based on type: {:?}",
+                    self.expr.get_white_type()
+                ),
+            );
         }
         st.push_scope();
         if !self.true_stmts.is_empty() {

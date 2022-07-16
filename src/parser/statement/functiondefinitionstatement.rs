@@ -4,11 +4,10 @@ use crate::parser::symbol_table::SymbolTable;
 use crate::parser::ParserErrorType::MismatchedTypes;
 use crate::parser::*;
 use crate::runtime::Runtime;
-use crate::IS_TESTING;
 
 #[derive(Clone, Debug)]
 pub struct FunctionDefinitionStatement {
-    name: String,
+    pub name: String,
     return_type: Type,
     args: Vec<Box<dyn Expression>>,
     arg_names: Vec<String>,
@@ -56,9 +55,15 @@ impl Statement for FunctionDefinitionStatement {
             if opt_rs.is_some() {
                 let rs = opt_rs.unwrap();
                 if rs.get_expr().get_white_type() != self.return_type {
-                    if !IS_TESTING.with(|test| test.get()) {
-                        add_parser_error(MismatchedTypes);
-                    }
+                    add_parser_error(
+                        MismatchedTypes,
+                        format!(
+                            "You cannot return {:?} from [{}], it is defined to return: {:?}",
+                            rs.get_expr().get_expr_type(),
+                            self.name,
+                            self.return_type
+                        ),
+                    );
                 }
             }
         }

@@ -47,15 +47,27 @@ impl CoreObjects {
         );
     }
 
-    pub fn get_tokenizer(&mut self) -> &mut Tokenizer {
+    pub fn get_tokenizer_mut(&mut self) -> &mut Tokenizer {
         &mut self.tokenizer
     }
 
-    pub fn get_parser(&mut self) -> &mut Parser {
+    pub fn get_parser_mut(&mut self) -> &mut Parser {
         &mut self.parser
     }
 
-    pub fn get_program(&mut self) -> &mut Program {
+    pub fn get_program_mut(&mut self) -> &mut Program {
         &mut self.program
+    }
+
+    pub fn get_tokenizer(&self) -> &Tokenizer {
+        &self.tokenizer
+    }
+
+    pub fn get_parser(&self) -> &Parser {
+        &self.parser
+    }
+
+    pub fn get_program(&self) -> &Program {
+        &self.program
     }
 }

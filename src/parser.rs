@@ -203,8 +203,8 @@ impl Parser {
         self.get_curr_tok().get_type().ne(&Eof)
     }
 
-    pub fn add_error(&mut self, error: ParserErrorType) {
-        self.errors.push(error);
+    pub fn error_panic(error: ParserErrorType) {
+        panic!("Error: {:?} occurred during validation", error);
     }
 
     // tells us if we have errors
@@ -255,6 +255,10 @@ impl Parser {
     fn require_token(&mut self, typ: TokenType) {
         use self::ParserErrorType::*;
         if !self.match_token(typ) {
+            LOGGER.warn(format!(
+                "Got unexpected token during parse: {:?}",
+                self.get_curr_tok()
+            ));
             self.errors.push(UnexpectedToken);
             self.check_for_parse_errors();
         }
@@ -555,10 +559,10 @@ impl Parser {
      */
 
     fn parse_expression(&mut self) -> Box<dyn Expression> {
-        let mut expr = self.parse_additive_expression();
-        if !IS_TESTING.with(|t| t.get()) {
-            expr.validate(&self.st);
-        }
+        let expr = self.parse_additive_expression();
+        //if !IS_TESTING.with(|t| t.get()) {    // not sure if commenting this out is correct, we want to ensure that
+        //    expr.validate(&self.st);          // all expressions/statements are validated, but having it here causes
+        //}                                     // for statement variables to break.
         expr
     }
 

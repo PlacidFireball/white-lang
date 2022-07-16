@@ -4,6 +4,7 @@ use crate::parser::symbol_table::SymbolTable;
 use crate::parser::whitetypes::Type;
 use crate::parser::ParserErrorType::UnexpectedToken;
 use crate::runtime::Runtime;
+use crate::LOGGER;
 use std::any::Any;
 
 #[derive(Clone, Debug)]
@@ -38,7 +39,7 @@ impl Statement for WhileStatement {
             cond = *self.expr.evaluate(runtime).downcast_ref::<bool>().unwrap();
             iterations += 1;
             if iterations > usize::MAX - 1 {
-                panic!("Infinite Loop!"); // idk about this one but I feel like this should be a feature
+                LOGGER.error("Infinite loop!".to_string()); // idk about this one but I feel like this should be a feature
             }
         }
         runtime.pop_scope();
@@ -55,7 +56,10 @@ impl Statement for WhileStatement {
     fn validate(&mut self, st: &mut SymbolTable) {
         self.expr.validate(st);
         if self.expr.get_white_type() != Type::Boolean {
-            add_parser_error(UnexpectedToken);
+            add_parser_error(
+                UnexpectedToken,
+                format!("Expected a boolean type to loop on."),
+            );
         }
         st.push_scope();
         if !self.body.is_empty() {

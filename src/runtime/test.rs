@@ -5,8 +5,8 @@ mod test {
     fn test_execute(src: &str, expected: &str) {
         IS_TESTING.with(|t| t.set(true));
         let mut core: CoreObjects = CoreObjects::new(src);
-        core.get_program().execute();
-        assert_eq!(core.get_program().stdout.as_str(), expected);
+        core.get_program_mut().execute();
+        assert_eq!(core.get_program_mut().stdout.as_str(), expected);
     }
 
     #[test]

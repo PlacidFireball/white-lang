@@ -32,7 +32,13 @@ impl Statement for ReturnStatement {
     fn validate(&mut self, st: &mut SymbolTable) {
         let fds = st.get_function(self.function.clone()).unwrap();
         if self.return_type != fds.get_return_type() {
-            add_parser_error(ParserErrorType::BadReturnType);
+            add_parser_error(
+                ParserErrorType::MismatchedTypes,
+                format!(
+                    "You cannot return {:?} from [{}], it is defined to return: {:?}",
+                    self.return_type, fds.name, self.return_type
+                ),
+            );
         }
     }
 

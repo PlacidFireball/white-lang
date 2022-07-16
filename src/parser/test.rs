@@ -40,7 +40,7 @@ mod test {
         let mut core: CoreObjects = CoreObjects::new(src.as_str());
         println!("Start test...");
         print!("Tokens: [");
-        let tokenizer = core.get_tokenizer();
+        let tokenizer = core.get_tokenizer_mut();
         for token in tokenizer.get_token_list() {
             print!("{} ", token.get_type());
         }
@@ -343,6 +343,7 @@ mod test {
     }
 
     #[test]
+    #[should_panic]
     fn test_parse_variable_statement_bad_assignment_type() {
         let mut parser = Parser::new(&mut Tokenizer::new(String::from("let x : string = 10;")));
         IS_TESTING.with(|t| t.set(true));

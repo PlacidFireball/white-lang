@@ -3,12 +3,13 @@ use crate::parser::symbol_table::SymbolTable;
 use crate::parser::whitetypes::Type;
 use crate::parser::ParserErrorType::MismatchedTypes;
 use crate::runtime::Runtime;
+use crate::LOGGER;
 use std::any::Any;
 
 #[derive(Clone, Debug)]
 pub(crate) struct ListLiteralExpression {
     exprs: Vec<Box<dyn Expression>>,
-    inferred_type: Type,
+    typ: Type,
 }
 
 impl ToAny for ListLiteralExpression {
@@ -38,13 +39,17 @@ impl Expression for ListLiteralExpression {
         if self.exprs.is_empty() {
             return;
         }
-        self.inferred_type = self.exprs[0].get_white_type();
+        self.typ = self.exprs[0].get_white_type().get_list_type();
         for expr in &mut self.exprs {
             expr.validate(st);
-            if expr.get_white_type() != self.inferred_type {
-                add_parser_error(MismatchedTypes);
+            if expr.get_white_type() != self.typ.get_type_from_list() {
+                add_parser_error(
+                    MismatchedTypes,
+                    format!("All items in the list must be of the same type."),
+                );
             }
         }
+        LOGGER.info(format!("Validated a list literal expression: {:?}", self))
     }
 
     fn debug(&self) -> String {
@@ -60,7 +65,7 @@ impl Expression for ListLiteralExpression {
     }
 
     fn get_white_type(&self) -> Type {
-        self.inferred_type.get_list_type()
+        self.typ
     }
 
     fn get_expr_type(&self) -> String {
@@ -71,7 +76,7 @@ impl ListLiteralExpression {
     pub fn new() -> ListLiteralExpression {
         ListLiteralExpression {
             exprs: vec![],
-            inferred_type: Type::Initialized,
+            typ: Type::Initialized,
         }
     }
     pub fn add_expr(&mut self, expr: Box<dyn Expression>) {

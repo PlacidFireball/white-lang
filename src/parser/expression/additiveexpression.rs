@@ -84,10 +84,22 @@ impl Expression for AdditiveExpression {
         self.lhs.validate(st);
         self.rhs.validate(st);
         if self.lhs.get_white_type() != Type::Integer && self.lhs.get_white_type() != Type::Float {
-            add_parser_error(ParserErrorType::IncompatibleTypes);
+            add_parser_error(
+                ParserErrorType::IncompatibleTypes,
+                format!(
+                    "You cannot add/subtract two non number types. lhs: {:?} rhs: {:?}",
+                    self.lhs, self.rhs
+                ),
+            );
         }
         if self.rhs.get_white_type() != Type::Integer && self.rhs.get_white_type() != Type::Float {
-            add_parser_error(ParserErrorType::IncompatibleTypes);
+            add_parser_error(
+                ParserErrorType::IncompatibleTypes,
+                format!(
+                    "You cannot add/subtract two non number types. lhs: {:?} rhs: {:?}",
+                    self.lhs, self.rhs
+                ),
+            );
         }
     }
 

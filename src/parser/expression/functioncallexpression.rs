@@ -68,20 +68,36 @@ impl Expression for FunctionCallExpression {
     fn validate(&mut self, st: &SymbolTable) {
         let fds_opt = st.get_function(self.name.clone());
         if fds_opt.is_none() {
-            add_parser_error(UnknownName);
+            add_parser_error(
+                UnknownName,
+                format!(
+                    "You cannot call: [{}], it has not been defined",
+                    self.name.clone()
+                ),
+            );
             self.typ = Type::Null; // TODO: default typing (maybe Object)
         } else {
             let mut fds = fds_opt.unwrap();
             let args = fds.get_args();
             if self.args.len() != args.len() {
-                add_parser_error(ArgMismatch);
+                add_parser_error(
+                    ArgMismatch,
+                    format!("Expected {} args, found {}", self.args.len(), args.len()),
+                );
             } else {
                 for i in 0..args.len() {
                     let arg = &mut args[i];
                     arg.validate(st);
                     let param_type = self.args[i].get_white_type();
                     if !param_type.is_assignable_from(arg.get_white_type()) {
-                        add_parser_error(IncompatibleTypes);
+                        add_parser_error(
+                            IncompatibleTypes,
+                            format!(
+                                "You cannot assign {:?} to {:?}",
+                                param_type,
+                                arg.get_white_type()
+                            ),
+                        );
                     }
                 }
             }

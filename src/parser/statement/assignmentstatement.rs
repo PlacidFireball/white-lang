@@ -54,10 +54,27 @@ impl Statement for AssignmentStatement {
             .downcast_ref::<IdentifierExpression>()
             .is_none()
         {
-            add_parser_error(ParserErrorType::UnexpectedToken);
+            add_parser_error(
+                ParserErrorType::UnexpectedToken,
+                format!(
+                    "Variable: [{}] is not defined in this scope",
+                    self.variable.debug()
+                ),
+            );
         }
-        if self.expr.get_white_type() != self.variable.get_white_type() {
-            add_parser_error(ParserErrorType::IncompatibleTypes);
+        if !self
+            .expr
+            .get_white_type()
+            .is_assignable_from(self.variable.get_white_type())
+        {
+            add_parser_error(
+                ParserErrorType::IncompatibleTypes,
+                format!(
+                    "You cannot assign {:?} to {:?}",
+                    self.variable.get_white_type(),
+                    self.expr.get_white_type()
+                ),
+            );
         }
     }
 

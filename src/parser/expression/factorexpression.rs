@@ -69,12 +69,24 @@ impl Expression for FactorExpression {
         if self.lhs.get_white_type().ne(&Type::Float)
             && self.lhs.get_white_type().ne(&Type::Integer)
         {
-            add_parser_error(ParserErrorType::IncompatibleTypes);
+            add_parser_error(
+                ParserErrorType::IncompatibleTypes,
+                format!(
+                    "You cannot multiply/divide two non number types. lhs: {:?} rhs: {:?}",
+                    self.lhs, self.rhs
+                ),
+            );
         }
         if self.rhs.get_white_type().ne(&Type::Float)
             && self.rhs.get_white_type().ne(&Type::Integer)
         {
-            add_parser_error(ParserErrorType::IncompatibleTypes);
+            add_parser_error(
+                ParserErrorType::IncompatibleTypes,
+                format!(
+                    "You cannot multiply/divide two non number types. lhs: {:?} rhs: {:?}",
+                    self.lhs, self.rhs
+                ),
+            );
         }
     }
 
