@@ -38,7 +38,7 @@ impl Expression for AdditiveExpression {
             );
         } else {
             println!(
-                "[ADDITIVE_EXPR]: {} - {}",
+                "[ADD_EXPR]: {} - {}",
                 try_print_output(&lhs_eval),
                 try_print_output(&rhs_eval)
             );
@@ -105,11 +105,7 @@ impl Expression for AdditiveExpression {
 
     // gives debug information of the expression without having to downcast it
     fn debug(&self) -> String {
-        let mut builder = String::new();
-        builder = builder + &*self.lhs.debug() + " ";
-        builder = builder + &*self.operator + " ";
-        builder = builder + &*self.rhs.debug();
-        builder
+        format!("{} {} {}", self.lhs.debug(), self.operator, self.rhs.debug())
     }
 
     fn get_white_type(&self) -> Type {

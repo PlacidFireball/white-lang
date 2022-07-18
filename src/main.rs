@@ -29,20 +29,15 @@ thread_local! {
     pub static IS_TESTING: Cell<bool> = Cell::new(false);
 }
 
-const LOGGER: Logger = Logger {
-    enabled: Cell::new(true),
-};
+const LOGGER: Logger = Logger {};
 
 fn main() {
     env::set_var("RUST_BACKTRACE", "1");
-    let logger = Logger {
-        enabled: Cell::new(true),
-    };
     // open xxx.whl
     let mut args: Vec<String> = env::args().collect();
     if args.len() < 2 {
         args = vec!["white-lang".to_string(), "./scratch.whl".to_string()];
-        logger.warn("Didn't supply a path to a .whl file, defaulting to ./scratch.whl".to_string());
+        LOGGER.warn("Didn't supply a path to a .whl file, defaulting to ./scratch.whl".to_string());
     }
     let path = Path::new(&args[1]);
     let display = path.display();
@@ -52,14 +47,14 @@ fn main() {
     };
     let mut source = String::new();
     match file.read_to_string(&mut source) {
-        Ok(_) => logger.info(format!("opened {} and got:\n{}", display, source.trim())),
+        Ok(_) => LOGGER.info(format!("opened {} and got:\n{}", display, source.trim())),
         Err(why) => panic!("[FATAL] couldn't read {}: {}", display, why),
     };
     // run xxx.whl
     CORE_OBJECTS.with(|core| {
         core.borrow_mut().set_src(source.as_str());
         core.borrow_mut().get_program_mut().execute();
-        logger.info(format!(
+        LOGGER.info(format!(
             "output:\n{}",
             core.borrow_mut().get_program_mut().stdout.clone()
         ));

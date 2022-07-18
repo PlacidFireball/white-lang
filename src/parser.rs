@@ -5,7 +5,6 @@ use crate::parser::whitetypes::*;
 use crate::tokenizer::TokenType::*;
 use crate::tokenizer::*;
 use std::any::Any;
-use std::cell::Cell;
 
 mod symbol_table;
 mod test;
@@ -42,13 +41,10 @@ use crate::config::WhiteLangFloat;
 use crate::parser::parser_traits::{Expression, Statement};
 use crate::parser::statement::breakstatement::BreakStatement;
 use crate::parser::ParserErrorType::UnterminatedArgList;
-use crate::{Logger, IS_TESTING};
 use statement::variablestatement::VariableStatement;
 use symbol_table::SymbolTable;
 
-const LOGGER: Logger = Logger {
-    enabled: Cell::new(true),
-};
+use crate::LOGGER;
 
 // Parsing Errors
 #[derive(Clone, Copy, Debug, PartialOrd, PartialEq)]
@@ -152,9 +148,7 @@ impl Parser {
             self.curr_idx = 0;
             while self.has_tokens() {
                 let mut stmt = self.parse_statement();
-                if !IS_TESTING.with(|t| t.get()) {
-                    stmt.validate(&mut self.st)
-                }
+                stmt.validate(&mut self.st);
                 self.statement_list.push(stmt);
                 self.check_for_parse_errors();
             }

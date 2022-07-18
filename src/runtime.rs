@@ -1,6 +1,7 @@
 use crate::parser::expression::syntaxerrorexpression::SyntaxErrorExpression;
 use crate::parser::parser_traits::Expression;
 use crate::parser::statement::functiondefinitionstatement::FunctionDefinitionStatement;
+use crate::parser::statement::structdefinitionstatement::StructDefinitionStatement;
 use std::any::Any;
 use std::collections::HashMap;
 
@@ -10,6 +11,7 @@ pub struct Runtime {
     scopes: Vec<HashMap<String, Box<dyn Expression>>>,
     ids: Vec<String>,
     functions: HashMap<String, FunctionDefinitionStatement>,
+    structs: HashMap<String, StructDefinitionStatement>,
     ret: Box<dyn Expression>,
     pub(crate) output: String,
     brk: bool,
@@ -20,6 +22,7 @@ impl Runtime {
             scopes: vec![HashMap::new()],
             ids: vec![String::from("global")],
             functions: HashMap::new(),
+            structs: HashMap::new(),
             ret: Box::new(SyntaxErrorExpression::new()),
             output: String::new(),
             brk: false,
@@ -28,19 +31,13 @@ impl Runtime {
 
     pub fn get_value(&mut self, name: String) -> Option<Box<dyn Any + '_>> {
         for i in (0..self.scopes.len()).rev() {
-            println!("[RUNTIME] ---- Scope [{}] ----", i);
+            crate::LOGGER.debug(format!("sid.{}", self.ids[i]));
             for (name, expr) in &self.scopes[i] {
-                println!("[RUNTIME] Name: {}\tValue: {}", name, expr.debug());
+                crate::LOGGER.debug(format!("{} => {}", name, expr.debug()));
             }
             if self.scopes[i].contains_key(&name) {
                 let val = self.scopes[i].remove(&name).unwrap();
                 self.scopes[i].insert(name.clone(), val.clone());
-                println!(
-                    "[RUNTIME]: Name: {}\tValue: {}\t Scope: {}",
-                    name,
-                    val.debug(),
-                    i
-                );
                 return Some(val.evaluate(self));
             }
         }
@@ -66,54 +63,39 @@ impl Runtime {
         };
         self.scopes[idx].insert(name.clone(), value.clone());
     }
-    // may not be necessary
-    pub fn get_value_in_scope(&mut self, id: String, name: String) -> Option<Box<dyn Any + '_>> {
-        let idx = match self.ids.iter().position(|id_| id_.clone() == id) {
-            Some(idx) => idx,
-            None => {
-                crate::LOGGER.warn(format!("[RUNTIME] Did not find scope {}, sending 0", id));
-                0
-            }
-        };
-        if self.scopes[idx].contains_key(&id) {
-            let val = self.scopes[idx].remove(&name).unwrap();
-            self.scopes[idx].insert(name.clone(), val.clone());
-            Some(val.evaluate(self))
-        } else {
-            None
-        }
-    }
 
-    pub fn set_function(&mut self, name: String, fds: FunctionDefinitionStatement) {
+    pub fn add_function(&mut self, name: String, fds: FunctionDefinitionStatement) {
         self.functions.insert(name, fds);
     }
 
     pub fn get_function(&mut self, name: String) -> FunctionDefinitionStatement {
         if !self.functions.contains_key(&name) {
-            panic!("function: `{}` not in the functions map", name);
+            crate::LOGGER.error(format!("function: `{}` not in the functions map", name));
+            unreachable!();
         }
-        let func = self.functions.remove(&name).unwrap();
-        self.functions.insert(name.clone(), func.clone());
-        func
+        self.functions.get(&name).unwrap().clone()
+    }
+
+    pub fn add_struct(&mut self, name: String, sds: StructDefinitionStatement) {
+        self.structs.insert(name.clone(), sds.clone());
+    }
+
+    pub fn get_struct(&self, name: String) -> StructDefinitionStatement {
+        if !self.structs.contains_key(&name) {
+            crate::LOGGER.error( format!("struct: `{}` not in the structs map", name));
+            unreachable!(); // need this here to get compiler to heck off
+        } 
+        self.structs.get(&name).unwrap().clone()
     }
 
     pub fn push_scope(&mut self, typ: String) {
         self.ids.push(typ);
-        let last = self.scopes.last().unwrap().clone();
-        self.scopes.push(last);
+        self.scopes.push(HashMap::new());
     }
 
     pub fn pop_scope(&mut self) {
         self.scopes.pop();
         self.ids.pop();
-    }
-
-    pub fn pop_nearest_loop(&mut self) {
-        for i in (0..self.ids.len()).rev() {
-            if self.ids[i].eq("while") {
-                // TODO: trying to implement inner break statement
-            }
-        }
     }
 
     pub fn set_return(&mut self, ret: Box<dyn Expression>) {

@@ -1,28 +1,15 @@
-use std::cell::Cell;
-
-pub struct Logger {
-    pub enabled: Cell<bool>,
-}
-#[allow(dead_code)]
+pub struct Logger;
 impl Logger {
     pub fn info(&self, msg: String) {
-        if self.enabled.get() {
-            println!("[INFO] {}", msg);
-        }
+        println!("[INFO] {}", msg);
     }
     pub fn debug(&self, msg: String) {
-        if self.enabled.get() {
-            println!("[DEBUG] {}", msg);
-        }
+        println!("[DEBUG] {}", msg);
     }
     pub fn warn(&self, msg: String) {
-        if self.enabled.get() {
-            println!("[WARN] {}", msg);
-        }
+        println!("[WARN] {}", msg);
     }
     pub fn error(&self, msg: String) {
-        if self.enabled.get() {
-            panic!("[ERROR] {}", msg);
-        }
+        panic!("[ERROR] {}", msg);
     }
 }

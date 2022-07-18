@@ -38,7 +38,7 @@ impl Default for FunctionDefinitionStatement {
 
 impl Statement for FunctionDefinitionStatement {
     fn execute(&self, runtime: &mut Runtime) {
-        runtime.set_function(self.name.clone(), self.clone());
+        runtime.add_function(self.name.clone(), self.clone());
     }
 
     fn compile(&self) {
