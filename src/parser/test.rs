@@ -383,6 +383,7 @@ mod test {
     }
 
     #[test]
+    #[should_panic]
     fn test_parse_function_definition_mismatched_return() {
         let parser = init_parser("fn foo() : string { let x = 10; return x; }".to_string());
         let stmt = parser.statement_list.first().unwrap();

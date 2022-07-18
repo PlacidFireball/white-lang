@@ -39,16 +39,16 @@ impl Statement for StructDefinitionStatement {
         if st.has_symbol(self.name.clone()) {
             add_parser_error(ParserErrorType::DuplicateName, format!("Duplicate name `{}`", self.name));
         }
-        st.register_symbol(self.name.clone(), self.typ.clone());
         for (name, typ) in self.fields.iter() {
-            st.register_symbol(format!("{}.{}", self.name, name), typ.clone());
+            st.register_symbol(format!("{}.{}", self.name, name), typ.clone()); // do this because we don't want to clash y and x.y
         }
         for (name, method) in self.methods.iter() {
             let mut func = method.clone();
-            func.name = format!("{}.{}", self.name, name);
+            func.name = format!("{}.{}", self.name, name); // do this because we don't want to clash foo() and x.foo()
             func.validate(st);
             st.register_function(func.name.clone(), func);
         }
+        st.register_struct(self.name.clone(), self.clone());
     }
 
     fn get_expr(&self) -> &Box<dyn Expression> {
@@ -76,5 +76,15 @@ impl StructDefinitionStatement {
 
     pub fn add_method(&mut self, method_name: String, method: FunctionDefinitionStatement) {
         self.methods.insert(method_name, method);
+    }
+
+    pub fn get_method(&self, method_name: String) -> Option<FunctionDefinitionStatement> {
+        match self.methods.get(&method_name) {
+            Some(fds) =>  Some(fds.clone()),
+            None => {
+                crate::LOGGER.warn(format!("No such method `{}`", method_name));
+                None
+            }
+        }
     }
 }

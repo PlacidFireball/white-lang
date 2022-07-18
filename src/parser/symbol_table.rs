@@ -3,6 +3,8 @@ use crate::parser::whitetypes::Type;
 use std::any::Any;
 use std::collections::HashMap;
 
+use super::statement::structdefinitionstatement::StructDefinitionStatement;
+
 pub struct SymbolTable {
     symbol_stack: Vec<HashMap<String, Box<dyn Any>>>,
 }
@@ -54,6 +56,10 @@ impl SymbolTable {
         self.symbol_stack[0].insert(name, Box::new(def));
     }
 
+    pub fn register_struct(&mut self, name: String, def: StructDefinitionStatement) {
+        self.symbol_stack[0].insert(name, Box::new(def));
+    }
+
     pub fn get_symbol_type(&self, name: String) -> Option<Type> {
         return match self.get_symbol(name) {
             Some(t) => {
@@ -75,6 +81,23 @@ impl SymbolTable {
                         t.downcast_ref::<FunctionDefinitionStatement>()
                             .unwrap()
                             .clone(),
+                    )
+                } else {
+                    Option::None
+                }
+            }
+            _ => Option::None,
+        };
+    }
+
+    pub fn get_struct(&self, name: String) -> Option<StructDefinitionStatement> {
+        return match self.get_symbol(name) {
+            Some(t) => {
+                if t.downcast_ref::<StructDefinitionStatement>().is_some() {
+                    Option::Some(
+                        t.downcast_ref::<StructDefinitionStatement>()
+                            .unwrap()
+                            .clone()
                     )
                 } else {
                     Option::None

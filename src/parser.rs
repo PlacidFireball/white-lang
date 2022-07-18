@@ -42,6 +42,7 @@ use crate::parser::parser_traits::{Expression, Statement};
 use crate::parser::statement::breakstatement::BreakStatement;
 use crate::parser::ParserErrorType::UnterminatedArgList;
 use statement::variablestatement::VariableStatement;
+use crate::parser::statement::syntaxerrorstatement::SyntaxErrorStatement;
 use symbol_table::SymbolTable;
 
 use crate::LOGGER;
@@ -166,7 +167,7 @@ impl Parser {
             );
         }
         for statement in &self.statement_list {
-            if let Some(_) = statement.to_any().downcast_ref::<SyntaxErrorExpression>() {
+            if let Some(_) = statement.to_any().downcast_ref::<SyntaxErrorStatement>() {
                 panic!(
                     "Parse error occurred at token `{}`",
                     self.get_curr_tok().get_string_value()
