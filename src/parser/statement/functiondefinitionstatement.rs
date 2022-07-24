@@ -63,7 +63,7 @@ impl Statement for FunctionDefinitionStatement {
                 let rs = opt_rs.unwrap();
                 if rs.get_expr().get_white_type() != self.return_type {
                     add_parser_error(
-                        MismatchedTypes,
+                        MismatchedTypes(rs.get_expr().get_white_type(), self.return_type.clone()),
                         format!(
                             "You cannot return {:?} from [{}], it is defined to return: {:?}",
                             rs.get_expr().get_white_type(),

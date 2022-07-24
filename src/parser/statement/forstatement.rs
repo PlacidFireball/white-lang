@@ -73,7 +73,10 @@ impl Statement for ForStatement {
             let name = id_expr.debug();
             if st.has_symbol(name.clone()) {
                 add_parser_error(
-                    ParserErrorType::DuplicateName,
+                    ParserErrorType::DuplicateName(
+                        name.clone(),
+                        st.get_symbol_type(name.clone()).unwrap(),
+                    ),
                     format!(
                         "Duplicate name: [{}] has already been defined.",
                         id_expr.debug()
@@ -87,30 +90,11 @@ impl Statement for ForStatement {
         if typ != Type::Error && typ != Type::Initialized {
             st.register_symbol(self.variable.debug(), typ);
         } else {
-            add_parser_error(IncompatibleTypes, format!("Unexpected typing error."));
+            add_parser_error(
+                IncompatibleTypes(typ, self.variable.clone().get_white_type()),
+                format!("Unexpected typing error."),
+            );
         }
-
-        /*if let Some(lle) = self
-            .iterator
-            .to_any()
-            .downcast_ref::<ListLiteralExpression>()
-        {
-            let mut lle_cln = lle.clone();
-            lle_cln.validate(st);
-            let typ = lle_cln.get_white_type().get_type_from_list();
-            self.iterator = Box::new(lle_cln);
-            if typ != Type::Error {
-                st.register_symbol(self.variable.debug(), typ);
-            } else {
-                add_parser_error(IncompatibleTypes, format!("Bad type here"));
-                st.register_symbol(self.variable.debug(), Type::Void); // TODO: Make this Object
-            }
-        } else if self.iterator.get_white_type().is_list_type() {
-            crate::LOGGER.info("Here".to_string());
-            let typ = self.iterator.get_white_type().get_type_from_list();
-            st.register_symbol(self.variable.debug(), typ);
-            self.variable.validate(st);
-        }*/
         for stmt in &mut self.statements {
             stmt.validate(st);
         }
@@ -145,7 +129,7 @@ impl ForStatement {
             .is_none()
         {
             add_parser_error(
-                ParserErrorType::UnexpectedToken,
+                ParserErrorType::UnexpectedExpression(iter_var),
                 format!("You must use an identifier as your iteration variable."),
             );
         } else {
@@ -167,7 +151,7 @@ impl ForStatement {
             self.iterator = iter.clone();
         } else {
             add_parser_error(
-                ParserErrorType::UnexpectedToken,
+                ParserErrorType::UnexpectedExpression(iter),
                 format!("Unexpected token, make sure your iterator is a list type."),
             );
         }

@@ -55,7 +55,7 @@ impl Statement for AssignmentStatement {
             .is_none()
         {
             add_parser_error(
-                ParserErrorType::UnexpectedToken,
+                ParserErrorType::UnexpectedExpression(self.variable.clone()),
                 format!(
                     "Variable: [{}] is not defined in this scope",
                     self.variable.debug()
@@ -68,7 +68,10 @@ impl Statement for AssignmentStatement {
             .is_assignable_to(self.variable.get_white_type())
         {
             add_parser_error(
-                ParserErrorType::IncompatibleTypes,
+                ParserErrorType::IncompatibleTypes(
+                    self.expr.clone().get_white_type(),
+                    self.variable.clone().get_white_type(),
+                ),
                 format!(
                     "You cannot assign {:?} to {:?}",
                     self.expr.get_white_type(),

@@ -43,14 +43,14 @@ impl Expression for LogicalExpression {
     fn validate(&mut self, _st: &SymbolTable) {
         if self.operator.ne("&&") && self.operator.ne("||") {
             add_parser_error(
-                ParserErrorType::BadOperator,
+                ParserErrorType::BadOperator(self.operator.clone()),
                 format!("Operator: {} is not valid here", self.operator),
             );
         }
         if self.lhs.get_white_type() != self.rhs.get_white_type()
             && self.lhs.get_white_type() != Type::Boolean
         {
-            add_parser_error(MismatchedTypes, format!("You cannot and/or two expressions that do not evaluate to booleans. lhs: {:?} rhs: {:?}", self.lhs, self.rhs));
+            add_parser_error(MismatchedTypes(self.lhs.get_white_type(), self.rhs.get_white_type()), format!("You cannot and/or two expressions that do not evaluate to booleans. lhs: {:?} rhs: {:?}", self.lhs, self.rhs));
         }
     }
 

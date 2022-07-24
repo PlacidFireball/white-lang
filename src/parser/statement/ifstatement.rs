@@ -1,9 +1,8 @@
 use crate::config::*;
 use crate::parser::expression::syntaxerrorexpression::SyntaxErrorExpression;
-use crate::parser::parser_traits::*;
 use crate::parser::symbol_table::SymbolTable;
 use crate::parser::whitetypes::Type;
-use crate::parser::ParserErrorType::UnexpectedToken;
+use crate::parser::{parser_traits::*, ParserErrorType};
 use crate::runtime::Runtime;
 use std::any::Any;
 
@@ -48,7 +47,7 @@ impl Statement for IfStatement {
         self.expr.validate(st);
         if self.expr.get_white_type() != Type::Boolean {
             add_parser_error(
-                UnexpectedToken,
+                ParserErrorType::BadType(self.expr.get_white_type()),
                 format!(
                     "You cannot branch based on type: {:?}",
                     self.expr.get_white_type()

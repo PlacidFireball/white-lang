@@ -70,7 +70,10 @@ impl Expression for FactorExpression {
             && self.lhs.get_white_type().ne(&Type::Integer)
         {
             add_parser_error(
-                ParserErrorType::IncompatibleTypes,
+                ParserErrorType::IncompatibleTypes(
+                    self.lhs.get_white_type(),
+                    self.rhs.get_white_type(),
+                ),
                 format!(
                     "You cannot multiply/divide two non number types. lhs: {:?} rhs: {:?}",
                     self.lhs, self.rhs
@@ -81,7 +84,10 @@ impl Expression for FactorExpression {
             && self.rhs.get_white_type().ne(&Type::Integer)
         {
             add_parser_error(
-                ParserErrorType::IncompatibleTypes,
+                ParserErrorType::IncompatibleTypes(
+                    self.lhs.get_white_type(),
+                    self.rhs.get_white_type(),
+                ),
                 format!(
                     "You cannot multiply/divide two non number types. lhs: {:?} rhs: {:?}",
                     self.lhs, self.rhs

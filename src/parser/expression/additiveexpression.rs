@@ -85,7 +85,10 @@ impl Expression for AdditiveExpression {
         self.rhs.validate(st);
         if self.lhs.get_white_type() != Type::Integer && self.lhs.get_white_type() != Type::Float {
             add_parser_error(
-                ParserErrorType::IncompatibleTypes,
+                ParserErrorType::IncompatibleTypes(
+                    self.lhs.get_white_type(),
+                    self.rhs.get_white_type(),
+                ),
                 format!(
                     "You cannot add/subtract two non number types. lhs: {:?} rhs: {:?}",
                     self.lhs, self.rhs
@@ -94,7 +97,10 @@ impl Expression for AdditiveExpression {
         }
         if self.rhs.get_white_type() != Type::Integer && self.rhs.get_white_type() != Type::Float {
             add_parser_error(
-                ParserErrorType::IncompatibleTypes,
+                ParserErrorType::IncompatibleTypes(
+                    self.lhs.get_white_type(),
+                    self.rhs.get_white_type(),
+                ),
                 format!(
                     "You cannot add/subtract two non number types. lhs: {:?} rhs: {:?}",
                     self.lhs, self.rhs
@@ -105,7 +111,12 @@ impl Expression for AdditiveExpression {
 
     // gives debug information of the expression without having to downcast it
     fn debug(&self) -> String {
-        format!("{} {} {}", self.lhs.debug(), self.operator, self.rhs.debug())
+        format!(
+            "{} {} {}",
+            self.lhs.debug(),
+            self.operator,
+            self.rhs.debug()
+        )
     }
 
     fn get_white_type(&self) -> Type {

@@ -44,7 +44,7 @@ impl Expression for ListLiteralExpression {
             expr.validate(st);
             if expr.get_white_type() != self.typ.get_type_from_list() {
                 add_parser_error(
-                    MismatchedTypes,
+                    MismatchedTypes(expr.get_white_type(), self.typ.get_type_from_list()),
                     format!("All items in the list must be of the same type."),
                 );
             }

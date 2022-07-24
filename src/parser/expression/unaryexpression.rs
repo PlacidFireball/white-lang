@@ -53,13 +53,13 @@ impl Expression for UnaryExpression {
                 || self.expr.get_white_type() == Type::Float)
         {
             add_parser_error(
-                ParserErrorType::BadOperator,
+                ParserErrorType::BadOperator(self.operator.clone()),
                 format!("You cannot use `not` on numerical types."),
             );
         }
         if self.operator == "-" && self.expr.get_white_type() == Type::Boolean {
             add_parser_error(
-                ParserErrorType::BadOperator,
+                ParserErrorType::BadOperator(self.operator.clone()),
                 format!("You cannot use `-` on boolean types."),
             );
         }

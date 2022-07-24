@@ -36,7 +36,7 @@ impl Statement for ReturnStatement {
         LOGGER.info(format!("Got {:?}", fds));
         if self.return_type != fds.get_return_type() {
             add_parser_error(
-                ParserErrorType::MismatchedTypes,
+                ParserErrorType::MismatchedTypes(self.return_type.clone(), fds.get_return_type()),
                 format!(
                     "You cannot return {:?} from [{}], it is defined to return: {:?}",
                     self.return_type,

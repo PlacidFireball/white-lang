@@ -39,15 +39,15 @@ impl Expression for FunctionCallExpression {
             }
             evaluated_args.push(tmp);
         }
-        assert_eq!(self.args.len(), evaluated_args.len());
-        /*for (i, arg) in evaluated_args.iter().enumerate() {
-            println!(
-                "[FNCALL: {}]: Arg Name: {}\tValue: {}",
-                self.name,
-                fds.get_arg_names()[i],
-                try_print_output(&arg.evaluate(runtime))
-            );
-        }*/
+        assert_eq!(self.args.len(), evaluated_args.len()); // sanity check
+                                                           /*for (i, arg) in evaluated_args.iter().enumerate() {
+                                                               println!(
+                                                                   "[FNCALL: {}]: Arg Name: {}\tValue: {}",
+                                                                   self.name,
+                                                                   fds.get_arg_names()[i],
+                                                                   try_print_output(&arg.evaluate(runtime))
+                                                               );
+                                                           }*/
         println!(
             "[FUNCTION CALL] invoking {}...\n| args: {:?}",
             self.name, self.args
@@ -69,7 +69,7 @@ impl Expression for FunctionCallExpression {
         let fds_opt = st.get_function(self.name.clone());
         if fds_opt.is_none() {
             add_parser_error(
-                UnknownName,
+                UnknownName(self.name.clone()),
                 format!(
                     "You cannot call: [{}], it has not been defined",
                     self.name.clone()
@@ -93,7 +93,7 @@ impl Expression for FunctionCallExpression {
                     let param_type = self.args[i].get_white_type();
                     if !param_type.is_assignable_to(arg.get_white_type()) {
                         add_parser_error(
-                            IncompatibleTypes,
+                            IncompatibleTypes(param_type.clone(), arg.get_white_type()),
                             format!(
                                 "You cannot assign {:?} to {:?}",
                                 param_type,

@@ -82,9 +82,9 @@ impl Runtime {
 
     pub fn get_struct(&self, name: String) -> StructDefinitionStatement {
         if !self.structs.contains_key(&name) {
-            crate::LOGGER.error( format!("struct: `{}` not in the structs map", name));
+            crate::LOGGER.error(format!("struct: `{}` not in the structs map", name));
             unreachable!(); // need this here to get compiler to heck off
-        } 
+        }
         self.structs.get(&name).unwrap().clone()
     }
 

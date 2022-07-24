@@ -26,7 +26,7 @@ thread_local! {
         CoreObjects::new_uninit()
     );
 
-    pub static IS_TESTING: Cell<bool> = Cell::new(false);
+    pub static IS_TESTING: Cell<bool> = Cell::new(false); // legacy trying to move away from this
 }
 
 const LOGGER: Logger = Logger {};

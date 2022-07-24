@@ -108,7 +108,11 @@ pub struct Token {
 impl Display for Token {
     // for debug info
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", self.typ)
+        write!(
+            f,
+            "line: {}, offset: {}, type: {}",
+            self.line, self.line_offset, self.typ
+        )
     }
 }
 #[allow(dead_code)]
@@ -511,7 +515,7 @@ impl Tokenizer {
             // regex: [a-zA-Z_][a-zA-Z_0-9]*
             let start = self.position; // set start
             self.consume_char(); // consume the first char
-            while self.peek().is_alphanumeric() {
+            while self.peek().is_alphanumeric() || self.peek().eq(&'_') {
                 // while we have anything [a-zA-Z_0-9]
                 self.consume_char();
                 if self.tokenization_end() {

@@ -27,10 +27,10 @@ use expression::stringliteralexpression::StringLiteralExpression;
 use expression::syntaxerrorexpression::SyntaxErrorExpression;
 use expression::unaryexpression::UnaryExpression;
 use statement::forstatement::ForStatement;
-use statement::whilestatement::WhileStatement;
-use statement::structdefinitionstatement::StructDefinitionStatement;
 use statement::functiondefinitionstatement::FunctionDefinitionStatement;
 use statement::returnstatement::ReturnStatement;
+use statement::structdefinitionstatement::StructDefinitionStatement;
+use statement::whilestatement::WhileStatement;
 
 use statement::assignmentstatement::AssignmentStatement;
 use statement::functioncallstatement::FunctionCallStatement;
@@ -40,50 +40,58 @@ use statement::printstatement::PrintStatement;
 use crate::config::WhiteLangFloat;
 use crate::parser::parser_traits::{Expression, Statement};
 use crate::parser::statement::breakstatement::BreakStatement;
+use crate::parser::statement::syntaxerrorstatement::SyntaxErrorStatement;
 use crate::parser::ParserErrorType::UnterminatedArgList;
 use statement::variablestatement::VariableStatement;
-use crate::parser::statement::syntaxerrorstatement::SyntaxErrorStatement;
 use symbol_table::SymbolTable;
 
 use crate::LOGGER;
 
 // Parsing Errors
-#[derive(Clone, Copy, Debug, PartialOrd, PartialEq)]
+#[derive(Clone, Debug)]
 pub enum ParserErrorType {
-    UnexpectedToken,       // we've encountered some unexpected token
-    UnterminatedArgList,   // function has unterminated argument list
-    UnterminatedList,      // list literal is unterminated
-    BadOperator,           // calling operator on types that don't make sense
-    MismatchedTypes,       // attempting to pass bad types into various facets of whitelang
-    SymbolDefinitionError, //
-    DuplicateName,         // attempting to redefine a symbol already in the symbol table
-    BadReturnType,         // function returns a type that it's not supposed to
-    BadVariableType,       // variable has bad type
-    UnknownName,           // trying to assign to a variable that whitelang doesn't know about
-    ArgMismatch,           //
-    IncompatibleTypes,     //
+    UnexpectedToken(Token),        // we've encountered some unexpected token
+    UnterminatedArgList(Token),    // function has unterminated argument list
+    UnterminatedList(Token),       // list literal is unterminated
+    BadOperator(String),           // calling operator on types that don't make sense
+    MismatchedTypes(Type, Type),   // attempting to pass bad types into various facets of whitelang
+    SymbolDefinitionError,         //
+    DuplicateName(String, Type),   // attempting to redefine a symbol already in the symbol table
+    BadReturnType,                 // function returns a type that it's not supposed to
+    BadVariableType,               // variable has bad type
+    UnknownName(String), // trying to assign to a variable that whitelang doesn't know about
+    ArgMismatch,         //
+    IncompatibleTypes(Type, Type), //
+    UnexpectedExpression(Box<dyn Expression>),
+    BadType(Type),
 }
 impl ParserErrorType {
     fn to_error_msg(&self) -> String {
         use ParserErrorType::*;
         match self {
-            UnexpectedToken => "Unexpected token: {}".to_string(),
-            UnterminatedArgList => "Unterminated argument list: {}".to_string(),
-            UnterminatedList => "Unterminated list: {}".to_string(),
-            BadOperator => "Bad operator: {}".to_string(),
-            MismatchedTypes => "Mismatched types: {}".to_string(),
+            UnexpectedToken(tok) => format!("Unexpected token: {}", tok),
+            UnterminatedArgList(tok) => format!("Unterminated argument list: {}", tok),
+            UnterminatedList(tok) => format!("Unterminated list: {}", tok),
+            BadOperator(op) => format!("Bad operator: {}", op),
+            MismatchedTypes(t1, t2) => format!("Mismatched types: {:?} + {:?}", t1, t2),
             SymbolDefinitionError => "Symbol definition error: {}".to_string(),
-            DuplicateName => "Duplicate name: {}".to_string(),
+            DuplicateName(name, typ) => format!(
+                "Duplicate name: {}\n| It was earlier defined as: {0} -> {:?}",
+                name, typ
+            ),
             BadReturnType => "Bad return type: {}".to_string(),
             BadVariableType => "Bad variable name: {}".to_string(),
-            UnknownName => "Unknown name: {}".to_string(),
+            UnknownName(name) => format!("Unknown name: {}", name),
             ArgMismatch => "Argument mismatch: {}".to_string(),
-            IncompatibleTypes => "Incompatible types: {}".to_string(),
+            IncompatibleTypes(t1, t2) => format!("Incompatible types: {:?} + {:?}", t1, t2),
+            UnexpectedExpression(expr) => format!("Unexpected expression: {:?}", expr),
+            BadType(typ) => format!("Bad type: {:?}", typ),
         }
     }
 }
 
-// The White-lang parser
+/// The White-lang parser
+/// Turns tokens from crate::Tokenizer into an AST
 #[allow(dead_code)]
 pub struct Parser {
     token_list: Vec<Token>,                  // gets the token list
@@ -199,7 +207,8 @@ impl Parser {
     }
 
     pub fn error_panic(error: ParserErrorType) {
-        panic!("Error: {:?} occurred during validation", error);
+        println!("[FATAL]: {}", error.to_error_msg());
+        panic!("[FATAL]: {:?} occurred during validation", error);
     }
 
     // tells us if we have errors
@@ -207,8 +216,8 @@ impl Parser {
         !self.errors.is_empty()
     }
 
-    fn get_curr_tok(&self) -> &Token {
-        &self.token_list[self.curr_idx]
+    fn get_curr_tok(&self) -> Token {
+        self.token_list[self.curr_idx].clone()
     }
 
     // consumes the token unconditionally
@@ -254,7 +263,7 @@ impl Parser {
                 "Got unexpected token during parse: {:?}",
                 self.get_curr_tok()
             ));
-            self.errors.push(UnexpectedToken);
+            self.errors.push(UnexpectedToken(self.get_curr_tok()));
             self.check_for_parse_errors();
         }
         self.consume_token();
@@ -369,7 +378,7 @@ impl Parser {
                 let typ = self.require_a_type();
                 fds.add_arg_type(typ);
                 if !self.has_tokens() {
-                    self.errors.push(UnterminatedArgList);
+                    self.errors.push(UnterminatedArgList(self.get_curr_tok()));
                     break;
                 }
             }
@@ -482,7 +491,8 @@ impl Parser {
             while !self.match_and_consume(RightBrace) && self.has_tokens() {
                 if_stmt.add_true_statement(self.parse_statement());
                 if !self.has_tokens() {
-                    self.errors.push(ParserErrorType::UnexpectedToken);
+                    self.errors
+                        .push(ParserErrorType::UnexpectedToken(self.get_curr_tok()));
                     break;
                 }
             }
@@ -491,7 +501,8 @@ impl Parser {
                 while !self.match_and_consume(RightBrace) && self.has_tokens() {
                     if_stmt.add_false_statement(self.parse_statement());
                     if !self.has_tokens() {
-                        self.errors.push(ParserErrorType::UnexpectedToken);
+                        self.errors
+                            .push(ParserErrorType::UnexpectedToken(self.get_curr_tok()));
                         break;
                     }
                 }
@@ -527,7 +538,8 @@ impl Parser {
             while !self.match_and_consume(RightBrace) && self.has_tokens() {
                 while_statement.add_body_statement(self.parse_statement());
                 if !self.has_tokens() {
-                    self.errors.push(ParserErrorType::UnexpectedToken);
+                    self.errors
+                        .push(ParserErrorType::UnexpectedToken(self.get_curr_tok()));
                     break;
                 }
             }
@@ -559,8 +571,12 @@ impl Parser {
                 sds.add_field(expr.debug(), typ);
                 self.match_and_consume(TokenType::Comma);
                 if !self.has_tokens() {
-                    LOGGER.warn(format!("Unexpected token: {:?} while parsing struct definition.", self.get_curr_tok()));
-                    self.errors.push(ParserErrorType::UnexpectedToken);
+                    LOGGER.warn(format!(
+                        "Unexpected token: {:?} while parsing struct definition.",
+                        self.get_curr_tok()
+                    ));
+                    self.errors
+                        .push(ParserErrorType::UnexpectedToken(self.get_curr_tok()));
                 }
             }
             if self.match_and_consume(TokenType::Implement) {
@@ -573,17 +589,23 @@ impl Parser {
                             let method = method_opt.unwrap();
                             sds.add_method(method.name.clone(), method.clone());
                         } else {
-                            self.errors.push(ParserErrorType::UnexpectedToken);
+                            self.errors
+                                .push(ParserErrorType::UnexpectedToken(self.get_curr_tok()));
                             self.check_for_parse_errors();
                         }
                         if !self.has_tokens() {
-                            LOGGER.warn(format!("Unexpected token: {:?} while parsing struct definition.", self.get_curr_tok()));
-                            self.errors.push(ParserErrorType::UnexpectedToken);
+                            LOGGER.warn(format!(
+                                "Unexpected token: {:?} while parsing struct definition.",
+                                self.get_curr_tok()
+                            ));
+                            self.errors
+                                .push(ParserErrorType::UnexpectedToken(self.get_curr_tok()));
                             self.check_for_parse_errors();
                         }
                     }
                 } else {
-                    self.errors.push(ParserErrorType::UnexpectedToken);
+                    self.errors
+                        .push(ParserErrorType::UnexpectedToken(self.get_curr_tok()));
                     self.check_for_parse_errors();
                 }
             }
@@ -714,7 +736,8 @@ impl Parser {
                 self.match_and_consume(Comma); // consume a comma if we have one
                 if !self.has_tokens() {
                     // check to see if we've run out of tokens
-                    self.errors.push(ParserErrorType::UnterminatedArgList); // add an error if we have
+                    self.errors
+                        .push(ParserErrorType::UnterminatedArgList(self.get_curr_tok())); // add an error if we have
                     break;
                 }
             }
@@ -734,7 +757,8 @@ impl Parser {
                 self.match_and_consume(Comma); // consume a comma if there is any
                 if !self.has_tokens() {
                     // check to see if we have an unterminated list
-                    self.errors.push(ParserErrorType::UnterminatedList); // if we do add an error
+                    self.errors
+                        .push(ParserErrorType::UnterminatedList(self.get_curr_tok())); // if we do add an error
                     break;
                 }
             }

@@ -2,7 +2,7 @@ use crate::parser::expression::syntaxerrorexpression::SyntaxErrorExpression;
 use crate::parser::parser_traits::{add_parser_error, Expression, Statement, ToAny};
 use crate::parser::symbol_table::SymbolTable;
 use crate::parser::whitetypes::Type;
-use crate::parser::ParserErrorType::UnexpectedToken;
+use crate::parser::ParserErrorType;
 use crate::runtime::Runtime;
 use crate::LOGGER;
 use std::any::Any;
@@ -57,7 +57,7 @@ impl Statement for WhileStatement {
         self.expr.validate(st);
         if self.expr.get_white_type() != Type::Boolean {
             add_parser_error(
-                UnexpectedToken,
+                ParserErrorType::BadType(self.expr.get_white_type()),
                 format!("Expected a boolean type to loop on."),
             );
         }

@@ -97,7 +97,7 @@ impl SymbolTable {
                     Option::Some(
                         t.downcast_ref::<StructDefinitionStatement>()
                             .unwrap()
-                            .clone()
+                            .clone(),
                     )
                 } else {
                     Option::None

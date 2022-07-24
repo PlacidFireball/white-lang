@@ -91,7 +91,10 @@ impl Expression for ComparisonExpression {
         self.rhs.validate(st);
         if self.lhs.get_white_type() != self.rhs.get_white_type() {
             add_parser_error(
-                ParserErrorType::MismatchedTypes,
+                ParserErrorType::MismatchedTypes(
+                    self.lhs.get_white_type(),
+                    self.rhs.get_white_type(),
+                ),
                 format!(
                     "Types must be comparable: lhs: {:?} rhs {:?}",
                     self.lhs.get_white_type(),

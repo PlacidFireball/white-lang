@@ -36,12 +36,15 @@ impl Statement for VariableStatement {
         self.expr.validate(st);
         if st.has_symbol(self.name.clone()) {
             add_parser_error(
-                DuplicateName,
+                DuplicateName(
+                    self.name.clone(),
+                    st.get_symbol_type(self.name.clone()).unwrap(),
+                ),
                 format!("Duplicate name: {}", self.name.clone()),
             );
         }
         if self.typ == Type::Error {
-            add_parser_error(UnexpectedToken, format!("Got error type."));
+            add_parser_error(BadType(self.typ.clone()), format!("Got error type."));
         }
         LOGGER.info(format!(
             "Registering `{}` with type {:?}",
@@ -72,7 +75,10 @@ impl VariableStatement {
             LOGGER.info(format!("Set type of `{}` to {:?}", self.name, self.typ));
             self.typ = typ;
         } else if self.typ != typ {
-            add_parser_error(MismatchedTypes, format!("Set bad type"));
+            add_parser_error(
+                MismatchedTypes(self.typ.clone(), typ),
+                format!("Set bad type"),
+            );
         }
     }
 

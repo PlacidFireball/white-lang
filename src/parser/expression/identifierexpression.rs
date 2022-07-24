@@ -42,12 +42,11 @@ impl Expression for IdentifierExpression {
         let opt_typ = st.get_symbol_type(self.name.clone());
         if opt_typ.is_some() {
             self.typ = opt_typ.unwrap();
-        }
-        else {
+        } else {
             self.typ = Type::Error;
             LOGGER.warn(format!("Couldn't get the type for identifier {:?}", self));
             add_parser_error(
-                UnknownName,
+                UnknownName(self.name.clone()),
                 format!(
                     "You cannot use {} as you have not defined it.\n|Try: let {} = ...",
                     self.name, self.name

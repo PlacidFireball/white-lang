@@ -1,8 +1,8 @@
-use crate::parser::ParserErrorType;
-use crate::parser::parser_traits::{Expression, Statement, ToAny, add_parser_error};
+use crate::parser::parser_traits::{add_parser_error, Expression, Statement, ToAny};
 use crate::parser::statement::functiondefinitionstatement::FunctionDefinitionStatement;
 use crate::parser::symbol_table::SymbolTable;
 use crate::parser::whitetypes::Type;
+use crate::parser::ParserErrorType;
 use crate::runtime::Runtime;
 use std::any::Any;
 use std::collections::HashMap;
@@ -37,7 +37,13 @@ impl Statement for StructDefinitionStatement {
 
     fn validate(&mut self, st: &mut SymbolTable) {
         if st.has_symbol(self.name.clone()) {
-            add_parser_error(ParserErrorType::DuplicateName, format!("Duplicate name `{}`", self.name));
+            add_parser_error(
+                ParserErrorType::DuplicateName(
+                    self.name.clone(),
+                    st.get_symbol_type(self.name.clone()).unwrap(),
+                ),
+                format!("Duplicate name `{}`", self.name),
+            );
         }
         for (name, typ) in self.fields.iter() {
             st.register_symbol(format!("{}.{}", self.name, name), typ.clone()); // do this because we don't want to clash y and x.y
@@ -80,7 +86,7 @@ impl StructDefinitionStatement {
 
     pub fn get_method(&self, method_name: String) -> Option<FunctionDefinitionStatement> {
         match self.methods.get(&method_name) {
-            Some(fds) =>  Some(fds.clone()),
+            Some(fds) => Some(fds.clone()),
             None => {
                 crate::LOGGER.warn(format!("No such method `{}`", method_name));
                 None

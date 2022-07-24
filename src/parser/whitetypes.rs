@@ -56,9 +56,7 @@ impl Type {
             ListFloat => ListFloat,
             ListBoolean => ListBoolean,
             ListObject => ListObject,
-            Struct(a) => {
-                ListStruct(a.clone())
-            },
+            Struct(a) => ListStruct(a.clone()),
             ListStruct { .. } => self.clone(),
             Initialized => Error,
             Void => Error,
