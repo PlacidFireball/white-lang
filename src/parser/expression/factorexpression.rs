@@ -1,4 +1,5 @@
 use crate::config::{WhiteLangFloat, WhiteLangInt};
+use crate::javascript::JavaScript;
 use crate::parser::parser_traits::{add_parser_error, Expression, ToAny};
 use crate::parser::symbol_table::SymbolTable;
 use crate::parser::whitetypes::Type;
@@ -59,7 +60,7 @@ impl Expression for FactorExpression {
         todo!()
     }
 
-    fn transpile(&self) {
+    fn transpile(&self, javascript: &mut JavaScript) {
         todo!()
     }
 

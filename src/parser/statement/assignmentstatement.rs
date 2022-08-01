@@ -6,6 +6,7 @@ use crate::parser::ParserErrorType;
 use crate::runtime::Runtime;
 
 use std::any::Any;
+use crate::javascript::JavaScript;
 
 #[derive(Clone, Debug)]
 pub(crate) struct AssignmentStatement {
@@ -41,7 +42,7 @@ impl Statement for AssignmentStatement {
         todo!()
     }
 
-    fn transpile(&self) -> String {
+    fn transpile(&self, javascript: &mut JavaScript)  {
         todo!()
     }
 

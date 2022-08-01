@@ -1,4 +1,5 @@
 use crate::config::{WhiteLangBool, WhiteLangFloat, WhiteLangInt, WhiteLangString};
+use crate::javascript::JavaScript;
 use crate::parser::parser_traits::{try_print_output, Expression, ToAny};
 use crate::parser::symbol_table::SymbolTable;
 use crate::parser::whitetypes::Type;
@@ -106,7 +107,7 @@ impl Expression for EqualityExpression {
         todo!()
     }
 
-    fn transpile(&self) {
+    fn transpile(&self, javascript: &mut JavaScript) {
         todo!()
     }
 

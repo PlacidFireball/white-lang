@@ -3,6 +3,7 @@ use crate::parser::symbol_table::SymbolTable;
 use crate::parser::whitetypes::Type;
 use crate::runtime::Runtime;
 use std::any::Any;
+use crate::javascript::JavaScript;
 
 #[derive(Clone, Debug)]
 pub(crate) struct NullLiteralExpression {}
@@ -22,7 +23,7 @@ impl Expression for NullLiteralExpression {
         todo!()
     }
 
-    fn transpile(&self) {
+    fn transpile(&self, javascript: &mut JavaScript)  {
         todo!()
     }
 

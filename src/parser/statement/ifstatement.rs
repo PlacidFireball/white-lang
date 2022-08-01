@@ -5,6 +5,7 @@ use crate::parser::whitetypes::Type;
 use crate::parser::{parser_traits::*, ParserErrorType};
 use crate::runtime::Runtime;
 use std::any::Any;
+use crate::javascript::JavaScript;
 
 #[derive(Clone, Debug)]
 pub struct IfStatement {
@@ -39,7 +40,7 @@ impl Statement for IfStatement {
         todo!()
     }
 
-    fn transpile(&self) -> String {
+    fn transpile(&self, javascript: &mut JavaScript) {
         todo!()
     }
 

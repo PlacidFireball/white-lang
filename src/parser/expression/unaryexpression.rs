@@ -5,6 +5,7 @@ use crate::parser::whitetypes::Type;
 use crate::parser::ParserErrorType;
 use crate::runtime::Runtime;
 use std::any::Any;
+use crate::javascript::JavaScript;
 
 #[derive(Clone, Debug)]
 pub(crate) struct UnaryExpression {
@@ -43,7 +44,7 @@ impl Expression for UnaryExpression {
         todo!()
     }
 
-    fn transpile(&self) {
+    fn transpile(&self, javascript: &mut JavaScript) {
         todo!()
     }
 

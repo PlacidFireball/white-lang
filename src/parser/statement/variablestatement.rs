@@ -5,6 +5,7 @@ use crate::parser::ParserErrorType::*;
 use crate::runtime::Runtime;
 use crate::LOGGER;
 use std::any::Any;
+use crate::javascript::JavaScript;
 
 #[derive(Clone, Debug)]
 pub(crate) struct VariableStatement {
@@ -28,7 +29,7 @@ impl Statement for VariableStatement {
         todo!()
     }
 
-    fn transpile(&self) -> String {
+    fn transpile(&self, javascript: &mut JavaScript) {
         todo!()
     }
 

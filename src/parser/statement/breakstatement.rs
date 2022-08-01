@@ -3,6 +3,7 @@ use crate::parser::symbol_table::SymbolTable;
 use crate::runtime::Runtime;
 
 use std::any::Any;
+use crate::javascript::JavaScript;
 
 #[derive(Clone, Debug)]
 pub(crate) struct BreakStatement {}
@@ -22,7 +23,7 @@ impl Statement for BreakStatement {
         todo!()
     }
 
-    fn transpile(&self) -> String {
+    fn transpile(&self, javascript: &mut JavaScript)  {
         todo!()
     }
 

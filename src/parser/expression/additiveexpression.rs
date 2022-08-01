@@ -1,3 +1,4 @@
+use crate::javascript::JavaScript;
 use crate::parser::whitetypes::Type;
 use crate::parser::ParserErrorType;
 
@@ -76,7 +77,7 @@ impl Expression for AdditiveExpression {
 
     fn compile(&self) {}
 
-    fn transpile(&self) {}
+    fn transpile(&self, javascript: &mut JavaScript) {}
 
     fn validate(&mut self, st: &SymbolTable) {
         // I have decided that I am not going to allow + being called on strings,

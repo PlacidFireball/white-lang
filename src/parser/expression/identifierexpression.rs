@@ -5,6 +5,7 @@ use crate::parser::ParserErrorType::UnknownName;
 use crate::runtime::Runtime;
 use crate::LOGGER;
 use std::any::Any;
+use crate::javascript::JavaScript;
 
 #[derive(Clone, Debug)]
 pub(crate) struct IdentifierExpression {
@@ -34,7 +35,7 @@ impl Expression for IdentifierExpression {
         todo!()
     }
 
-    fn transpile(&self) {
+    fn transpile(&self, javascript: &mut JavaScript) {
         todo!()
     }
 

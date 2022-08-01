@@ -17,6 +17,7 @@ mod core;
 mod logger;
 mod program;
 mod runtime;
+mod javascript;
 use crate::logger::Logger;
 
 use crate::core::CoreObjects;

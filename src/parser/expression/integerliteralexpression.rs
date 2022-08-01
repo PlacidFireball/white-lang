@@ -4,6 +4,7 @@ use crate::parser::symbol_table::SymbolTable;
 use crate::parser::whitetypes::Type;
 use crate::runtime::Runtime;
 use std::any::Any;
+use crate::javascript::JavaScript;
 
 #[derive(Clone, Debug)]
 pub struct IntegerLiteralExpression {
@@ -25,7 +26,7 @@ impl Expression for IntegerLiteralExpression {
         todo!()
     }
 
-    fn transpile(&self) {
+    fn transpile(&self, javascript: &mut JavaScript) {
         todo!()
     }
 

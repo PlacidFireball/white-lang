@@ -1,4 +1,5 @@
 use crate::config::{WhiteLangBool, WhiteLangFloat, WhiteLangInt, WhiteLangList, WhiteLangString};
+use crate::javascript::{JavaScript, self};
 use crate::parser::expression::additiveexpression::AdditiveExpression;
 use crate::parser::expression::booleanliteralexpression::BooleanLiteralExpression;
 use crate::parser::expression::comparisonexpression::ComparisonExpression;
@@ -114,7 +115,7 @@ pub fn try_print_output(evaluated: &Box<dyn Any>) -> String {
 pub trait Expression: ToAny + Debug {
     fn evaluate(&self, runtime: &mut Runtime) -> Box<dyn Any>; // evaluate the expression
     fn compile(&self); // compile the expression to nasm
-    fn transpile(&self); // transpile the expression to javascript
+    fn transpile(&self, javascript: &mut JavaScript); // transpile the expression to javascript
     fn validate(&mut self, st: &SymbolTable); // validate the expression via the symbol table
     fn debug(&self) -> String; // for retrieving information about the expression
     fn get_white_type(&self) -> Type; // getting the type of the expression
@@ -168,7 +169,7 @@ impl Clone for Box<dyn Expression> {
 pub trait Statement: ToAny + Debug {
     fn execute(&self, runtime: &mut Runtime); // execute the statement
     fn compile(&self); // compile the statement to nasm
-    fn transpile(&self) -> String; // transpile the statement to Javascript
+    fn transpile(&self, javascript: &mut JavaScript); // transpile the statement to Javascript
     fn validate(&mut self, st: &mut SymbolTable); // validate the statement via the symbol table
     fn get_expr(&self) -> &Box<dyn Expression>; // retrieve the expression if the statement has one
     fn get_statement_type(&self) -> String; // debug info of the class

@@ -6,6 +6,7 @@ use crate::parser::ParserErrorType;
 use crate::runtime::Runtime;
 use crate::LOGGER;
 use std::any::Any;
+use crate::javascript::JavaScript;
 
 #[derive(Clone, Debug)]
 pub struct WhileStatement {
@@ -49,7 +50,7 @@ impl Statement for WhileStatement {
         todo!()
     }
 
-    fn transpile(&self) -> String {
+    fn transpile(&self, javascript: &mut JavaScript) {
         todo!()
     }
 

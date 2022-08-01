@@ -9,6 +9,8 @@ use crate::parser::ParserErrorType::IncompatibleTypes;
 use crate::runtime::Runtime;
 use std::any::Any;
 use uuid::Uuid;
+use crate::javascript::JavaScript;
+
 #[derive(Clone, Debug)]
 pub(crate) struct ForStatement {
     statements: Vec<Box<dyn Statement>>,
@@ -59,7 +61,7 @@ impl Statement for ForStatement {
         todo!()
     }
 
-    fn transpile(&self) -> String {
+    fn transpile(&self, javascript: &mut JavaScript) {
         todo!()
     }
 

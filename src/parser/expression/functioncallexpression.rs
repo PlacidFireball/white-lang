@@ -1,3 +1,4 @@
+use crate::javascript::JavaScript;
 use crate::parser::parser_traits::{
     add_parser_error, any_into_bool_literal, any_into_f64_literal, any_into_int_literal,
     Expression, ToAny,
@@ -61,7 +62,7 @@ impl Expression for FunctionCallExpression {
         todo!()
     }
 
-    fn transpile(&self) {
+    fn transpile(&self, javascript: &mut JavaScript) {
         todo!()
     }
 

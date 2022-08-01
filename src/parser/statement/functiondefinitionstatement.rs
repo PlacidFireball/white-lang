@@ -6,6 +6,7 @@ use crate::parser::*;
 use crate::runtime::Runtime;
 
 use uuid::Uuid;
+use crate::javascript::JavaScript;
 
 #[derive(Clone, Debug)]
 pub struct FunctionDefinitionStatement {
@@ -45,7 +46,7 @@ impl Statement for FunctionDefinitionStatement {
         todo!()
     }
 
-    fn transpile(&self) -> String {
+    fn transpile(&self, javascript: &mut JavaScript) {
         todo!()
     }
 

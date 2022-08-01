@@ -3,6 +3,7 @@ use crate::parser::symbol_table::SymbolTable;
 use crate::program::Program;
 use crate::runtime::Runtime;
 use std::any::Any;
+use crate::javascript::JavaScript;
 
 #[derive(Clone, Debug)]
 pub(crate) struct PrintStatement {
@@ -26,7 +27,7 @@ impl Statement for PrintStatement {
         todo!()
     }
 
-    fn transpile(&self) -> String {
+    fn transpile(&self, javascript: &mut JavaScript) {
         todo!()
     }
 

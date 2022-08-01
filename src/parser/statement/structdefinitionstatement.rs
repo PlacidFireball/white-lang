@@ -7,6 +7,7 @@ use crate::runtime::Runtime;
 use std::any::Any;
 use std::collections::HashMap;
 use std::fmt::Debug;
+use crate::javascript::JavaScript;
 
 #[allow(dead_code)]
 #[derive(Clone, Debug)]
@@ -31,7 +32,7 @@ impl Statement for StructDefinitionStatement {
         todo!()
     }
 
-    fn transpile(&self) -> String {
+    fn transpile(&self, javascript: &mut JavaScript) {
         todo!()
     }
 

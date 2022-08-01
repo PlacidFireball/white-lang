@@ -5,6 +5,7 @@ use crate::parser::ParserErrorType::MismatchedTypes;
 use crate::runtime::Runtime;
 use crate::LOGGER;
 use std::any::Any;
+use crate::javascript::JavaScript;
 
 #[derive(Clone, Debug)]
 pub(crate) struct ListLiteralExpression {
@@ -31,7 +32,7 @@ impl Expression for ListLiteralExpression {
         todo!()
     }
 
-    fn transpile(&self) {
+    fn transpile(&self, javascript: &mut JavaScript) {
         todo!()
     }
 

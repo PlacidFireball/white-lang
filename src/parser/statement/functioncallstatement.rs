@@ -3,6 +3,7 @@ use crate::parser::parser_traits::*;
 use crate::parser::symbol_table::SymbolTable;
 use crate::runtime::Runtime;
 use std::any::Any;
+use crate::javascript::JavaScript;
 
 #[allow(dead_code)]
 #[derive(Clone, Debug)]
@@ -27,7 +28,7 @@ impl Statement for FunctionCallStatement {
         todo!()
     }
 
-    fn transpile(&self) -> String {
+    fn transpile(&self, javascript: &mut JavaScript) {
         todo!()
     }
 

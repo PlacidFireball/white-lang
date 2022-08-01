@@ -1,4 +1,5 @@
 use crate::config::WhiteLangFloat;
+use crate::javascript::JavaScript;
 use crate::parser::parser_traits::{Expression, ToAny};
 use crate::parser::symbol_table::SymbolTable;
 use crate::parser::whitetypes::Type;
@@ -25,7 +26,7 @@ impl Expression for FloatLiteralExpression {
         todo!()
     }
 
-    fn transpile(&self) {
+    fn transpile(&self, javascript: &mut JavaScript) {
         todo!()
     }
 

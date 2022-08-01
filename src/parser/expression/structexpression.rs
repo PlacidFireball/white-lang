@@ -6,6 +6,7 @@ use crate::runtime::Runtime;
 use std::any::Any;
 use std::collections::HashMap;
 use std::fmt::Debug;
+use crate::javascript::JavaScript;
 
 /*
 // struct definition
@@ -47,7 +48,7 @@ impl Expression for StructExpression {
         todo!()
     }
 
-    fn transpile(&self) {
+    fn transpile(&self, javascript: &mut JavaScript) {
         todo!()
     }
 
