@@ -42,8 +42,11 @@ impl Statement for AssignmentStatement {
         todo!()
     }
 
-    fn transpile(&self, javascript: &mut JavaScript)  {
-        todo!()
+    fn transpile(&self, javascript: &mut JavaScript) {
+        self.variable.transpile(javascript);
+        javascript.append(format!(" {} ", "="));
+        self.expr.transpile(javascript);
+        javascript.append(String::from(";"));
     }
 
     fn validate(&mut self, st: &mut SymbolTable) {

@@ -61,7 +61,9 @@ impl Expression for FactorExpression {
     }
 
     fn transpile(&self, javascript: &mut JavaScript) {
-        todo!()
+        self.lhs.transpile(javascript);
+        javascript.append(format!(" {} ", self.operator));
+        self.rhs.transpile(javascript);
     }
 
     fn validate(&mut self, st: &SymbolTable) {

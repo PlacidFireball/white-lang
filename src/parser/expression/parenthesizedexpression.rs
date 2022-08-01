@@ -26,7 +26,9 @@ impl Expression for ParenthesizedExpression {
     }
 
     fn transpile(&self, javascript: &mut JavaScript)  {
-        todo!()
+        javascript.append(String::from("("));
+        self.expr.transpile(javascript);
+        javascript.append(String::from(")"));
     }
 
     fn validate(&mut self, st: &SymbolTable) {

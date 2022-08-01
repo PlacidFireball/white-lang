@@ -8,6 +8,7 @@ use crate::parser::whitetypes::Type;
 use crate::parser::ParserErrorType::{ArgMismatch, IncompatibleTypes, UnknownName};
 use crate::runtime::Runtime;
 use std::any::Any;
+use std::fmt::format;
 
 #[derive(Clone, Debug)]
 pub(crate) struct FunctionCallExpression {
@@ -63,7 +64,14 @@ impl Expression for FunctionCallExpression {
     }
 
     fn transpile(&self, javascript: &mut JavaScript) {
-        todo!()
+        javascript.append(format!("{}(", self.name));
+        for (i, arg) in self.args.iter().enumerate() {
+            arg.transpile(javascript);
+            if i != self.args.len() - 1 {
+                javascript.append(String::from(","));
+            }
+        }
+        javascript.append(String::from(")"));
     }
 
     fn validate(&mut self, st: &SymbolTable) {

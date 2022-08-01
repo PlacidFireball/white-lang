@@ -26,7 +26,7 @@ impl Expression for StringLiteralExpression {
     }
 
     fn transpile(&self, javascript: &mut JavaScript)  {
-        todo!()
+        javascript.append(format!("\"{}\"", self.string_value));
     }
 
     fn validate(&mut self, _st: &SymbolTable) {}

@@ -24,7 +24,7 @@ impl Statement for BreakStatement {
     }
 
     fn transpile(&self, javascript: &mut JavaScript)  {
-        todo!()
+        javascript.append(String::from("break;"));
     }
 
     fn validate(&mut self, _st: &mut SymbolTable) {}

@@ -24,7 +24,7 @@ impl Expression for NullLiteralExpression {
     }
 
     fn transpile(&self, javascript: &mut JavaScript)  {
-        todo!()
+        javascript.append(String::from("null"));
     }
 
     fn validate(&mut self, _st: &SymbolTable) {}

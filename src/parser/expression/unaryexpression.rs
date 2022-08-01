@@ -45,7 +45,13 @@ impl Expression for UnaryExpression {
     }
 
     fn transpile(&self, javascript: &mut JavaScript) {
-        todo!()
+        if self.is_not {
+            javascript.append(String::from("!"));
+            self.expr.transpile(javascript);
+        } else {
+            javascript.append(String::from("-"));
+            self.expr.transpile(javascript);
+        }
     }
 
     fn validate(&mut self, _st: &SymbolTable) {

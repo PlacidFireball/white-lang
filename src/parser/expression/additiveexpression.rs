@@ -77,7 +77,11 @@ impl Expression for AdditiveExpression {
 
     fn compile(&self) {}
 
-    fn transpile(&self, javascript: &mut JavaScript) {}
+    fn transpile(&self, javascript: &mut JavaScript) {
+        self.lhs.transpile(javascript);
+        javascript.append(format!(" {} ", self.operator));
+        self.rhs.transpile(javascript);
+    }
 
     fn validate(&mut self, st: &SymbolTable) {
         // I have decided that I am not going to allow + being called on strings,

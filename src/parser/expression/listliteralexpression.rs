@@ -33,7 +33,14 @@ impl Expression for ListLiteralExpression {
     }
 
     fn transpile(&self, javascript: &mut JavaScript) {
-        todo!()
+        javascript.append(String::from("["));
+        for (i, expr) in self.exprs.iter().enumerate(){
+            expr.transpile(javascript);
+            if i < self.exprs.len() - 1 {
+                javascript.append(String::from(","));
+            }
+        }
+        javascript.append(String::from("]"));
     }
 
     fn validate(&mut self, st: &SymbolTable) {

@@ -24,7 +24,7 @@ impl Expression for SyntaxErrorExpression {
     }
 
     fn transpile(&self, javascript: &mut JavaScript) {
-        todo!()
+        panic!("You cannot transpile a syntax error :)")
     }
 
     fn validate(&mut self, _st: &SymbolTable) {}

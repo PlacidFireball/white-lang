@@ -62,7 +62,16 @@ impl Statement for ForStatement {
     }
 
     fn transpile(&self, javascript: &mut JavaScript) {
-        todo!()
+        let variable = self.variable.debug(); // the name of the variable
+        javascript.append(format!("for (const {} of ", variable));
+        self.iterator.transpile(javascript); // may or may not be a list/variable
+        javascript.append(String::from(") {\n"));
+        javascript.indent();
+        for statement in self.statements.iter() {
+            statement.transpile(javascript);
+            javascript.newline();
+        }
+        javascript.outdent();
     }
 
     fn validate(&mut self, st: &mut SymbolTable) {

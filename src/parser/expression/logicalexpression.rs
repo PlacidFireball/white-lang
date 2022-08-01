@@ -38,7 +38,9 @@ impl Expression for LogicalExpression {
     }
 
     fn transpile(&self, javascript: &mut JavaScript)  {
-        todo!()
+        self.lhs.transpile(javascript);
+        javascript.append(format!(" {} ", self.operator));
+        self.rhs.transpile(javascript);
     }
 
     fn validate(&mut self, _st: &SymbolTable) {

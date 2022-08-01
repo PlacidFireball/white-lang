@@ -36,7 +36,7 @@ impl Expression for IdentifierExpression {
     }
 
     fn transpile(&self, javascript: &mut JavaScript) {
-        todo!()
+        javascript.append(self.name.clone());
     }
 
     fn validate(&mut self, st: &SymbolTable) {
