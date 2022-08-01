@@ -27,7 +27,9 @@ impl Statement for ReturnStatement {
     }
 
     fn transpile(&self, javascript: &mut JavaScript) {
-        todo!()
+        javascript.append(String::from("return "));
+        self.expr.transpile(javascript);
+        javascript.semicolon();
     }
 
     fn validate(&mut self, st: &mut SymbolTable) {

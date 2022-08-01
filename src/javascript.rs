@@ -13,6 +13,10 @@ impl JavaScript {
         }
     }
 
+    pub fn get_src(&self) -> String {
+        self.src.clone()
+    }
+
     pub fn append(&mut self, value: String) -> &mut JavaScript {
         self.src.push_str(self.level.as_str());
         self.src.push_str(value.as_str());
@@ -20,7 +24,12 @@ impl JavaScript {
     }
 
     pub fn newline(&mut self) -> &mut JavaScript {
-        self.append(String::from("\n"));
+        self.src.push_str("\n");
+        self
+    }
+
+    pub fn semicolon(&mut self) -> &mut JavaScript {
+        self.src.push_str(";");
         self
     }
 

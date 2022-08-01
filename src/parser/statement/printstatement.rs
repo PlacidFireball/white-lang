@@ -28,7 +28,9 @@ impl Statement for PrintStatement {
     }
 
     fn transpile(&self, javascript: &mut JavaScript) {
-        todo!()
+        javascript.append(String::from("console.log("));
+        self.expr.transpile(javascript);
+        javascript.append(String::from(");"));
     }
 
     fn validate(&mut self, st: &mut SymbolTable) {

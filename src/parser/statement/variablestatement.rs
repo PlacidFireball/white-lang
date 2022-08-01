@@ -30,7 +30,9 @@ impl Statement for VariableStatement {
     }
 
     fn transpile(&self, javascript: &mut JavaScript) {
-        todo!()
+        javascript.append(format!("let {} = ", self.name));
+        self.expr.transpile(javascript);
+        javascript.semicolon();
     }
 
     fn validate(&mut self, st: &mut SymbolTable) {

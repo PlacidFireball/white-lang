@@ -1,3 +1,4 @@
+use crate::javascript::JavaScript;
 use crate::parser::Parser;
 use crate::program::Program;
 use crate::tokenizer::Tokenizer;
@@ -6,6 +7,7 @@ pub struct CoreObjects {
     pub parser: Parser,
     pub tokenizer: Tokenizer,
     pub program: Program,
+    pub javascript: JavaScript
 }
 impl CoreObjects {
     #[allow(dead_code)]
@@ -19,6 +21,7 @@ impl CoreObjects {
             parser,
             tokenizer,
             program,
+            javascript: JavaScript::new(),
         }
     }
 
@@ -30,6 +33,7 @@ impl CoreObjects {
             parser,
             tokenizer,
             program,
+            javascript: JavaScript::new(),
         }
     }
 
@@ -59,6 +63,10 @@ impl CoreObjects {
         &mut self.program
     }
 
+    pub fn get_javascript_mut(&mut self) -> &mut JavaScript {
+        &mut self.javascript
+    }
+
     pub fn get_tokenizer(&self) -> &Tokenizer {
         &self.tokenizer
     }
@@ -69,5 +77,9 @@ impl CoreObjects {
 
     pub fn get_program(&self) -> &Program {
         &self.program
+    }
+
+    pub fn get_javascript(&self) -> &JavaScript {
+        &self.javascript
     }
 }

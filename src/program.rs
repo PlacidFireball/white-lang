@@ -6,12 +6,14 @@ use crate::parser::ParserErrorType;
 use crate::runtime::Runtime;
 use crate::{parser, Parser, Tokenizer};
 use std::any::Any;
+use crate::javascript::JavaScript;
 
 #[allow(dead_code)]
 pub struct Program {
     statements: Vec<Box<dyn Statement>>,
     expr: Box<dyn Expression>,
     runtime: Runtime,
+    javascript: JavaScript,
     pub stdout: String,
     pub stderr: String,
     errors: Vec<ParserErrorType>,
@@ -29,6 +31,7 @@ impl Program {
                 statements: statements.clone(),
                 expr: Box::new(SyntaxErrorExpression::new()),
                 runtime: Runtime::new(),
+                javascript: JavaScript::new(),
                 stdout: String::new(),
                 stderr: String::new(),
                 errors: vec![],
@@ -39,6 +42,7 @@ impl Program {
                 statements: vec![],
                 expr: expr.clone(),
                 runtime: Runtime::new(),
+                javascript: JavaScript::new(),
                 stdout: String::new(),
                 stderr: String::new(),
                 errors: vec![],
@@ -51,6 +55,7 @@ impl Program {
             statements: vec![],
             expr: Box::new(SyntaxErrorExpression::new()),
             runtime: Runtime::new(),
+            javascript: JavaScript::new(),
             stdout: "".to_string(),
             stderr: "".to_string(),
             errors: vec![],
@@ -82,6 +87,17 @@ impl Program {
                 self.stdout = self.runtime.get_output();
             }
         }
+    }
+
+    pub fn transpile_to_js(&mut self) -> String {
+        if self.statements.is_empty() {
+            self.expr.transpile(&mut self.javascript);
+        } else {
+            for statement in &self.statements {
+                statement.transpile(&mut self.javascript);
+            }
+        }
+        self.javascript.get_src()
     }
 
     pub fn try_print_output(evaluated: &Box<dyn Any>) -> String {

@@ -41,7 +41,20 @@ impl Statement for IfStatement {
     }
 
     fn transpile(&self, javascript: &mut JavaScript) {
-        todo!()
+        javascript.append(String::from("if ("));
+        self.expr.transpile(javascript);
+        javascript.append(String::from(") {")).newline().indent();
+        for stmt in self.true_stmts.iter() {
+            stmt.transpile(javascript);
+        }
+        javascript.newline().outdent().append(String::from("}"));
+        if self.false_stmts.len() > 0 {
+            javascript.newline().append(String::from("else {")).newline();
+            for stmt in self.false_stmts.iter() {
+                stmt.transpile(javascript);
+            }
+            javascript.newline().append(String::from("}"));
+        }
     }
 
     fn validate(&mut self, st: &mut SymbolTable) {

@@ -41,15 +41,7 @@ impl Expression for FunctionCallExpression {
             }
             evaluated_args.push(tmp);
         }
-        assert_eq!(self.args.len(), evaluated_args.len()); // sanity check
-                                                           /*for (i, arg) in evaluated_args.iter().enumerate() {
-                                                               println!(
-                                                                   "[FNCALL: {}]: Arg Name: {}\tValue: {}",
-                                                                   self.name,
-                                                                   fds.get_arg_names()[i],
-                                                                   try_print_output(&arg.evaluate(runtime))
-                                                               );
-                                                           }*/
+        assert_eq!(self.args.len(), evaluated_args.len()); // sanity check, should always pass...
         println!(
             "[FUNCTION CALL] invoking {}...\n| args: {:?}",
             self.name, self.args

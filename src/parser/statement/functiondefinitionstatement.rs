@@ -47,7 +47,18 @@ impl Statement for FunctionDefinitionStatement {
     }
 
     fn transpile(&self, javascript: &mut JavaScript) {
-        todo!()
+        javascript.append(format!("function {}(", self.name));
+        for (i, arg) in self.args.iter().enumerate() {
+            arg.transpile(javascript);
+            if i != self.args.len() - 1 {
+                javascript.append(String::from(", "));
+            }
+        }
+        javascript.append(String::from(") {")).newline().indent();
+        for stmt in self.statements.iter() {
+            stmt.transpile(javascript);
+        }
+        javascript.newline().outdent().append(String::from("}"));
     }
 
     fn validate(&mut self, st: &mut SymbolTable) {

@@ -29,7 +29,8 @@ impl Statement for FunctionCallStatement {
     }
 
     fn transpile(&self, javascript: &mut JavaScript) {
-        todo!()
+        self.expr.transpile(javascript);
+        javascript.semicolon();
     }
 
     fn validate(&mut self, st: &mut SymbolTable) {
