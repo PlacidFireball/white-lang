@@ -1,3 +1,4 @@
+use crate::javascript::JavaScript;
 use crate::parser::parser_traits::*;
 use crate::parser::symbol_table::SymbolTable;
 use crate::parser::whitetypes::Type;
@@ -5,7 +6,6 @@ use crate::parser::ParserErrorType::*;
 use crate::runtime::Runtime;
 use crate::LOGGER;
 use std::any::Any;
-use crate::javascript::JavaScript;
 
 #[derive(Clone, Debug)]
 pub(crate) struct VariableStatement {
@@ -32,7 +32,7 @@ impl Statement for VariableStatement {
     fn transpile(&self, javascript: &mut JavaScript) {
         javascript.append(format!("let {} = ", self.name));
         self.expr.transpile(javascript);
-        javascript.semicolon();
+        javascript.semicolon().newline();
     }
 
     fn validate(&mut self, st: &mut SymbolTable) {

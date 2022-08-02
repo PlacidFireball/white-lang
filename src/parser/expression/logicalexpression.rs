@@ -1,3 +1,4 @@
+use crate::javascript::JavaScript;
 use crate::parser::parser_traits::{add_parser_error, Expression, ToAny};
 use crate::parser::symbol_table::SymbolTable;
 use crate::parser::whitetypes::Type;
@@ -5,7 +6,6 @@ use crate::parser::ParserErrorType;
 use crate::parser::ParserErrorType::MismatchedTypes;
 use crate::runtime::Runtime;
 use std::any::Any;
-use crate::javascript::JavaScript;
 
 #[derive(Clone, Debug)]
 pub(crate) struct LogicalExpression {
@@ -37,9 +37,9 @@ impl Expression for LogicalExpression {
         todo!()
     }
 
-    fn transpile(&self, javascript: &mut JavaScript)  {
+    fn transpile(&self, javascript: &mut JavaScript) {
         self.lhs.transpile(javascript);
-        javascript.append(format!(" {} ", self.operator));
+        javascript.append_no_tabs(format!(" {} ", self.operator));
         self.rhs.transpile(javascript);
     }
 

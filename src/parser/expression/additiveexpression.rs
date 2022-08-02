@@ -79,7 +79,7 @@ impl Expression for AdditiveExpression {
 
     fn transpile(&self, javascript: &mut JavaScript) {
         self.lhs.transpile(javascript);
-        javascript.append(format!(" {} ", self.operator));
+        javascript.append_no_tabs(format!(" {} ", self.operator));
         self.rhs.transpile(javascript);
     }
 

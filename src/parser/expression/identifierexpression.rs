@@ -1,3 +1,4 @@
+use crate::javascript::JavaScript;
 use crate::parser::parser_traits::{add_parser_error, Expression, ToAny};
 use crate::parser::symbol_table::SymbolTable;
 use crate::parser::whitetypes::Type;
@@ -5,7 +6,6 @@ use crate::parser::ParserErrorType::UnknownName;
 use crate::runtime::Runtime;
 use crate::LOGGER;
 use std::any::Any;
-use crate::javascript::JavaScript;
 
 #[derive(Clone, Debug)]
 pub(crate) struct IdentifierExpression {
@@ -36,7 +36,7 @@ impl Expression for IdentifierExpression {
     }
 
     fn transpile(&self, javascript: &mut JavaScript) {
-        javascript.append(self.name.clone());
+        javascript.append_no_tabs(self.name.clone());
     }
 
     fn validate(&mut self, st: &SymbolTable) {

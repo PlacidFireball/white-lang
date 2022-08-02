@@ -1,5 +1,5 @@
 use crate::config::{WhiteLangBool, WhiteLangFloat, WhiteLangInt, WhiteLangList, WhiteLangString};
-use crate::javascript::{JavaScript, self};
+use crate::javascript::{self, JavaScript};
 use crate::parser::expression::additiveexpression::AdditiveExpression;
 use crate::parser::expression::booleanliteralexpression::BooleanLiteralExpression;
 use crate::parser::expression::comparisonexpression::ComparisonExpression;

@@ -1,9 +1,9 @@
+use crate::javascript::JavaScript;
 use crate::parser::expression::functioncallexpression::FunctionCallExpression;
 use crate::parser::parser_traits::*;
 use crate::parser::symbol_table::SymbolTable;
 use crate::runtime::Runtime;
 use std::any::Any;
-use crate::javascript::JavaScript;
 
 #[allow(dead_code)]
 #[derive(Clone, Debug)]

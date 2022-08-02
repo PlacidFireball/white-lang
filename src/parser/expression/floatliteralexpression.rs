@@ -27,7 +27,7 @@ impl Expression for FloatLiteralExpression {
     }
 
     fn transpile(&self, javascript: &mut JavaScript) {
-        javascript.append(self.value.to_string());
+        javascript.append_no_tabs(self.value.to_string());
     }
 
     fn validate(&mut self, _st: &SymbolTable) {}

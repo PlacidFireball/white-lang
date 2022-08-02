@@ -26,7 +26,7 @@ impl Expression for BooleanLiteralExpression {
     }
 
     fn transpile(&self, javascript: &mut JavaScript) {
-        javascript.append(self.boolean.to_string());
+        javascript.append_no_tabs(self.boolean.to_string());
     }
 
     fn validate(&mut self, _st: &SymbolTable) {}

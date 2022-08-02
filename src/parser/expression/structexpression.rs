@@ -1,3 +1,4 @@
+use crate::javascript::JavaScript;
 use crate::parser::parser_traits::{Expression, ToAny};
 use crate::parser::statement::functiondefinitionstatement::FunctionDefinitionStatement;
 use crate::parser::symbol_table::SymbolTable;
@@ -6,7 +7,6 @@ use crate::runtime::Runtime;
 use std::any::Any;
 use std::collections::HashMap;
 use std::fmt::Debug;
-use crate::javascript::JavaScript;
 
 /*
 // struct definition

@@ -1,4 +1,3 @@
-
 #[derive(Debug, Clone)]
 pub struct JavaScript {
     src: String,
@@ -9,7 +8,7 @@ impl JavaScript {
     pub fn new() -> Self {
         Self {
             src: String::new(),
-            level: String::new()
+            level: String::new(),
         }
     }
 
@@ -19,6 +18,11 @@ impl JavaScript {
 
     pub fn append(&mut self, value: String) -> &mut JavaScript {
         self.src.push_str(self.level.as_str());
+        self.src.push_str(value.as_str());
+        self
+    }
+
+    pub fn append_no_tabs(&mut self, value: String) -> &mut JavaScript {
         self.src.push_str(value.as_str());
         self
     }

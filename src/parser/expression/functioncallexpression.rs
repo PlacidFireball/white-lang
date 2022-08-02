@@ -56,14 +56,14 @@ impl Expression for FunctionCallExpression {
     }
 
     fn transpile(&self, javascript: &mut JavaScript) {
-        javascript.append(format!("{}(", self.name));
+        javascript.append_no_tabs(format!("{}(", self.name));
         for (i, arg) in self.args.iter().enumerate() {
             arg.transpile(javascript);
             if i != self.args.len() - 1 {
-                javascript.append(String::from(","));
+                javascript.append_no_tabs(String::from(","));
             }
         }
-        javascript.append(String::from(")"));
+        javascript.append_no_tabs(String::from(")"));
     }
 
     fn validate(&mut self, st: &SymbolTable) {

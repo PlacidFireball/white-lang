@@ -1,11 +1,11 @@
 use crate::config::*;
+use crate::javascript::JavaScript;
 use crate::parser::expression::syntaxerrorexpression::SyntaxErrorExpression;
 use crate::parser::symbol_table::SymbolTable;
 use crate::parser::whitetypes::Type;
 use crate::parser::{parser_traits::*, ParserErrorType};
 use crate::runtime::Runtime;
 use std::any::Any;
-use crate::javascript::JavaScript;
 
 #[derive(Clone, Debug)]
 pub struct IfStatement {
@@ -43,18 +43,26 @@ impl Statement for IfStatement {
     fn transpile(&self, javascript: &mut JavaScript) {
         javascript.append(String::from("if ("));
         self.expr.transpile(javascript);
-        javascript.append(String::from(") {")).newline().indent();
+        javascript
+            .append_no_tabs(String::from(") {"))
+            .newline()
+            .indent();
         for stmt in self.true_stmts.iter() {
             stmt.transpile(javascript);
         }
         javascript.newline().outdent().append(String::from("}"));
         if self.false_stmts.len() > 0 {
-            javascript.newline().append(String::from("else {")).newline();
+            javascript
+                .newline()
+                .append(String::from("else {"))
+                .newline()
+                .indent();
             for stmt in self.false_stmts.iter() {
                 stmt.transpile(javascript);
             }
-            javascript.newline().append(String::from("}"));
+            javascript.outdent().newline().append(String::from("}"));
         }
+        javascript.newline();
     }
 
     fn validate(&mut self, st: &mut SymbolTable) {

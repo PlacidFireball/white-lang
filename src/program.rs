@@ -1,12 +1,12 @@
 use crate::config::WhiteLangList;
 use crate::config::*;
+use crate::javascript::JavaScript;
 use crate::parser::expression::syntaxerrorexpression::SyntaxErrorExpression;
 use crate::parser::parser_traits::{Expression, Statement};
 use crate::parser::ParserErrorType;
 use crate::runtime::Runtime;
 use crate::{parser, Parser, Tokenizer};
 use std::any::Any;
-use crate::javascript::JavaScript;
 
 #[allow(dead_code)]
 pub struct Program {

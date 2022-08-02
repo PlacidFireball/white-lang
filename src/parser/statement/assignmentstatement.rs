@@ -5,8 +5,8 @@ use crate::parser::symbol_table::SymbolTable;
 use crate::parser::ParserErrorType;
 use crate::runtime::Runtime;
 
-use std::any::Any;
 use crate::javascript::JavaScript;
+use std::any::Any;
 
 #[derive(Clone, Debug)]
 pub(crate) struct AssignmentStatement {
@@ -43,10 +43,11 @@ impl Statement for AssignmentStatement {
     }
 
     fn transpile(&self, javascript: &mut JavaScript) {
+        javascript.append("".to_string());
         self.variable.transpile(javascript);
-        javascript.append(format!(" {} ", "="));
+        javascript.append_no_tabs(format!(" = "));
         self.expr.transpile(javascript);
-        javascript.append(String::from(";"));
+        javascript.append_no_tabs(String::from(";")).newline();
     }
 
     fn validate(&mut self, st: &mut SymbolTable) {

@@ -5,8 +5,8 @@ use crate::parser::ParserErrorType::MismatchedTypes;
 use crate::parser::*;
 use crate::runtime::Runtime;
 
-use uuid::Uuid;
 use crate::javascript::JavaScript;
+use uuid::Uuid;
 
 #[derive(Clone, Debug)]
 pub struct FunctionDefinitionStatement {
@@ -58,7 +58,11 @@ impl Statement for FunctionDefinitionStatement {
         for stmt in self.statements.iter() {
             stmt.transpile(javascript);
         }
-        javascript.newline().outdent().append(String::from("}"));
+        javascript
+            .newline()
+            .outdent()
+            .append(String::from("}"))
+            .newline();
     }
 
     fn validate(&mut self, st: &mut SymbolTable) {

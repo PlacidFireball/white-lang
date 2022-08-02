@@ -1,11 +1,11 @@
 use crate::config::{WhiteLangFloat, WhiteLangInt};
+use crate::javascript::JavaScript;
 use crate::parser::parser_traits::{add_parser_error, Expression, ToAny};
 use crate::parser::symbol_table::SymbolTable;
 use crate::parser::whitetypes::Type;
 use crate::parser::ParserErrorType;
 use crate::runtime::Runtime;
 use std::any::Any;
-use crate::javascript::JavaScript;
 
 #[derive(Clone, Debug)]
 pub(crate) struct UnaryExpression {
@@ -46,10 +46,10 @@ impl Expression for UnaryExpression {
 
     fn transpile(&self, javascript: &mut JavaScript) {
         if self.is_not {
-            javascript.append(String::from("!"));
+            javascript.append_no_tabs(String::from("!"));
             self.expr.transpile(javascript);
         } else {
-            javascript.append(String::from("-"));
+            javascript.append_no_tabs(String::from("-"));
             self.expr.transpile(javascript);
         }
     }

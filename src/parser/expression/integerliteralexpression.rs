@@ -1,10 +1,10 @@
 use crate::config::*;
+use crate::javascript::JavaScript;
 use crate::parser::parser_traits::{Expression, ToAny};
 use crate::parser::symbol_table::SymbolTable;
 use crate::parser::whitetypes::Type;
 use crate::runtime::Runtime;
 use std::any::Any;
-use crate::javascript::JavaScript;
 
 #[derive(Clone, Debug)]
 pub struct IntegerLiteralExpression {
@@ -27,7 +27,7 @@ impl Expression for IntegerLiteralExpression {
     }
 
     fn transpile(&self, javascript: &mut JavaScript) {
-        javascript.append(self.value.to_string());
+        javascript.append_no_tabs(self.value.to_string());
     }
 
     fn validate(&mut self, _st: &SymbolTable) {}

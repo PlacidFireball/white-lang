@@ -1,9 +1,9 @@
+use crate::javascript::JavaScript;
 use crate::parser::parser_traits::{Expression, ToAny};
 use crate::parser::symbol_table::SymbolTable;
 use crate::parser::whitetypes::Type;
 use crate::runtime::Runtime;
 use std::any::Any;
-use crate::javascript::JavaScript;
 
 #[derive(Clone, Debug)]
 pub(crate) struct NullLiteralExpression {}
@@ -23,8 +23,8 @@ impl Expression for NullLiteralExpression {
         todo!()
     }
 
-    fn transpile(&self, javascript: &mut JavaScript)  {
-        javascript.append(String::from("null"));
+    fn transpile(&self, javascript: &mut JavaScript) {
+        javascript.append_no_tabs(String::from("null"));
     }
 
     fn validate(&mut self, _st: &SymbolTable) {}

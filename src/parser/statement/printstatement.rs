@@ -1,9 +1,9 @@
+use crate::javascript::JavaScript;
 use crate::parser::parser_traits::*;
 use crate::parser::symbol_table::SymbolTable;
 use crate::program::Program;
 use crate::runtime::Runtime;
 use std::any::Any;
-use crate::javascript::JavaScript;
 
 #[derive(Clone, Debug)]
 pub(crate) struct PrintStatement {
@@ -30,7 +30,7 @@ impl Statement for PrintStatement {
     fn transpile(&self, javascript: &mut JavaScript) {
         javascript.append(String::from("console.log("));
         self.expr.transpile(javascript);
-        javascript.append(String::from(");"));
+        javascript.append_no_tabs(String::from(");")).newline();
     }
 
     fn validate(&mut self, st: &mut SymbolTable) {

@@ -1,3 +1,4 @@
+use crate::javascript::JavaScript;
 use crate::parser::expression::identifierexpression::IdentifierExpression;
 use crate::parser::expression::listliteralexpression::ListLiteralExpression;
 use crate::parser::expression::syntaxerrorexpression::SyntaxErrorExpression;
@@ -9,7 +10,6 @@ use crate::parser::ParserErrorType::IncompatibleTypes;
 use crate::runtime::Runtime;
 use std::any::Any;
 use uuid::Uuid;
-use crate::javascript::JavaScript;
 
 #[derive(Clone, Debug)]
 pub(crate) struct ForStatement {
@@ -69,9 +69,8 @@ impl Statement for ForStatement {
         javascript.indent();
         for statement in self.statements.iter() {
             statement.transpile(javascript);
-            javascript.newline();
         }
-        javascript.outdent();
+        javascript.outdent().append(String::from("}")).newline();
     }
 
     fn validate(&mut self, st: &mut SymbolTable) {

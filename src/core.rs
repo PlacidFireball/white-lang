@@ -7,7 +7,7 @@ pub struct CoreObjects {
     pub parser: Parser,
     pub tokenizer: Tokenizer,
     pub program: Program,
-    pub javascript: JavaScript
+    pub javascript: JavaScript,
 }
 impl CoreObjects {
     #[allow(dead_code)]

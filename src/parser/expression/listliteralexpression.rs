@@ -1,3 +1,4 @@
+use crate::javascript::JavaScript;
 use crate::parser::parser_traits::{add_parser_error, Expression, ToAny};
 use crate::parser::symbol_table::SymbolTable;
 use crate::parser::whitetypes::Type;
@@ -5,7 +6,6 @@ use crate::parser::ParserErrorType::MismatchedTypes;
 use crate::runtime::Runtime;
 use crate::LOGGER;
 use std::any::Any;
-use crate::javascript::JavaScript;
 
 #[derive(Clone, Debug)]
 pub(crate) struct ListLiteralExpression {
@@ -33,11 +33,11 @@ impl Expression for ListLiteralExpression {
     }
 
     fn transpile(&self, javascript: &mut JavaScript) {
-        javascript.append(String::from("["));
-        for (i, expr) in self.exprs.iter().enumerate(){
+        javascript.append_no_tabs(String::from("["));
+        for (i, expr) in self.exprs.iter().enumerate() {
             expr.transpile(javascript);
             if i < self.exprs.len() - 1 {
-                javascript.append(String::from(","));
+                javascript.append_no_tabs(String::from(","));
             }
         }
         javascript.append(String::from("]"));

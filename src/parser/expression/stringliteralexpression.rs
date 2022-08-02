@@ -1,9 +1,9 @@
+use crate::javascript::JavaScript;
 use crate::parser::parser_traits::{Expression, ToAny};
 use crate::parser::symbol_table::SymbolTable;
 use crate::parser::whitetypes::Type;
 use crate::runtime::Runtime;
 use std::any::Any;
-use crate::javascript::JavaScript;
 
 #[derive(Clone, Debug)]
 pub struct StringLiteralExpression {
@@ -25,8 +25,8 @@ impl Expression for StringLiteralExpression {
         todo!()
     }
 
-    fn transpile(&self, javascript: &mut JavaScript)  {
-        javascript.append(format!("\"{}\"", self.string_value));
+    fn transpile(&self, javascript: &mut JavaScript) {
+        javascript.append_no_tabs(format!("\"{}\"", self.string_value));
     }
 
     fn validate(&mut self, _st: &SymbolTable) {}

@@ -1,3 +1,4 @@
+use crate::javascript::JavaScript;
 use crate::parser::expression::syntaxerrorexpression::SyntaxErrorExpression;
 use crate::parser::parser_traits::{add_parser_error, Expression, Statement, ToAny};
 use crate::parser::symbol_table::SymbolTable;
@@ -6,7 +7,6 @@ use crate::parser::ParserErrorType;
 use crate::runtime::Runtime;
 use crate::LOGGER;
 use std::any::Any;
-use crate::javascript::JavaScript;
 
 #[derive(Clone, Debug)]
 pub struct WhileStatement {
@@ -51,7 +51,14 @@ impl Statement for WhileStatement {
     }
 
     fn transpile(&self, javascript: &mut JavaScript) {
-        todo!()
+        javascript.append(format!("while ("));
+        self.expr.transpile(javascript);
+        javascript.append_no_tabs(String::from(") {"));
+        javascript.indent().newline();
+        for stmt in self.body.iter() {
+            stmt.transpile(javascript);
+        }
+        javascript.outdent().append(String::from("}")).newline();
     }
 
     fn validate(&mut self, st: &mut SymbolTable) {
