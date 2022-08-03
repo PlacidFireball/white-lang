@@ -42,10 +42,10 @@ impl Expression for FunctionCallExpression {
             evaluated_args.push(tmp);
         }
         assert_eq!(self.args.len(), evaluated_args.len()); // sanity check, should always pass...
-        println!(
+        crate::LOGGER.debug(format!(
             "[FUNCTION CALL] invoking {}...\n| args: {:?}",
             self.name, self.args
-        );
+        ) ,crate::RUNTIME_DEBUG_LOGGING_ENABLED.with(|cell| !cell.get()));
         let value = fds.invoke(runtime, evaluated_args);
         runtime.pop_scope();
         value

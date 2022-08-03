@@ -36,7 +36,7 @@ impl Statement for ReturnStatement {
         let fds = st.get_function(self.function.clone()).unwrap();
         self.expr.validate(st);
         self.return_type = self.expr.get_white_type();
-        LOGGER.info(format!("Got {:?}", fds));
+        //LOGGER.debug(format!("Got {:?}", fds)); // very noisy log
         if self.return_type != fds.get_return_type() {
             add_parser_error(
                 ParserErrorType::MismatchedTypes(self.return_type.clone(), fds.get_return_type()),

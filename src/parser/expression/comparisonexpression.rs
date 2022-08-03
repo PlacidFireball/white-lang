@@ -105,10 +105,13 @@ impl Expression for ComparisonExpression {
                 ),
             );
         }
-        LOGGER.info(format!(
-            "Validated a comparison expression. lhs: {:?} rhs: {:?}",
-            self.lhs, self.rhs
-        ));
+        LOGGER.debug(
+            format!(
+                "Validated a comparison expression. lhs: {:?} rhs: {:?}",
+                self.lhs, self.rhs
+            ),
+            false,
+        );
         // TODO: When developing std, comparable might be a cool thing to implement
     }
 

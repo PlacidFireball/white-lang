@@ -31,19 +31,20 @@ thread_local! {
     );
 
     pub static IS_TESTING: Cell<bool> = Cell::new(false); // legacy trying to move away from this
+
+    pub static DEBUG_INFO_LOGGING_ENABLED: Cell<bool> = Cell::new(false);
+
+    pub static RUNTIME_DEBUG_LOGGING_ENABLED: Cell<bool> = Cell::new(false);
 }
 
 const LOGGER: Logger = Logger {};
 
 fn main() {
-    // TODO: add verbose flag and tie it to LOGGER
     let matches = App::new("white-lang")
         .version("1.0.0")
         .about("The white-lang compiler")
         .arg(
             Arg::new("src")
-                .short('s')
-                .long("src")
                 .takes_value(true)
                 .value_name("PATH")
                 .help("The path to a file containing your source code"),
@@ -68,20 +69,44 @@ fn main() {
                 .long("compile")
                 .takes_value(false)
                 .help("Whether or not to compile the source code to x86 assembly"),
-        ).subcommand(
-        Command::new("test")
-            .about("Run tests")
-            .subcommand_required(false)
-            // TODO: run when we do `white-lang test`
-    )
+        )
+        .arg(
+            Arg::new("parse-info")
+                .short('p')
+                .long("parse-info")
+                .takes_value(false)
+                .help("Log debug information for the parser to the console"),
+        )
+        .arg(
+            Arg::new("runtime-info")
+                .short('r')
+                .long("runtime-info")
+                .takes_value(false)
+                .help("Show runtime debug information on execute"),
+        )
+        .subcommand(
+            Command::new("test")
+                .about("Run tests")
+                .subcommand_required(false), // TODO: run when we do `white-lang test`
+        )
         .get_matches();
     let src_path = match matches.get_one::<String>("src") {
         None => panic!("You must provide a source path"),
-        Some(path) => path.clone()
+        Some(path) => path.clone(),
     };
     let should_transpile = matches.is_present("transpile");
     let should_compile = matches.is_present("compile");
     let should_interpret = matches.is_present("interpret");
+
+    if matches.is_present("parse-info") {
+        DEBUG_INFO_LOGGING_ENABLED.with(|c| c.set(true));
+        LOGGER.info("verbose output is enabled".to_string());
+    }
+
+    if matches.is_present("runtime-info") {
+        RUNTIME_DEBUG_LOGGING_ENABLED.with(|c| c.set(true));
+        LOGGER.info("runtime-info is enabled".to_string());
+    }
 
     env::set_var("RUST_BACKTRACE", "1");
     // open xxx.whl
@@ -93,13 +118,16 @@ fn main() {
     };
     let mut source = String::new();
     match file.read_to_string(&mut source) {
-        Ok(_) => LOGGER.info(format!("opened {} and got:\n{}", display, source.trim())),
+        Ok(_) => LOGGER.debug(
+            format!("opened {} and got:\n{}", display, source.trim()),
+            true,
+        ),
         Err(why) => panic!("[FATAL] couldn't read {}: {}", display, why),
     };
     // run xxx.whl
     CORE_OBJECTS.with(|core| {
         core.borrow_mut().set_src(source.as_str());
-        if should_compile{
+        if should_compile {
             LOGGER.warn(format!("compilation is unimplemented."));
         }
         if should_transpile {
@@ -113,6 +141,5 @@ fn main() {
                 core.borrow_mut().get_program_mut().stdout.clone()
             ));
         }
-
     })
 }

@@ -547,7 +547,7 @@ mod test {
         "
             .to_string(),
         );
-        crate::LOGGER.info(format!("{:?}", parser.statement_list[0]));
+        //crate::LOGGER.debug(format!("{:?}", parser.statement_list[0]));
         assert!(parser.statement_list[0]
             .clone()
             .to_any()
@@ -560,7 +560,7 @@ mod test {
         let parser = init_parser("
         struct X { y: string, z: int } implement X { fn foo(xx: string) {} fn bar(xy: int) {} fn baz(xz: float) {} };
         ".to_string());
-        crate::LOGGER.info(format!("{:?}", parser.statement_list[0]));
+        //crate::LOGGER.debug(format!("{:?}", parser.statement_list[0]));
         assert!(parser.statement_list[0]
             .clone()
             .to_any()

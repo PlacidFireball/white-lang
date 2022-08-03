@@ -26,17 +26,17 @@ impl Expression for EqualityExpression {
         let rhs_eval = self.rhs.evaluate(runtime);
         let is_equal = self.operator.contains("==");
         if is_equal {
-            println!(
+            crate::LOGGER.debug(format!(
                 "[EQ_EXPR]: {} == {}",
                 try_print_output(&lhs_eval),
                 try_print_output(&rhs_eval)
-            );
+            ), crate::RUNTIME_DEBUG_LOGGING_ENABLED.with(|cell| !cell.get()));
         } else {
-            println!(
+            crate::LOGGER.debug(format!(
                 "[EQ_EXPR]: {} != {}",
                 try_print_output(&lhs_eval),
                 try_print_output(&rhs_eval)
-            );
+            ), crate::RUNTIME_DEBUG_LOGGING_ENABLED.with(|cell| !cell.get()));
         }
         // handle null == null
         if self.lhs.get_white_type() == self.rhs.get_white_type()

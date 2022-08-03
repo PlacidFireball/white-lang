@@ -32,17 +32,17 @@ impl Expression for AdditiveExpression {
         let rhs_eval = self.rhs.evaluate(runtime);
         // debug info
         if self.is_add {
-            println!(
+            crate::LOGGER.debug(format!(
                 "[ADD_EXPR]: {} + {}",
                 try_print_output(&lhs_eval),
                 try_print_output(&rhs_eval)
-            );
+            ), crate::RUNTIME_DEBUG_LOGGING_ENABLED.with(|cell| !cell.get()));
         } else {
-            println!(
+            crate::LOGGER.debug(format!(
                 "[ADD_EXPR]: {} - {}",
                 try_print_output(&lhs_eval),
                 try_print_output(&rhs_eval)
-            );
+            ), crate::RUNTIME_DEBUG_LOGGING_ENABLED.with(|cell| !cell.get()));
         }
         if let Some(lhs_float) = lhs_eval.downcast_ref::<WhiteLangFloat>() {
             if let Some(rhs_float) = rhs_eval.downcast_ref::<WhiteLangFloat>() {

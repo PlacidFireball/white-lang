@@ -32,8 +32,8 @@ use crate::parser::statement::variablestatement::VariableStatement;
 use crate::parser::statement::whilestatement::WhileStatement;
 
 use crate::runtime::Runtime;
-use crate::Parser;
 use crate::LOGGER;
+use crate::{Parser, CORE_OBJECTS};
 
 use crate::parser::symbol_table::SymbolTable;
 use crate::parser::whitetypes::Type;
@@ -52,7 +52,7 @@ pub fn default_expr() -> Box<dyn Expression> {
 
 pub fn add_parser_error(error: ParserErrorType, info: String) {
     LOGGER.warn(info);
-    Parser::error_panic(error);
+    CORE_OBJECTS.with(|core| core.borrow().get_parser().error_panic(error));
 }
 pub fn any_into_int_literal(any: &Box<dyn Any>) -> Option<IntegerLiteralExpression> {
     if let Some(integer) = any.downcast_ref::<WhiteLangInt>() {

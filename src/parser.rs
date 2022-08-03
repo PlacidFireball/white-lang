@@ -206,9 +206,12 @@ impl Parser {
         self.get_curr_tok().get_type().ne(&Eof)
     }
 
-    pub fn error_panic(error: ParserErrorType) {
-        println!("[FATAL]: {}", error.to_error_msg());
-        panic!("[FATAL]: {:?} occurred during validation", error);
+    pub fn error_panic(&self, error: ParserErrorType) {
+        println!("[PARSE ERROR][FATAL]: {}", error.to_error_msg());
+        panic!(
+            "[PARSE ERROR][FATAL]: {:?} occurred during validation",
+            error
+        );
     }
 
     // tells us if we have errors
@@ -301,7 +304,7 @@ impl Parser {
             self.match_and_consume(Less); // <
             let typ = self.require_a_type().get_list_type(); // make sure we are parsing some type
             self.match_and_consume(Greater); // >
-            LOGGER.info(format!("parsed a type: {:?}", typ));
+                                             //LOGGER.debug(format!("parsed a type: {:?}", typ));
             if typ != Type::Error {
                 return Option::Some(typ);
             }
@@ -393,10 +396,13 @@ impl Parser {
             }
             self.curr_fn_def = String::new();
             self.st.register_function(name.clone(), fds.clone());
-            LOGGER.info(format!("Parsed a function definition statement: {:?}", fds));
-            return Option::Some(fds);
+            LOGGER.debug(
+                format!("Parsed a function definition statement: {:?}", fds),
+                false,
+            );
+            return Some(fds);
         }
-        Option::None
+        None
     }
 
     fn parse_variable_statement(&mut self) -> Option<VariableStatement> {
@@ -412,10 +418,13 @@ impl Parser {
             var_stmt.set_expr(self.parse_expression());
             var_stmt.set_type(var_stmt.get_expr().get_white_type());
             self.require_token(SemiColon);
-            LOGGER.info(format!("Parsed a variable statement: {:?}", var_stmt));
-            return Option::Some(var_stmt);
+            LOGGER.debug(
+                format!("Parsed a variable statement: {:?}", var_stmt),
+                false,
+            );
+            return Some(var_stmt);
         }
-        Option::None
+        None
     }
 
     fn parse_return_statement(&mut self) -> Option<ReturnStatement> {
@@ -424,10 +433,10 @@ impl Parser {
             self.consume_token();
             let rs = ReturnStatement::new(self.parse_expression(), self.curr_fn_def.clone());
             self.require_token(SemiColon);
-            LOGGER.info(format!("Parsed a return statement: {:?}", rs));
-            return Option::Some(rs);
+            LOGGER.debug(format!("Parsed a return statement: {:?}", rs), false);
+            return Some(rs);
         }
-        Option::None
+        None
     }
 
     fn parse_for_statement(&mut self) -> Option<ForStatement> {
@@ -443,10 +452,10 @@ impl Parser {
             while !self.match_and_consume(RightBrace) {
                 fs.add_statement(self.parse_statement());
             }
-            LOGGER.info(format!("Parsed a for statement: {:?}", fs));
-            return Option::Some(fs);
+            LOGGER.debug(format!("Parsed a for statement: {:?}", fs), false);
+            return Some(fs);
         }
-        Option::None
+        None
     }
 
     fn parse_assignment_statement(&mut self) -> Option<AssignmentStatement> {
@@ -457,7 +466,10 @@ impl Parser {
             self.require_token(Equal);
             assign_stmt.set_expr(self.parse_expression());
             self.require_token(SemiColon);
-            LOGGER.info(format!("Parsed an assignment statement: {:?}", assign_stmt));
+            LOGGER.debug(
+                format!("Parsed an assignment statement: {:?}", assign_stmt),
+                false,
+            );
             return Some(assign_stmt);
         }
         None
@@ -472,10 +484,10 @@ impl Parser {
             let print_stmt = PrintStatement::new(expr);
             self.require_token(RightParen);
             self.require_token(SemiColon);
-            LOGGER.info(format!("Parsed a print statement: {:?}", print_stmt));
-            return Option::Some(print_stmt);
+            LOGGER.debug(format!("Parsed a print statement: {:?}", print_stmt), false);
+            return Some(print_stmt);
         }
-        Option::None
+        None
     }
 
     fn parse_if_statement(&mut self) -> Option<IfStatement> {
@@ -507,10 +519,10 @@ impl Parser {
                     }
                 }
             }
-            LOGGER.info(format!("Parsed an if statement: {:?}", if_stmt));
-            return Option::Some(if_stmt);
+            LOGGER.debug(format!("Parsed an if statement: {:?}", if_stmt), false);
+            return Some(if_stmt);
         }
-        Option::None
+        None
     }
 
     fn parse_function_call_statement(&mut self) -> Option<FunctionCallStatement> {
@@ -520,10 +532,13 @@ impl Parser {
             let expr = self.parse_expression(); // retrieve the function call expression
             self.require_token(TokenType::SemiColon);
             let fcs = FunctionCallStatement::new(expr, name.clone());
-            LOGGER.info(format!("Parsed a function call statement: {:?}", fcs));
-            return Option::Some(fcs);
+            LOGGER.debug(
+                format!("Parsed a function call statement: {:?}", fcs),
+                false,
+            );
+            return Some(fcs);
         }
-        Option::None
+        None
     }
 
     fn parse_while_statement(&mut self) -> Option<WhileStatement> {
@@ -543,8 +558,11 @@ impl Parser {
                     break;
                 }
             }
-            LOGGER.info(format!("Parsed a while statement: {:?}", while_statement));
-            return Option::Some(while_statement);
+            LOGGER.debug(
+                format!("Parsed a while statement: {:?}", while_statement),
+                false,
+            );
+            return Some(while_statement);
         }
 
         None
@@ -641,10 +659,10 @@ impl Parser {
             self.consume_token();
             let rhs = self.parse_factor_expression(); // get the right hand side
             let additive_expr = AdditiveExpression::new(expr, operator.clone(), rhs);
-            LOGGER.info(format!(
-                "Parsed an additive expression: {:?}",
-                additive_expr
-            ));
+            LOGGER.debug(
+                format!("Parsed an additive expression: {:?}", additive_expr),
+                false,
+            );
             expr = Box::new(additive_expr);
         }
         expr
@@ -660,7 +678,10 @@ impl Parser {
             self.consume_token();
             let rhs = self.parse_logical_expression();
             let factor_expr = FactorExpression::new(expr, operator.clone(), rhs);
-            LOGGER.info(format!("Parsed a factor expression: {:?}", factor_expr));
+            LOGGER.debug(
+                format!("Parsed a factor expression: {:?}", factor_expr),
+                false,
+            );
             expr = Box::new(factor_expr);
         }
         expr
@@ -674,7 +695,10 @@ impl Parser {
             let rhs = self.parse_comparison_expression();
             let mut logical_expr = LogicalExpression::new(expr, rhs);
             logical_expr.set_operator(operator);
-            LOGGER.info(format!("Parsed a logical expression: {:?}", logical_expr));
+            LOGGER.debug(
+                format!("Parsed a logical expression: {:?}", logical_expr),
+                false,
+            );
             expr = Box::new(logical_expr);
         }
         expr
@@ -693,10 +717,10 @@ impl Parser {
             self.consume_token(); // consume op
             let rhs = self.parse_function_call_expression(); // get the right hand side expression
             let comparison_expr = ComparisonExpression::new(expr, operator.clone(), rhs); // create the expression
-            LOGGER.info(format!(
-                "Parsed a comparison expression: {:?}",
-                comparison_expr
-            ));
+            LOGGER.debug(
+                format!("Parsed a comparison expression: {:?}", comparison_expr),
+                false,
+            );
             return Box::new(comparison_expr); // return a box wrapper of the expression
         }
         expr // if we didn't parse a comparison expression, return whatever we parsed earlier
@@ -711,10 +735,10 @@ impl Parser {
             self.consume_token(); // consume the token
             let rhs = self.parse_expression(); // parse some other expression
             let equality_expr = EqualityExpression::new(expr, operator.clone(), rhs);
-            LOGGER.info(format!(
-                "Parsed an equality expression: {:?}",
-                equality_expr
-            ));
+            LOGGER.debug(
+                format!("Parsed an equality expression: {:?}", equality_expr),
+                false,
+            );
             return Box::new(equality_expr); // return a box wrapper to the expr
         }
         expr
@@ -741,7 +765,10 @@ impl Parser {
                     break;
                 }
             }
-            LOGGER.info(format!("Parsed a function call expression: {:?}", expr));
+            LOGGER.debug(
+                format!("Parsed a function call expression: {:?}", expr),
+                false,
+            );
             return Box::new(expr); // return whatever we have parsed
         }
         self.parse_list_literal_expression() // otherwise parse a list literal
@@ -762,7 +789,7 @@ impl Parser {
                     break;
                 }
             }
-            LOGGER.info(format!("Parsed a list literal: {:?}", lle));
+            LOGGER.debug(format!("Parsed a list literal: {:?}", lle), false);
             lle.validate(&mut self.st);
             return Box::new(lle); // return a box wrapper of the lle
         }
@@ -776,7 +803,10 @@ impl Parser {
             let expr = self.parse_expression();
             let pe = ParenthesizedExpression::new(expr);
             self.require_token(RightParen);
-            LOGGER.info(format!("Parsed a parenthesized expression: {:?}", pe));
+            LOGGER.debug(
+                format!("Parsed a parenthesized expression: {:?}", pe),
+                false,
+            );
             return Box::new(pe);
         }
         self.parse_unary_expression()
@@ -789,7 +819,10 @@ impl Parser {
             self.consume_token(); // consume the token
             let expr = self.parse_float_literal_expression(); // parse some other expression
             let unary_expr = UnaryExpression::new(operator, expr); // create the new expr
-            LOGGER.info(format!("Parsed a unary expression: {:?}", unary_expr));
+            LOGGER.debug(
+                format!("Parsed a unary expression: {:?}", unary_expr),
+                false,
+            );
             return Box::new(unary_expr); // return a box wrapper
         }
         self.parse_float_literal_expression()
@@ -804,7 +837,7 @@ impl Parser {
                     .parse::<WhiteLangFloat>()
                     .unwrap(),
             );
-            LOGGER.info(format!("Parsed a float literal: {:?}", expr));
+            LOGGER.debug(format!("Parsed a float literal: {:?}", expr), false);
             self.consume_token();
             Box::new(expr)
         } else {
@@ -823,7 +856,7 @@ impl Parser {
             // parse string
             let expr = StringLiteralExpression::new(self.get_curr_tok().get_string_value());
             self.consume_token();
-            LOGGER.info(format!("Parsed a string literal: {:?}", expr));
+            LOGGER.debug(format!("Parsed a string literal: {:?}", expr), false);
             Box::new(expr)
         } else {
             self.parse_integer_literal_expression()
@@ -840,7 +873,7 @@ impl Parser {
                     .unwrap(),
             );
             self.consume_token();
-            LOGGER.info(format!("Parsed an integer literal: {:?}", expr));
+            LOGGER.debug(format!("Parsed an integer literal: {:?}", expr), false);
             return Box::new(expr);
         }
         self.parse_identifier_expression()
@@ -851,7 +884,7 @@ impl Parser {
             let name = self.get_curr_tok().get_string_value();
             self.consume_token();
             let expr = IdentifierExpression::new(name);
-            LOGGER.info(format!("Parsed an identifier: {:?}", expr));
+            LOGGER.debug(format!("Parsed an identifier: {:?}", expr), false);
             return Box::new(expr);
         }
         return self.parse_boolean_literal_expression();
@@ -867,7 +900,7 @@ impl Parser {
                     .unwrap(),
             );
             self.consume_token();
-            LOGGER.info(format!("Parsed a boolean literal: {:?}", expr));
+            LOGGER.debug(format!("Parsed a boolean literal: {:?}", expr), false);
             return Box::new(expr);
         }
         self.parse_null_literal_expression()
@@ -878,13 +911,17 @@ impl Parser {
             // parse null literals
             let expr = NullLiteralExpression::new();
             self.consume_token();
-            LOGGER.info(format!("Parsed a null literal: {:?}", expr));
+            LOGGER.debug(format!("Parsed a null literal: {:?}", expr), false);
             return Box::new(expr);
         }
-        LOGGER.warn(format!(
-            "Couldn't parse an expression. Token: {}",
-            self.get_curr_tok()
-        ));
+        if !self.has_tokens() {
+            LOGGER.warn(format!(
+                "Couldn't parse an expression. Token: {}",
+                self.get_curr_tok()
+            ));
+        } else {
+            LOGGER.debug(format!("Couldn't parse an expression: this is likely because you've got a set of statements, like a normal human being, at the beginning of your file, who'da thunk"), true)
+        }
         Box::new(SyntaxErrorExpression::new())
     }
 }

@@ -49,10 +49,10 @@ impl Statement for VariableStatement {
         if self.typ == Type::Error {
             add_parser_error(BadType(self.typ.clone()), format!("Got error type."));
         }
-        LOGGER.info(format!(
-            "Registering `{}` with type {:?}",
-            self.name, self.typ
-        ));
+        // LOGGER.debug(format!(
+        //     "Registering `{}` with type {:?}",
+        //     self.name, self.typ
+        // ));
         st.register_symbol(self.name.clone(), self.typ.clone());
     }
 
@@ -75,7 +75,7 @@ impl VariableStatement {
     }
     pub fn set_type(&mut self, typ: Type) {
         if self.typ == Type::Initialized {
-            LOGGER.info(format!("Set type of `{}` to {:?}", self.name, self.typ));
+            //LOGGER.debug(format!("Set type of `{}` to {:?}", self.name, self.typ));
             self.typ = typ;
         } else if self.typ != typ {
             add_parser_error(

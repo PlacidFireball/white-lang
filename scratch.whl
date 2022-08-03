@@ -12,13 +12,14 @@ while (true) {
         break;
     } else {
         y = y + 1;
-        print(y);
+        //print(y);
     }
 }
 
 for (z in [1, 2, 3, 4, 5]) {
-    print(z);
+    //print(z);
     if (z == 3) {
+        print("z broke at 3 :)");
         break;
     }
 }

@@ -57,7 +57,10 @@ impl Expression for ListLiteralExpression {
                 );
             }
         }
-        LOGGER.info(format!("Validated a list literal expression: {:?}", self))
+        LOGGER.debug(
+            format!("Validated a list literal expression: {:?}", self),
+            false,
+        )
     }
 
     fn debug(&self) -> String {
