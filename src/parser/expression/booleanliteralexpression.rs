@@ -29,7 +29,7 @@ impl Expression for BooleanLiteralExpression {
         javascript.append_no_tabs(self.boolean.to_string());
     }
 
-    fn validate(&mut self, _st: &SymbolTable) {}
+    fn validate(&mut self, _st: &mut SymbolTable) {}
 
     fn debug(&self) -> String {
         String::from(self.boolean.to_string())

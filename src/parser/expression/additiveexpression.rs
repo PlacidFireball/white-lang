@@ -89,7 +89,7 @@ impl Expression for AdditiveExpression {
         self.rhs.transpile(javascript);
     }
 
-    fn validate(&mut self, st: &SymbolTable) {
+    fn validate(&mut self, st: &mut SymbolTable) {
         // I have decided that I am not going to allow + being called on strings,
         // gonna do some other op, perhaps a concatenate function in std
         self.lhs.validate(st);

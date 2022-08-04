@@ -27,7 +27,7 @@ impl Expression for SyntaxErrorExpression {
         panic!("You cannot transpile a syntax error :)")
     }
 
-    fn validate(&mut self, _st: &SymbolTable) {}
+    fn validate(&mut self, _st: &mut SymbolTable) {}
 
     fn debug(&self) -> String {
         String::from("Syntax Error")

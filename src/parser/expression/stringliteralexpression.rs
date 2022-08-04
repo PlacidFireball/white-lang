@@ -29,7 +29,7 @@ impl Expression for StringLiteralExpression {
         javascript.append_no_tabs(format!("\"{}\"", self.string_value));
     }
 
-    fn validate(&mut self, _st: &SymbolTable) {}
+    fn validate(&mut self, _st: &mut SymbolTable) {}
 
     fn debug(&self) -> String {
         self.string_value.clone()

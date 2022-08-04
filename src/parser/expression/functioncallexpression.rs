@@ -69,7 +69,7 @@ impl Expression for FunctionCallExpression {
         javascript.append_no_tabs(String::from(")"));
     }
 
-    fn validate(&mut self, st: &SymbolTable) {
+    fn validate(&mut self, st: &mut SymbolTable) {
         let fds_opt = st.get_function(self.name.clone());
         if fds_opt.is_none() {
             add_parser_error(

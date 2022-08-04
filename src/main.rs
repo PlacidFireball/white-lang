@@ -1,11 +1,11 @@
-mod tokenizer;
-mod parser;
 mod config;
 mod core;
 mod javascript;
 mod logger;
+mod parser;
 mod program;
 mod runtime;
+mod tokenizer;
 
 use clap::{App, AppSettings, Arg, ArgMatches, Command, SubCommand};
 use std::cell::Cell;
@@ -14,11 +14,11 @@ use std::env;
 use std::fs::File;
 use std::io::Read;
 use std::ops::Add;
-use std::path::{Path, PathBuf};
 use std::panic;
+use std::path::{Path, PathBuf};
 
-use crate::logger::Logger;
 use crate::core::CoreObjects;
+use crate::logger::Logger;
 use crate::parser::Parser;
 use crate::tokenizer::*;
 
@@ -98,12 +98,14 @@ fn cli_builder() -> ArgMatches {
 fn get_filename_no_extension(path: &String) -> String {
     let path_string = path.to_string();
     let parts = path_string.split("/").collect::<Vec<&str>>();
-    let white_lang_file_with_extension = parts.last().expect("unexpected error getting name of the file");
+    let white_lang_file_with_extension = parts
+        .last()
+        .expect("unexpected error getting name of the file");
     let ext_string = white_lang_file_with_extension.to_string();
     let no_ext_opt = ext_string.strip_suffix(config::WHITE_LANG_FILE_EXTENSION);
     match no_ext_opt {
         Some(no_ext) => no_ext.to_string(),
-        None => "a".to_string()
+        None => "a".to_string(),
     }
 }
 
@@ -155,7 +157,6 @@ fn main() {
         }
     }
 
-
     env::set_var("RUST_BACKTRACE", "1");
     // open xxx.whl
     let path = Path::new(src_path);
@@ -182,7 +183,6 @@ fn main() {
         // transpile the program
         if should_transpile {
             let js = core.borrow_mut().get_program_mut().transpile_to_js();
-            //LOGGER.info(format!("javascript:\n{}", js));
             let mut javascript_file_path = String::new();
             let mut should_evaluate = false;
             let mut should_cleanup = false;
@@ -202,7 +202,6 @@ fn main() {
             std::fs::write(format!("{}", javascript_file_path), js)
                 .expect(format!("transpile: failed to write to {}", javascript_file_path).as_str());
             if should_evaluate {
-
                 let node_exec = std::process::Command::new("node")
                     .arg(javascript_file_path.clone())
                     .output()

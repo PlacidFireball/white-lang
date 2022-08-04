@@ -120,7 +120,7 @@ impl Expression for EqualityExpression {
         self.rhs.transpile(javascript);
     }
 
-    fn validate(&mut self, st: &SymbolTable) {
+    fn validate(&mut self, st: &mut SymbolTable) {
         self.lhs.validate(st);
         self.rhs.validate(st);
     }

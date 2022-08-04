@@ -116,7 +116,7 @@ pub trait Expression: ToAny + Debug {
     fn evaluate(&self, runtime: &mut Runtime) -> Box<dyn Any>; // evaluate the expression
     fn compile(&self); // compile the expression to nasm
     fn transpile(&self, javascript: &mut JavaScript); // transpile the expression to javascript
-    fn validate(&mut self, st: &SymbolTable); // validate the expression via the symbol table
+    fn validate(&mut self, st: &mut SymbolTable); // validate the expression via the symbol table
     fn debug(&self) -> String; // for retrieving information about the expression
     fn get_white_type(&self) -> Type; // getting the type of the expression
     fn get_expr_type(&self) -> String; // get the rust type of the expression

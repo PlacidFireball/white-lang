@@ -43,7 +43,7 @@ impl Expression for ListLiteralExpression {
         javascript.append(String::from("]"));
     }
 
-    fn validate(&mut self, st: &SymbolTable) {
+    fn validate(&mut self, st: &mut SymbolTable) {
         if self.exprs.is_empty() {
             return;
         }

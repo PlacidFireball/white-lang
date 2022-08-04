@@ -54,7 +54,7 @@ impl Expression for UnaryExpression {
         }
     }
 
-    fn validate(&mut self, _st: &SymbolTable) {
+    fn validate(&mut self, _st: &mut SymbolTable) {
         if self.operator == "not"
             && (self.expr.get_white_type() == Type::Integer
                 || self.expr.get_white_type() == Type::Float)

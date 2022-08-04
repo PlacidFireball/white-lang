@@ -66,7 +66,7 @@ impl Expression for FactorExpression {
         self.rhs.transpile(javascript);
     }
 
-    fn validate(&mut self, st: &SymbolTable) {
+    fn validate(&mut self, st: &mut SymbolTable) {
         self.lhs.validate(st);
         self.rhs.validate(st);
         if self.lhs.get_white_type().ne(&Type::Float)

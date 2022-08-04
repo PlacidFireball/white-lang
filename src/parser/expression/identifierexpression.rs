@@ -39,7 +39,7 @@ impl Expression for IdentifierExpression {
         javascript.append_no_tabs(self.name.clone());
     }
 
-    fn validate(&mut self, st: &SymbolTable) {
+    fn validate(&mut self, st: &mut SymbolTable) {
         let opt_typ = st.get_symbol_type(self.name.clone());
         if opt_typ.is_some() {
             self.typ = opt_typ.unwrap();

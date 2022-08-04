@@ -15,7 +15,7 @@ pub struct StructDefinitionStatement {
     pub name: String,
     typ: Type,
     fields: HashMap<String, Type>,
-    methods: HashMap<String, FunctionDefinitionStatement>,
+    pub(crate) methods: HashMap<String, FunctionDefinitionStatement>,
 }
 impl ToAny for StructDefinitionStatement {
     fn to_any(&self) -> &dyn Any {
@@ -79,6 +79,16 @@ impl StructDefinitionStatement {
 
     pub fn add_field(&mut self, field_name: String, typ: Type) {
         self.fields.insert(field_name, typ);
+    }
+
+    pub fn get_field_type(&self, field_name: String) -> Option<Type> {
+        match self.fields.get(&field_name) {
+            Some(typ) => Some(typ.clone()),
+            None => {
+                crate::LOGGER.warn(format!("No such field: {}", field_name));
+                None
+            }
+        }
     }
 
     pub fn add_method(&mut self, method_name: String, method: FunctionDefinitionStatement) {

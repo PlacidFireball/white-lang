@@ -43,7 +43,7 @@ impl Expression for LogicalExpression {
         self.rhs.transpile(javascript);
     }
 
-    fn validate(&mut self, _st: &SymbolTable) {
+    fn validate(&mut self, _st: &mut SymbolTable) {
         if self.operator.ne("&&") && self.operator.ne("||") {
             add_parser_error(
                 ParserErrorType::BadOperator(self.operator.clone()),

@@ -27,7 +27,7 @@ impl Expression for NullLiteralExpression {
         javascript.append_no_tabs(String::from("null"));
     }
 
-    fn validate(&mut self, _st: &SymbolTable) {}
+    fn validate(&mut self, _st: &mut SymbolTable) {}
 
     fn debug(&self) -> String {
         String::from("null")

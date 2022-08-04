@@ -25,7 +25,7 @@ impl Program {
         parser.parse();
         Program::from_parser(&mut parser)
     }
-    pub fn from_parser(parser: &mut parser::Parser) -> Self {
+    pub fn from_parser(parser: &mut Parser) -> Self {
         if let Some(statements) = parser.get_statements() {
             return Program {
                 statements: statements.clone(),

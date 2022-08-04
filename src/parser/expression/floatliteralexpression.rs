@@ -30,7 +30,7 @@ impl Expression for FloatLiteralExpression {
         javascript.append_no_tabs(self.value.to_string());
     }
 
-    fn validate(&mut self, _st: &SymbolTable) {}
+    fn validate(&mut self, _st: &mut SymbolTable) {}
 
     fn debug(&self) -> String {
         String::from(self.value.to_string())

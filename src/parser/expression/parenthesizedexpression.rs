@@ -31,7 +31,7 @@ impl Expression for ParenthesizedExpression {
         javascript.append_no_tabs(String::from(")"));
     }
 
-    fn validate(&mut self, st: &SymbolTable) {
+    fn validate(&mut self, st: &mut SymbolTable) {
         self.expr.validate(st);
     }
 
