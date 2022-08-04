@@ -6,6 +6,7 @@ use crate::parser::ParserErrorType::*;
 use crate::runtime::Runtime;
 use crate::LOGGER;
 use std::any::Any;
+use crate::parser::expression::structexpression::StructExpression;
 
 #[derive(Clone, Debug)]
 pub(crate) struct VariableStatement {
@@ -36,6 +37,9 @@ impl Statement for VariableStatement {
     }
 
     fn validate(&mut self, st: &mut SymbolTable) {
+        if self.expr.debug() == "StructExpression" {
+            self.expr.set_name(self.name.clone());
+        }
         self.expr.validate(st);
         if st.has_symbol(self.name.clone()) {
             add_parser_error(

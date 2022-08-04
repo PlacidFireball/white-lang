@@ -5,6 +5,7 @@ use crate::parser::whitetypes::*;
 use crate::tokenizer::TokenType::*;
 use crate::tokenizer::*;
 use std::any::Any;
+use std::fmt::format;
 
 mod symbol_table;
 mod test;
@@ -38,14 +39,15 @@ use statement::ifstatement::IfStatement;
 use statement::printstatement::PrintStatement;
 
 use crate::config::WhiteLangFloat;
-use crate::parser::parser_traits::{Expression, Statement};
+use crate::parser::parser_traits::{add_parser_error, Expression, Statement};
 use crate::parser::statement::breakstatement::BreakStatement;
 use crate::parser::statement::syntaxerrorstatement::SyntaxErrorStatement;
-use crate::parser::ParserErrorType::UnterminatedArgList;
+use crate::parser::ParserErrorType::{EmptyStructVariable, UnexpectedToken, UnknownName, UnterminatedArgList};
 use statement::variablestatement::VariableStatement;
 use symbol_table::SymbolTable;
 
 use crate::LOGGER;
+use crate::parser::expression::structexpression::StructExpression;
 
 // Parsing Errors
 #[derive(Clone, Debug)]
@@ -64,6 +66,7 @@ pub enum ParserErrorType {
     IncompatibleTypes(Type, Type), //
     UnexpectedExpression(Box<dyn Expression>),
     BadType(Type),
+    EmptyStructVariable(String)
 }
 impl ParserErrorType {
     fn to_error_msg(&self) -> String {
@@ -86,6 +89,7 @@ impl ParserErrorType {
             IncompatibleTypes(t1, t2) => format!("Incompatible types: {:?} + {:?}", t1, t2),
             UnexpectedExpression(expr) => format!("Unexpected expression: {:?}", expr),
             BadType(typ) => format!("Bad type: {:?}", typ),
+            EmptyStructVariable(name) => format!("You didn't populate {} on this struct", name),
         }
     }
 }
@@ -187,17 +191,17 @@ impl Parser {
     /// Retrieve the expression if the parser has it
     pub fn get_expr(&self) -> Option<&Box<dyn Expression>> {
         if let Some(_) = self.expr.to_any().downcast_ref::<SyntaxErrorExpression>() {
-            return Option::None;
+            return None;
         }
-        Option::Some(&self.expr)
+        Some(&self.expr)
     }
 
     /// Get the statement list if the parser has it
     pub fn get_statements(&self) -> Option<&Vec<Box<dyn Statement>>> {
         if let Some(_) = self.expr.to_any().downcast_ref::<SyntaxErrorExpression>() {
-            return Option::Some(&self.statement_list);
+            return Some(&self.statement_list);
         }
-        Option::None
+        None
     }
 
     // tells us if parsing is done or not
@@ -232,6 +236,23 @@ impl Parser {
     // peeks at the next token and sees if it matches typ
     fn peek_next_token(&self, typ: TokenType) -> bool {
         self.token_list[self.curr_idx + 1].get_type() == typ
+    }
+
+    fn token_list_like(&self, expected: Vec<TokenType>) -> bool {
+        let len = expected.len();
+        let mut i = 0;
+        if self.curr_idx + len > self.token_list.len() - 1 {
+            LOGGER.debug(format!("Tried to check token list like {:?} but doing the check will cause an error, returning false.", expected), false);
+            return false;
+
+        }
+        for typ in expected.iter() {
+            if !self.token_list[self.curr_idx + i].get_type().eq(typ) {
+                return false;
+            }
+            i += 1;
+        }
+        true
     }
 
     // will match and a token at token_list[curr_idx] if its type = typ
@@ -281,7 +302,15 @@ impl Parser {
 
     fn require_a_type(&mut self) -> Type {
         let types = vec!["string", "bool", "float", "int", "void"]; // all the primitive types we can assign to so far
+        // custom struct types
+
         let curr_tok = self.get_curr_tok().get_string_value();
+        if self.st.has_symbol(curr_tok.clone()) {
+            if let Some(obj) = self.st.get_struct(curr_tok.clone()) {
+                LOGGER.debug(format!("Found a custom type: {:?}", obj.get_type()), false);
+                return obj.get_type();
+            }
+        }
         for i in 0..types.len() - 1 {
             // try to match some type, if we get a good one, return it
             if types[i] == curr_tok {
@@ -306,10 +335,10 @@ impl Parser {
             self.match_and_consume(Greater); // >
                                              //LOGGER.debug(format!("parsed a type: {:?}", typ));
             if typ != Type::Error {
-                return Option::Some(typ);
+                return Some(typ);
             }
         }
-        Option::None
+        None
     }
 
     // -------------------------------------------------------------------------- //
@@ -504,7 +533,7 @@ impl Parser {
                 if_stmt.add_true_statement(self.parse_statement());
                 if !self.has_tokens() {
                     self.errors
-                        .push(ParserErrorType::UnexpectedToken(self.get_curr_tok()));
+                        .push(UnexpectedToken(self.get_curr_tok()));
                     break;
                 }
             }
@@ -514,7 +543,7 @@ impl Parser {
                     if_stmt.add_false_statement(self.parse_statement());
                     if !self.has_tokens() {
                         self.errors
-                            .push(ParserErrorType::UnexpectedToken(self.get_curr_tok()));
+                            .push(UnexpectedToken(self.get_curr_tok()));
                         break;
                     }
                 }
@@ -528,21 +557,28 @@ impl Parser {
     fn parse_function_call_statement(&mut self) -> Option<FunctionCallStatement> {
         // x(args);
         if self.match_token(Identifier) && self.peek_next_token(LeftParen) {
-            let name = self.token_list[self.curr_idx.clone()].get_string_value();
-            let expr = self.parse_expression(); // retrieve the function call expression
-            self.require_token(TokenType::SemiColon);
-            let fcs = FunctionCallStatement::new(expr, name.clone());
-            LOGGER.debug(
-                format!("Parsed a function call statement: {:?}", fcs),
-                false,
-            );
-            return Some(fcs);
+            self.do_parse_function_call()
+        } else if self.token_list_like(vec![Identifier, Dot, Identifier, LeftParen]) {
+            self.do_parse_function_call()
+        } else {
+            None
         }
-        None
+    }
+
+    fn do_parse_function_call(&mut self) -> Option<FunctionCallStatement> {
+        let name = self.token_list[self.curr_idx.clone()].get_string_value();
+        let expr = self.parse_expression(); // retrieve the function call expression
+        self.require_token(SemiColon);
+        let fcs = FunctionCallStatement::new(expr, name.clone());
+        LOGGER.debug(
+            format!("Parsed a function call statement: {:?}", fcs),
+            false,
+        );
+        return Some(fcs);
     }
 
     fn parse_while_statement(&mut self) -> Option<WhileStatement> {
-        if self.match_token(TokenType::While) {
+        if self.match_token(While) {
             self.consume_token();
             self.require_token(LeftParen);
             let expr = self.parse_expression(); // condition we will loop on
@@ -554,7 +590,7 @@ impl Parser {
                 while_statement.add_body_statement(self.parse_statement());
                 if !self.has_tokens() {
                     self.errors
-                        .push(ParserErrorType::UnexpectedToken(self.get_curr_tok()));
+                        .push(UnexpectedToken(self.get_curr_tok()));
                     break;
                 }
             }
@@ -569,46 +605,46 @@ impl Parser {
     }
 
     fn parse_break_statement(&mut self) -> Option<BreakStatement> {
-        if self.match_and_consume(TokenType::Break) {
-            self.require_token(TokenType::SemiColon);
-            return Option::Some(BreakStatement::new());
+        if self.match_and_consume(Break) {
+            self.require_token(SemiColon);
+            return Some(BreakStatement::new());
         }
         None
     }
 
     fn parse_struct_definition_statement(&mut self) -> Option<StructDefinitionStatement> {
-        if self.match_and_consume(TokenType::Struct) {
+        if self.match_and_consume(Struct) {
             let name = self.get_curr_tok().get_string_value();
             let mut sds = StructDefinitionStatement::new(name.clone());
             self.consume_token();
-            self.require_token(TokenType::LeftBrace);
-            while !self.match_and_consume(TokenType::RightBrace) {
+            self.require_token(LeftBrace);
+            while !self.match_and_consume(RightBrace) {
                 let expr = self.parse_identifier_expression();
-                self.require_token(TokenType::Colon);
+                self.require_token(Colon);
                 let typ = self.require_a_type();
                 sds.add_field(expr.debug(), typ);
-                self.match_and_consume(TokenType::Comma);
+                self.match_and_consume(Comma);
                 if !self.has_tokens() {
                     LOGGER.warn(format!(
                         "Unexpected token: {:?} while parsing struct definition.",
                         self.get_curr_tok()
                     ));
                     self.errors
-                        .push(ParserErrorType::UnexpectedToken(self.get_curr_tok()));
+                        .push(UnexpectedToken(self.get_curr_tok()));
                 }
             }
-            if self.match_and_consume(TokenType::Implement) {
+            if self.match_and_consume(Implement) {
                 if self.match_str_val(name.clone()) {
                     self.consume_token();
-                    self.require_token(TokenType::LeftBrace);
-                    while !self.match_and_consume(TokenType::RightBrace) {
+                    self.require_token(LeftBrace);
+                    while !self.match_and_consume(RightBrace) {
                         let method_opt = self.parse_function_definition_statement();
                         if method_opt.is_some() {
                             let method = method_opt.unwrap();
                             sds.add_method(method.name.clone(), method.clone());
                         } else {
                             self.errors
-                                .push(ParserErrorType::UnexpectedToken(self.get_curr_tok()));
+                                .push(UnexpectedToken(self.get_curr_tok()));
                             self.check_for_parse_errors();
                         }
                         if !self.has_tokens() {
@@ -617,17 +653,17 @@ impl Parser {
                                 self.get_curr_tok()
                             ));
                             self.errors
-                                .push(ParserErrorType::UnexpectedToken(self.get_curr_tok()));
+                                .push(UnexpectedToken(self.get_curr_tok()));
                             self.check_for_parse_errors();
                         }
                     }
                 } else {
                     self.errors
-                        .push(ParserErrorType::UnexpectedToken(self.get_curr_tok()));
+                        .push(UnexpectedToken(self.get_curr_tok()));
                     self.check_for_parse_errors();
                 }
             }
-            self.require_token(TokenType::SemiColon);
+            self.require_token(SemiColon);
             return Some(sds);
         }
         None
@@ -728,7 +764,7 @@ impl Parser {
 
     // <expr> (== | !=) <expr>
     fn parse_equality_expression(&mut self) -> Box<dyn Expression> {
-        let expr = self.parse_function_call_expression(); // first try to parse a lower level expr
+        let expr = self.parse_struct_expression(); // first try to parse a lower level expr
         if self.match_token(EqualEqual) || self.match_token(BangEqual) {
             // if we match either != or ==
             let operator = self.get_curr_tok().get_string_value(); // get the op
@@ -744,27 +780,74 @@ impl Parser {
         expr
     }
 
+    fn parse_struct_expression(&mut self) -> Box<dyn Expression> {
+        let str_val = self.get_curr_tok().get_string_value();
+        if self.st.has_symbol(str_val.clone()) {
+            if let Some(obj) = self.st.get_struct(str_val.clone()) {
+                // now we're in business
+                let mut struct_expr = StructExpression::new(str_val.clone(), obj.get_type());
+                self.consume_token(); // consume the init token
+                self.require_token(LeftParen);
+                // fields
+                let fields = obj.fields.clone();
+                let fields_size = fields.keys().len();
+                let mut handled_fields = vec![];
+                while self.has_tokens() {
+                    let field_name = self.get_curr_tok().get_string_value();
+                    if fields.contains_key(&field_name) {
+                        self.consume_token();
+                        self.require_token(Equal);
+                        let expr = self.parse_expression();
+                        struct_expr.add_field(field_name.clone(), expr);
+                        handled_fields.push(field_name);
+                        if !self.match_and_consume(Comma) {
+                            if fields_size != handled_fields.len() {
+                                for field in handled_fields.iter() {
+                                    if !fields.contains_key(field) {
+                                        add_parser_error(EmptyStructVariable(field.clone()), "Empty variable".to_string());
+                                    }
+                                }
+                                add_parser_error(UnexpectedToken(self.get_curr_tok()), "idk".to_string());
+                            }
+                            self.require_token(RightParen);
+                            break;
+                        }
+                    } else if self.match_and_consume(RightParen) {
+                        break;
+                    } else if !self.has_tokens(){
+                        add_parser_error(UnexpectedToken(self.get_curr_tok()), format!("You probably didn't close the paren on your struct :)"));
+                    } else {
+                        add_parser_error(UnknownName(field_name.clone()), format!("No such field: {}", field_name));
+                    }
+                }
+                return Box::new(struct_expr)
+            }
+        }
+        self.parse_function_call_expression()
+    }
+
     fn parse_function_call_expression(&mut self) -> Box<dyn Expression> {
-        if self.match_token(Identifier) && self.peek_next_token(LeftParen) {
+        if self.token_list_like(vec![Identifier, Dot, Identifier, LeftParen]){
+            let namespace = self.get_curr_tok().get_string_value();
+            self.consume_token(); // namespace
+            self.consume_token(); // dot
+            let subname = self.get_curr_tok().get_string_value();
+            self.consume_token(); // subname
+            let mut expr = FunctionCallExpression::new(format!("{}.{}", namespace, subname));
+            self.require_token(LeftParen);
+            expr = self.decorate_function_call(expr);
+            LOGGER.debug(
+                format!("Parsed a function call expression: {:?}", expr),
+                false,
+            );
+            return Box::new(expr); // return whatever we have parsed
+        }
+        else if self.match_token(Identifier) && self.peek_next_token(LeftParen) {
             // function_name(
             let mut expr = FunctionCallExpression::new(self.get_curr_tok().get_string_value());
             self.require_token(Identifier); // consume the name and paren
             self.require_token(LeftParen);
-            loop {
-                if self.match_and_consume(RightParen) {
-                    // while the arg list hasn't terminated
-                    break;
-                }
-                let arg = self.parse_expression(); // parse some expression
-                expr.add_arg(arg); // add the argument to the argument vector
-                self.match_and_consume(Comma); // consume a comma if we have one
-                if !self.has_tokens() {
-                    // check to see if we've run out of tokens
-                    self.errors
-                        .push(ParserErrorType::UnterminatedArgList(self.get_curr_tok())); // add an error if we have
-                    break;
-                }
-            }
+            expr = self.decorate_function_call(expr);
             LOGGER.debug(
                 format!("Parsed a function call expression: {:?}", expr),
                 false,
@@ -772,6 +855,26 @@ impl Parser {
             return Box::new(expr); // return whatever we have parsed
         }
         self.parse_list_literal_expression() // otherwise parse a list literal
+    }
+
+    fn decorate_function_call(&mut self, mut expr: FunctionCallExpression) -> FunctionCallExpression {
+        loop {
+            if self.match_and_consume(RightParen) {
+                break;
+            }
+            let arg = self.parse_expression(); // parse some expression
+            expr.add_arg(arg); // add the argument to the argument vector
+            // parse commas until the end of the arg list
+            if !self.match_token(Comma) {
+                self.require_token(RightParen);
+                break;
+            }
+            if !self.has_tokens() {
+                self.errors.push(UnterminatedArgList(self.get_curr_tok()));
+                break;
+            }
+        }
+        expr
     }
 
     fn parse_list_literal_expression(&mut self) -> Box<dyn Expression> {
@@ -880,7 +983,21 @@ impl Parser {
     }
 
     fn parse_identifier_expression(&mut self) -> Box<dyn Expression> {
-        if self.match_token(Identifier) {
+        if self.match_token(Identifier) && self.peek_next_token(Dot) {
+            let name = self.get_curr_tok().get_string_value();
+            self.consume_token(); // name
+            self.consume_token(); // dot
+            let subname = if self.match_token(Identifier) {
+                let tmp = self.get_curr_tok().get_string_value();
+                self.consume_token(); // name
+                tmp
+            } else {
+                add_parser_error(UnexpectedToken(self.get_curr_tok()), "".to_string());
+                "".to_string() // unreachable
+            };
+            let expression = IdentifierExpression::new(format!("{}.{}", name, subname));
+            return Box::new(expression);
+        } else if self.match_token(Identifier) {
             let name = self.get_curr_tok().get_string_value();
             self.consume_token();
             let expr = IdentifierExpression::new(name);

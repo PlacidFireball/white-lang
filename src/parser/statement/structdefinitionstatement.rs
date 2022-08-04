@@ -14,7 +14,7 @@ use std::fmt::Debug;
 pub struct StructDefinitionStatement {
     pub name: String,
     typ: Type,
-    fields: HashMap<String, Type>,
+    pub(crate) fields: HashMap<String, Type>,
     pub(crate) methods: HashMap<String, FunctionDefinitionStatement>,
 }
 impl ToAny for StructDefinitionStatement {
@@ -103,5 +103,9 @@ impl StructDefinitionStatement {
                 None
             }
         }
+    }
+
+    pub fn get_type(&self) -> Type {
+        self.typ.clone()
     }
 }

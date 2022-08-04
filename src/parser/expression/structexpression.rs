@@ -43,7 +43,10 @@ impl ToAny for StructExpression {
 #[allow(dead_code, unused_variables)]
 impl Expression for StructExpression {
     fn evaluate(&self, runtime: &mut Runtime) -> Box<dyn Any> {
-        todo!()
+        for (name, expr) in self.fields.iter() {
+            runtime.set_value(name.clone(), expr.clone());
+        }
+        Box::new(self.clone())
     }
 
     fn compile(&self) {
@@ -56,6 +59,9 @@ impl Expression for StructExpression {
 
     fn validate(&mut self, st: &mut SymbolTable) {
         let mut struct_id = String::new();
+        if self.name == String::from("default") {
+            panic!("make sure you are setting the name of StructExpression somewhere")
+        }
         match self.typ.clone() {
             Struct(s) => struct_id = s,
             _ => add_parser_error(
@@ -102,18 +108,25 @@ impl Expression for StructExpression {
             let method_name_pure = name.split(".").last().unwrap().to_string();
             st.register_function(format!("{}.{}", self.name, method_name_pure), fds.clone());
         }
+        for (name, typ) in strct.fields.iter() {
+            st.register_symbol(format!("{}.{}", self.name, name.to_string()), typ.clone());
+        }
     }
 
     fn debug(&self) -> String {
-        todo!()
+        "StructExpression".to_string()
     }
 
     fn get_white_type(&self) -> Type {
-        todo!()
+        self.typ.clone()
     }
 
     fn get_expr_type(&self) -> String {
         todo!()
+    }
+
+    fn set_name(&mut self, name: String) {
+        self.name = name;
     }
 }
 
@@ -121,7 +134,7 @@ impl Expression for StructExpression {
 impl StructExpression {
     pub fn new(name: String, typ: Type) -> StructExpression {
         Self {
-            name,
+            name: String::from("default"),
             typ,
             fields: HashMap::new(),
         }
@@ -129,5 +142,9 @@ impl StructExpression {
 
     pub fn add_field(&mut self, field_name: String, expression: Box<dyn Expression>) {
         self.fields.insert(field_name, expression.clone());
+    }
+
+    pub fn set_name(&mut self, name: String) {
+        self.name = name;
     }
 }

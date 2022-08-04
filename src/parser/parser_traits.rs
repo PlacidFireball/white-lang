@@ -120,6 +120,7 @@ pub trait Expression: ToAny + Debug {
     fn debug(&self) -> String; // for retrieving information about the expression
     fn get_white_type(&self) -> Type; // getting the type of the expression
     fn get_expr_type(&self) -> String; // get the rust type of the expression
+    fn set_name(&mut self, name: String) { panic!("set_name is not defined on {:?}", self) }
 }
 
 // using to any to downcast the dyn Expression to the concrete class

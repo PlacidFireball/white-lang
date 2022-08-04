@@ -35,6 +35,7 @@ mod test {
     use crate::Tokenizer;
     use crate::IS_TESTING;
     use crate::{CoreObjects, Parser};
+    use crate::parser::expression::structexpression::StructExpression;
 
     fn init_parser(src: String) -> Parser {
         IS_TESTING.with(|test| test.set(true));
@@ -45,7 +46,7 @@ mod test {
         for token in tokenizer.get_token_list() {
             print!("{} ", token.get_type());
         }
-        print!("]");
+        println!("]");
         core.parser
     }
 
@@ -566,5 +567,22 @@ mod test {
             .to_any()
             .downcast_ref::<StructDefinitionStatement>()
             .is_some());
+    }
+
+    #[test]
+    fn test_struct_expression_parses() {
+        let parser = init_parser("
+        struct X { x: int };
+        let myStruct = X(x = 1);
+        struct Y { y: string, x: int } implement Y { fn foo(z: string) { print(z); } };
+        let myStruct2 = Y(x = 2, y = \"Hello World\");
+        print(myStruct.x);
+        myStruct2.foo(\"Hello World\");
+        ".to_string());
+        assert!(parser.statement_list[1].clone().to_any().downcast_ref::<VariableStatement>().is_some());
+        let v_s = parser.statement_list[1].clone();
+        let strct_expr = v_s.get_expr();
+        println!("{:?}", strct_expr);
+        assert_eq!("This looks right", "This looks right");
     }
 }
