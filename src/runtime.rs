@@ -32,7 +32,10 @@ impl Runtime {
     pub fn get_value(&mut self, name: String) -> Option<Box<dyn Any + '_>> {
         let log_runtime_debug = crate::RUNTIME_DEBUG_LOGGING_ENABLED.with(|cell| !cell.get());
         for i in (0..self.scopes.len()).rev() {
-            crate::LOGGER.debug(format!("[RUNTIME] scope: sid.{}", self.ids[i]), log_runtime_debug);
+            crate::LOGGER.debug(
+                format!("[RUNTIME] scope: sid.{}", self.ids[i]),
+                log_runtime_debug,
+            );
             for (name, expr) in &self.scopes[i] {
                 crate::LOGGER.debug(format!("{} => {}", name, expr.debug()), log_runtime_debug);
             }

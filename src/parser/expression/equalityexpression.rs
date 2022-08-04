@@ -26,17 +26,23 @@ impl Expression for EqualityExpression {
         let rhs_eval = self.rhs.evaluate(runtime);
         let is_equal = self.operator.contains("==");
         if is_equal {
-            crate::LOGGER.debug(format!(
-                "[EQ_EXPR]: {} == {}",
-                try_print_output(&lhs_eval),
-                try_print_output(&rhs_eval)
-            ), crate::RUNTIME_DEBUG_LOGGING_ENABLED.with(|cell| !cell.get()));
+            crate::LOGGER.debug(
+                format!(
+                    "[EQ_EXPR]: {} == {}",
+                    try_print_output(&lhs_eval),
+                    try_print_output(&rhs_eval)
+                ),
+                crate::RUNTIME_DEBUG_LOGGING_ENABLED.with(|cell| !cell.get()),
+            );
         } else {
-            crate::LOGGER.debug(format!(
-                "[EQ_EXPR]: {} != {}",
-                try_print_output(&lhs_eval),
-                try_print_output(&rhs_eval)
-            ), crate::RUNTIME_DEBUG_LOGGING_ENABLED.with(|cell| !cell.get()));
+            crate::LOGGER.debug(
+                format!(
+                    "[EQ_EXPR]: {} != {}",
+                    try_print_output(&lhs_eval),
+                    try_print_output(&rhs_eval)
+                ),
+                crate::RUNTIME_DEBUG_LOGGING_ENABLED.with(|cell| !cell.get()),
+            );
         }
         // handle null == null
         if self.lhs.get_white_type() == self.rhs.get_white_type()
@@ -109,7 +115,8 @@ impl Expression for EqualityExpression {
 
     fn transpile(&self, javascript: &mut JavaScript) {
         self.lhs.transpile(javascript);
-        javascript.append_no_tabs(format!(" {} ", self.operator));
+        // because js sucks -> do === to avoid unexpected coercion
+        javascript.append_no_tabs(format!(" {}= ", self.operator));
         self.rhs.transpile(javascript);
     }
 

@@ -4,3 +4,4 @@ launch.json
 *.iml
 /.idea
 /.vscode
+*.js
