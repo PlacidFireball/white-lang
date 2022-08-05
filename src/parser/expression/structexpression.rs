@@ -43,10 +43,20 @@ impl ToAny for StructExpression {
 #[allow(dead_code, unused_variables)]
 impl Expression for StructExpression {
     fn evaluate(&self, runtime: &mut Runtime) -> Box<dyn Any> {
+        // register fields
         for (name, expr) in self.fields.iter() {
-            runtime.set_value(name.clone(), expr.clone());
+            crate::LOGGER.debug(format!("[RUNTIME] Registering {} with {:?}", name, expr), false);
+            runtime.set_value(format!("{}.{}", self.name, name), expr.clone());
         }
-        Box::new(self.clone())
+        // register functions
+        let obj = runtime.get_struct(match self.typ.clone() {
+            Struct(s) => s,
+            _ => panic!("Something bad happened"),
+        });
+        for (name, fds) in obj.methods.iter() {
+            runtime.add_function(format!("{}.{}", self.name, name), fds.clone());
+        }
+        Box::new(self.clone()) //
     }
 
     fn compile(&self) {

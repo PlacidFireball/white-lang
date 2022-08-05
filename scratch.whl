@@ -1,4 +1,4 @@
-print("Hello World!");
+/*print("Hello World!");
 let x : int = 10;
 if (x==10) {
     print("x is indeed 10!");
@@ -35,3 +35,16 @@ fn fib(n : int) : int {
     return fib(n-1) + fib(n-2);
 }
 print(fib(6));
+*/
+
+struct Vec2D {
+    x: int,
+    y: int
+} implement Vec2D {
+    fn display() : int {
+        return 1 + 2;
+    }
+};
+let myVec = Vec2D(x = 2, y = 3);
+print(myVec.x);
+print(myVec.display());

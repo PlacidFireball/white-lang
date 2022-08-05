@@ -148,24 +148,23 @@ mod test {
     #[test]
     /// test parsing a function call expression, this time with args
     fn test_function_call_args_expression() {
-        let mut parser = Parser::new(&mut Tokenizer::new("x(1,2)".to_string()));
-        let expr = parser.parse_function_call_expression();
-        if let None = expr.to_any().downcast_ref::<FunctionCallExpression>() {
-            panic!("failure");
-        }
-        assert_eq!(expr.debug(), "x: 1 2 ");
+        let mut parser = init_parser("fn foo(y : int, z : int) {} foo(1 ,2);".to_string());
+        let uncertain_fcs = parser.statement_list[1].clone();
+        let uncertain_fds = parser.statement_list[0].clone();
+        let fcs = uncertain_fcs.to_any().downcast_ref::<FunctionCallStatement>().unwrap();
+        let fds = uncertain_fds.to_any().downcast_ref::<FunctionDefinitionStatement>().unwrap();
+        assert_eq!("This looks right 8/4/22", "This looks right 8/4/22");
+        println!("{:?}", fds);
+        println!("{:?}", fcs);
+
     }
 
     #[test]
+    #[should_panic]
     /// test for errors when the function call doesn't have a closed paren
     fn test_fn_unterminated_args() {
         let mut parser = Parser::new(&mut Tokenizer::new("x(".to_string()));
         let expr = parser.parse_function_call_expression();
-        assert!(expr
-            .to_any()
-            .downcast_ref::<FunctionCallExpression>()
-            .is_some());
-        assert!(parser.has_errors());
     }
 
     #[test]

@@ -23,6 +23,9 @@ impl ToAny for VariableStatement {
 
 impl Statement for VariableStatement {
     fn execute(&self, runtime: &mut Runtime) {
+        if self.expr.debug() == String::from("StructExpression") {
+            self.expr.evaluate(runtime); // need to do this to get the functions and fields in the runtime
+        }
         runtime.set_value(self.name.clone(), self.expr.clone());
     }
 

@@ -274,4 +274,21 @@ mod test {
         let src = "for(x in [1,2,3]) { print(x); break; }";
         test_execute(src, "1\n");
     }
+
+    #[test]
+    fn test_stucts_work() {
+        let src = "\
+        struct Vec2D { \
+            x: int, \
+            y: int \
+        } implement Vec2D {\
+            fn display() : int {
+                return 1 + 2;
+            }
+        };
+        let myVec = Vec2D(x = 2, y = 3);
+        print(myVec.x);
+        print(myVec.display());";
+        test_execute(src, "2\n3\n");
+    }
 }

@@ -409,6 +409,10 @@ impl Parser {
                 self.require_token(Colon);
                 let typ = self.require_a_type();
                 fds.add_arg_type(typ);
+                if !self.match_and_consume(Comma) {
+                    self.require_token(RightParen);
+                    break;
+                }
                 if !self.has_tokens() {
                     self.errors.push(UnterminatedArgList(self.get_curr_tok()));
                     break;
@@ -555,7 +559,7 @@ impl Parser {
     }
 
     fn parse_function_call_statement(&mut self) -> Option<FunctionCallStatement> {
-        // x(args);
+        // x(args); || x.foo(args);
         if self.match_token(Identifier) && self.peek_next_token(LeftParen) {
             self.do_parse_function_call()
         } else if self.token_list_like(vec![Identifier, Dot, Identifier, LeftParen]) {
@@ -865,7 +869,7 @@ impl Parser {
             let arg = self.parse_expression(); // parse some expression
             expr.add_arg(arg); // add the argument to the argument vector
             // parse commas until the end of the arg list
-            if !self.match_token(Comma) {
+            if !self.match_and_consume(Comma) {
                 self.require_token(RightParen);
                 break;
             }
