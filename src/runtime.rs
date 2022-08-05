@@ -15,6 +15,7 @@ pub struct Runtime {
     ret: Box<dyn Expression>,
     pub(crate) output: String,
     brk: bool,
+    __self: String,
 }
 impl Runtime {
     pub fn new() -> Self {
@@ -26,6 +27,7 @@ impl Runtime {
             ret: Box::new(SyntaxErrorExpression::new()),
             output: String::new(),
             brk: false,
+            __self: String::new()
         }
     }
 
@@ -45,7 +47,7 @@ impl Runtime {
                 return Some(val.evaluate(self));
             }
         }
-        Option::None
+        None
     }
 
     pub fn set_value(&mut self, name: String, value: Box<dyn Expression>) {
@@ -142,4 +144,7 @@ impl Runtime {
     pub fn get_break(&self) -> bool {
         self.brk
     }
+
+    pub fn set_self(&mut self, name: String) { self.__self = name; }
+    pub fn get_self(&self) -> String { self.__self.clone() }
 }

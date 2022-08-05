@@ -51,8 +51,7 @@ pub fn default_expr() -> Box<dyn Expression> {
 }
 
 pub fn add_parser_error(error: ParserErrorType, info: String) {
-    LOGGER.warn(info);
-    CORE_OBJECTS.with(|core| core.borrow().get_parser().error_panic(error));
+    LOGGER.error(format!("Error: {:?}\ninfo: {}", error, info));
 }
 pub fn any_into_int_literal(any: &Box<dyn Any>) -> Option<IntegerLiteralExpression> {
     if let Some(integer) = any.downcast_ref::<WhiteLangInt>() {

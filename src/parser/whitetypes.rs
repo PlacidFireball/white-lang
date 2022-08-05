@@ -72,6 +72,7 @@ impl Type {
             ListFloat => Float,
             ListBoolean => Boolean,
             ListObject => Object,
+            ListStruct(s) => Struct(s.to_string()),
             _ => self.clone(),
         }
     }
@@ -94,6 +95,7 @@ impl Type {
             ListBoolean => true,
             ListFloat => true,
             ListObject => true,
+            ListStruct(_) => true,
             _ => false,
         }
     }

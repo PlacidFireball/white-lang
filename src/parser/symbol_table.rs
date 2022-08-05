@@ -7,6 +7,7 @@ use super::statement::structdefinitionstatement::StructDefinitionStatement;
 
 pub struct SymbolTable {
     symbol_stack: Vec<HashMap<String, Box<dyn Any>>>,
+    __self: String
 }
 
 #[allow(dead_code)]
@@ -14,6 +15,7 @@ impl SymbolTable {
     pub fn new() -> SymbolTable {
         SymbolTable {
             symbol_stack: vec![HashMap::<String, Box<dyn Any>>::new()], // <- the global scope
+            __self: String::new()
         }
     }
 
@@ -113,5 +115,12 @@ impl SymbolTable {
     }
     pub fn pop_scope(&mut self) {
         self.symbol_stack.pop();
+    }
+
+    pub fn set_self(&mut self, name: String) {
+        self.__self = name;
+    }
+    pub fn get_self(&self) -> String {
+        self.__self.clone()
     }
 }

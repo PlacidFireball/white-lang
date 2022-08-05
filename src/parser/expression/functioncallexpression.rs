@@ -25,6 +25,11 @@ impl ToAny for FunctionCallExpression {
 
 impl Expression for FunctionCallExpression {
     fn evaluate(&self, runtime: &mut Runtime) -> Box<dyn Any> {
+        if self.name.contains(".") {
+            let parts : Vec<&str>= self.name.split(".").collect();
+            let name_no_func = parts[0].to_string();
+            runtime.set_self(name_no_func);
+        }
         let fds = runtime.get_function(self.name.clone());
         let mut evaluated_args: Vec<Box<dyn Expression>> = vec![];
         for expr in &self.args {
@@ -95,6 +100,7 @@ impl Expression for FunctionCallExpression {
                     arg.validate(st);
                     self.args[i].validate(st);
                     let param_type = self.args[i].get_white_type();
+                    let arg_type = arg.get_white_type();
                     if !param_type.is_assignable_to(arg.get_white_type()) {
                         add_parser_error(
                             IncompatibleTypes(param_type.clone(), arg.get_white_type()),
@@ -147,5 +153,9 @@ impl FunctionCallExpression {
     #[allow(dead_code)]
     pub fn get_name(&self) -> String {
         self.name.clone()
+    }
+
+    pub fn set_type(&mut self, typ: Type) {
+        self.typ = typ;
     }
 }

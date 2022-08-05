@@ -142,7 +142,7 @@ impl Expression for StructExpression {
 
 #[allow(dead_code)]
 impl StructExpression {
-    pub fn new(name: String, typ: Type) -> StructExpression {
+    pub fn new(_: String, typ: Type) -> StructExpression {
         Self {
             name: String::from("default"),
             typ,

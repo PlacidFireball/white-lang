@@ -1,0 +1,32 @@
+struct Math {}
+implement Math {
+    fn approx_sqrt(val: float) : float {
+        let k : float = val;
+        let r = (val - k * k) / ((k+1)*(k+1) - k*k);
+        return k + r;
+    }
+
+    fn pow(val: float, power: int) : float {
+        if (power > 0) {
+            let times = power;
+            while (times > 1) {
+                val = val * val;
+                times = times - 1;
+            }
+            return val;
+        } else {
+            if (power < 0) {
+                let calculated : float = pow(val, -1*power);
+                return 1.0 / calculated;
+            } else {
+                return 1.0;
+            }
+        }
+    }
+};
+
+// test
+let math = Math();
+print(math.pow(2.5, 2)); // pass
+print(math.pow(2, -1)); // fail
+print(math.pow(2000000.0, 0)); // pass

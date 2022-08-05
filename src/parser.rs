@@ -48,6 +48,7 @@ use symbol_table::SymbolTable;
 
 use crate::LOGGER;
 use crate::parser::expression::structexpression::StructExpression;
+use crate::parser::whitetypes::Type::Initialized;
 
 // Parsing Errors
 #[derive(Clone, Debug)]
@@ -404,11 +405,12 @@ impl Parser {
             self.consume_token();
             self.require_token(LeftParen);
             while !self.match_and_consume(RightParen) {
-                let expr = self.parse_expression();
-                fds.add_arg(expr);
+                let mut expr = self.parse_expression();
+                fds.add_arg(expr.clone());
                 self.require_token(Colon);
                 let typ = self.require_a_type();
-                fds.add_arg_type(typ);
+                fds.add_arg_type(typ.clone());
+                self.st.register_symbol(expr.debug(), typ.clone());
                 if !self.match_and_consume(Comma) {
                     self.require_token(RightParen);
                     break;
@@ -449,7 +451,16 @@ impl Parser {
             }
             self.require_token(Equal);
             var_stmt.set_expr(self.parse_expression());
-            var_stmt.set_type(var_stmt.get_expr().get_white_type());
+            let st_says = match self.st.get_symbol_type(var_stmt.get_expr().debug()) {
+                // handles `let x = y;` in functions
+                Some(t) => t,
+                None => Initialized,
+            };
+            if st_says.ne(&Initialized) {
+                var_stmt.set_type(st_says.clone());
+            } else {
+                var_stmt.set_type(var_stmt.get_expr().get_white_type());
+            }
             self.require_token(SemiColon);
             LOGGER.debug(
                 format!("Parsed a variable statement: {:?}", var_stmt),
@@ -878,6 +889,17 @@ impl Parser {
                 break;
             }
         }
+        let st_says = match self.st.get_function(expr.get_name()) {
+            Some(fds) => {
+                LOGGER.debug(format!("Got a function definition from the symbol table, it's return type is: {:?}", fds.get_return_type()), false);
+                fds.get_return_type()
+            },
+            None => {
+                LOGGER.debug(format!("Failed to retrieve function definition {} from the symbol table", expr.get_name()), false);
+                Initialized
+            }
+        };
+        expr.set_type(st_says);
         expr
     }
 
