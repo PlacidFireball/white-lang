@@ -67,6 +67,10 @@ impl Expression for IdentifierExpression {
     fn get_expr_type(&self) -> String {
         String::from("IdentifierExpression")
     }
+
+    fn set_type(&mut self, typ: Type) {
+        self.typ = typ;
+    }
 }
 impl IdentifierExpression {
     pub fn new(name: String) -> IdentifierExpression {

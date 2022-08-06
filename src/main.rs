@@ -7,15 +7,14 @@ mod program;
 mod runtime;
 mod tokenizer;
 
-use clap::{App, AppSettings, Arg, ArgMatches, Command, SubCommand};
+use clap::{App, AppSettings, Arg, ArgMatches, Command};
 use std::cell::Cell;
 use std::cell::RefCell;
 use std::env;
 use std::fs::File;
 use std::io::Read;
-use std::ops::Add;
 use std::panic;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
 use crate::core::CoreObjects;
 use crate::logger::Logger;
@@ -115,7 +114,6 @@ fn main() {
     let mut should_transpile: bool = false;
     let mut should_compile: bool = false;
     let mut should_interpret: bool = false;
-    let mut src_path = &String::new();
     // argument options
     {
         if let Some(_) = matches.subcommand_matches("interpret") {
@@ -138,10 +136,7 @@ fn main() {
             return;
         }
 
-        src_path = match matches.get_one::<String>("src") {
-            None => panic!("You must provide a source path"),
-            Some(path) => path,
-        };
+
 
         if matches.is_present("parse-info") {
             DEBUG_INFO_LOGGING_ENABLED.with(|c| c.set(true));
@@ -159,6 +154,11 @@ fn main() {
 
     env::set_var("RUST_BACKTRACE", "1");
     // open xxx.whl
+
+    let src_path = match matches.get_one::<String>("src") {
+        None => panic!("You must provide a source path"),
+        Some(path) => path,
+    };
     let path = Path::new(src_path);
     let display = path.display();
     let mut file = match File::open(&path) {

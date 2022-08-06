@@ -99,9 +99,9 @@ impl Display for TokenType {
 #[derive(PartialEq, Debug, Clone)]
 pub struct Token {
     // the Token
-    typ: TokenType,       // has a type
-    string_value: String, // stores its string value
-    start: usize,         // and maintains location data for future error reporting TODO
+    typ: TokenType,                  // has a type
+    pub(crate) string_value: String, // stores its string value
+    start: usize,                    // and maintains location data for future error reporting TODO
     end: usize,
     line: usize,
     line_offset: usize,

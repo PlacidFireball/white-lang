@@ -27,23 +27,34 @@ impl Runtime {
             ret: Box::new(SyntaxErrorExpression::new()),
             output: String::new(),
             brk: false,
-            __self: String::new()
+            __self: String::new(),
         }
     }
 
     pub fn get_value(&mut self, name: String) -> Option<Box<dyn Any + '_>> {
         let log_runtime_debug = crate::RUNTIME_DEBUG_LOGGING_ENABLED.with(|cell| !cell.get());
-        for i in (0..self.scopes.len()).rev() {
+        crate::LOGGER.debug(
+            format!("[RUNTIME] Searching for value: {}", name),
+            log_runtime_debug,
+        );
+        for (i, scope) in self.scopes.iter_mut().rev().enumerate() {
             crate::LOGGER.debug(
                 format!("[RUNTIME] scope: sid.{}", self.ids[i]),
                 log_runtime_debug,
             );
-            for (name, expr) in &self.scopes[i] {
-                crate::LOGGER.debug(format!("{} => {}", name, expr.debug()), log_runtime_debug);
+            for (name, expr) in scope.iter() {
+                crate::LOGGER.debug(
+                    format!("-- {} \t\t=> {}", name, expr.debug()),
+                    log_runtime_debug,
+                );
             }
-            if self.scopes[i].contains_key(&name) {
-                let val = self.scopes[i].remove(&name).unwrap();
-                self.scopes[i].insert(name.clone(), val.clone());
+            if scope.contains_key(&name) {
+                let val = scope.remove(&name).unwrap();
+                crate::LOGGER.debug(
+                    format!("[RUNTIME] got {} value: {:?}", name, val),
+                    log_runtime_debug,
+                );
+                scope.insert(name.clone(), val.clone());
                 return Some(val.evaluate(self));
             }
         }
@@ -51,11 +62,23 @@ impl Runtime {
     }
 
     pub fn set_value(&mut self, name: String, value: Box<dyn Expression>) {
-        for i in (0..self.scopes.len()).rev() {
-            if self.scopes[i].contains_key(&name) {
-                self.scopes[i].insert(name.clone(), value.clone());
+        crate::LOGGER.debug(
+            format!("[RUNTIME] Setting {} -> {:?}", name, value),
+            crate::RUNTIME_DEBUG_LOGGING_ENABLED.with(|cell| !cell.get()),
+        );
+        for (i, scope) in self.scopes.iter_mut().enumerate() {
+            if scope.contains_key(&name) {
+                crate::LOGGER.debug(
+                    format!("[RUNTIME] Setting {} in {}", name, self.ids[i]),
+                    crate::RUNTIME_DEBUG_LOGGING_ENABLED.with(|cell| !cell.get()),
+                );
+                scope.insert(name.clone(), value.clone());
             }
         }
+        crate::LOGGER.debug(
+            format!("[RUNTIME] Setting {} in {}", name, self.ids.last().unwrap()),
+            crate::RUNTIME_DEBUG_LOGGING_ENABLED.with(|cell| !cell.get()),
+        );
         self.scopes.last_mut().unwrap().insert(name.clone(), value);
     }
 
@@ -145,6 +168,10 @@ impl Runtime {
         self.brk
     }
 
-    pub fn set_self(&mut self, name: String) { self.__self = name; }
-    pub fn get_self(&self) -> String { self.__self.clone() }
+    pub fn set_self(&mut self, name: String) {
+        self.__self = name;
+    }
+    pub fn get_self(&self) -> String {
+        self.__self.clone()
+    }
 }

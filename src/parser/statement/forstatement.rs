@@ -25,7 +25,7 @@ impl ToAny for ForStatement {
 }
 
 impl Statement for ForStatement {
-    fn execute(&self, runtime: &mut Runtime) {
+    fn execute(&mut self, runtime: &mut Runtime) {
         runtime.push_scope(String::from(Uuid::new_v4().to_string()));
         let any = self.iterator.evaluate(runtime);
         let list = any.downcast_ref::<Vec<Box<dyn Any>>>().unwrap();
@@ -42,7 +42,7 @@ impl Statement for ForStatement {
             } else {
                 panic!("Some type in the list variable not covered");
             }
-            for statement in self.statements.iter() {
+            for statement in self.statements.iter_mut() {
                 statement.execute(runtime);
                 if runtime.get_break() {
                     runtime.set_break(false);

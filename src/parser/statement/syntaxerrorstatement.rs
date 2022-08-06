@@ -14,7 +14,7 @@ impl ToAny for SyntaxErrorStatement {
 }
 
 impl Statement for SyntaxErrorStatement {
-    fn execute(&self, _: &mut Runtime) {
+    fn execute(&mut self, _: &mut Runtime) {
         panic!("Evaluated a syntax error")
     }
 
@@ -22,7 +22,7 @@ impl Statement for SyntaxErrorStatement {
         panic!("Compiled a syntax error")
     }
 
-    fn transpile(&self, javascript: &mut JavaScript) {
+    fn transpile(&self, _: &mut JavaScript) {
         panic!("Transpiled a syntax error")
     }
 

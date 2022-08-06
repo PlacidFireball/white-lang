@@ -8,7 +8,6 @@ use crate::parser::whitetypes::Type;
 use crate::parser::ParserErrorType::{ArgMismatch, IncompatibleTypes, UnknownName};
 use crate::runtime::Runtime;
 use std::any::Any;
-use std::fmt::format;
 
 #[derive(Clone, Debug)]
 pub(crate) struct FunctionCallExpression {
@@ -25,12 +24,7 @@ impl ToAny for FunctionCallExpression {
 
 impl Expression for FunctionCallExpression {
     fn evaluate(&self, runtime: &mut Runtime) -> Box<dyn Any> {
-        if self.name.contains(".") {
-            let parts : Vec<&str>= self.name.split(".").collect();
-            let name_no_func = parts[0].to_string();
-            runtime.set_self(name_no_func);
-        }
-        let fds = runtime.get_function(self.name.clone());
+        let mut fds = runtime.get_function(self.name.clone());
         let mut evaluated_args: Vec<Box<dyn Expression>> = vec![];
         for expr in &self.args {
             let eval = expr.evaluate(runtime);
@@ -100,7 +94,6 @@ impl Expression for FunctionCallExpression {
                     arg.validate(st);
                     self.args[i].validate(st);
                     let param_type = self.args[i].get_white_type();
-                    let arg_type = arg.get_white_type();
                     if !param_type.is_assignable_to(arg.get_white_type()) {
                         add_parser_error(
                             IncompatibleTypes(param_type.clone(), arg.get_white_type()),

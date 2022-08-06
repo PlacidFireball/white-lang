@@ -23,7 +23,7 @@ impl Expression for SyntaxErrorExpression {
         todo!()
     }
 
-    fn transpile(&self, javascript: &mut JavaScript) {
+    fn transpile(&self, _: &mut JavaScript) {
         panic!("You cannot transpile a syntax error :)")
     }
 

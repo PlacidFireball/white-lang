@@ -17,7 +17,7 @@ impl ToAny for PrintStatement {
 }
 
 impl Statement for PrintStatement {
-    fn execute(&self, runtime: &mut Runtime) {
+    fn execute(&mut self, runtime: &mut Runtime) {
         let eval = self.expr.evaluate(runtime);
         runtime.push_output(String::from(Program::try_print_output(&eval)));
         runtime.push_output(String::from("\n"));

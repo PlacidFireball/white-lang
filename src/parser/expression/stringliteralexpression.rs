@@ -4,6 +4,7 @@ use crate::parser::symbol_table::SymbolTable;
 use crate::parser::whitetypes::Type;
 use crate::runtime::Runtime;
 use std::any::Any;
+use crate::parser::expression::listliteralexpression::ListLiteralExpression;
 
 #[derive(Clone, Debug)]
 pub struct StringLiteralExpression {
@@ -46,5 +47,13 @@ impl Expression for StringLiteralExpression {
 impl StringLiteralExpression {
     pub fn new(string_value: String) -> StringLiteralExpression {
         StringLiteralExpression { string_value }
+    }
+
+    pub fn to_list_literal(&self) -> ListLiteralExpression/*list<char>*/ {
+        let mut list = ListLiteralExpression::new();
+        for c in self.string_value.chars() {
+            list.add_expr(Box::new(StringLiteralExpression::new(c.to_string())));
+        }
+        list
     }
 }

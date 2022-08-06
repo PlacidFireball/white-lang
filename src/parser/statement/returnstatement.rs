@@ -18,7 +18,7 @@ impl ToAny for ReturnStatement {
 }
 
 impl Statement for ReturnStatement {
-    fn execute(&self, runtime: &mut Runtime) {
+    fn execute(&mut self, runtime: &mut Runtime) {
         runtime.set_return(self.expr.clone());
     }
 
@@ -33,6 +33,7 @@ impl Statement for ReturnStatement {
     }
 
     fn validate(&mut self, st: &mut SymbolTable) {
+        println!("{}", self.function);
         let fds = st.get_function(self.function.clone()).unwrap();
         self.expr.validate(st);
         self.return_type = self.expr.get_white_type();

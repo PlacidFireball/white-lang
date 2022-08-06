@@ -5,7 +5,7 @@ use crate::parser::expression::syntaxerrorexpression::SyntaxErrorExpression;
 use crate::parser::parser_traits::{Expression, Statement};
 use crate::parser::ParserErrorType;
 use crate::runtime::Runtime;
-use crate::{parser, Parser, Tokenizer};
+use crate::{Parser, Tokenizer};
 use std::any::Any;
 
 #[allow(dead_code)]
@@ -82,7 +82,7 @@ impl Program {
             self.stdout += &Program::try_print_output(&eval);
             self.stdout.push_str("\n");
         } else {
-            for statement in &self.statements {
+            for statement in self.statements.iter_mut(){
                 statement.execute(&mut self.runtime);
                 self.stdout = self.runtime.get_output();
             }

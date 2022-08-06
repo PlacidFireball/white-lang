@@ -15,7 +15,7 @@ impl ToAny for BreakStatement {
 }
 
 impl Statement for BreakStatement {
-    fn execute(&self, runtime: &mut Runtime) {
+    fn execute(&mut self, runtime: &mut Runtime) {
         runtime.set_break(true)
     }
 

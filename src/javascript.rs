@@ -54,6 +54,5 @@ impl JavaScript {
 }
 
 mod test {
-    use super::*;
     // tests t o  d o
 }

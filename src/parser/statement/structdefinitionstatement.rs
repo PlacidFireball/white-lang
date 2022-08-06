@@ -24,7 +24,7 @@ impl ToAny for StructDefinitionStatement {
 }
 #[allow(dead_code, unused_variables)]
 impl Statement for StructDefinitionStatement {
-    fn execute(&self, runtime: &mut Runtime) {
+    fn execute(&mut self, runtime: &mut Runtime) {
         runtime.add_struct(self.name.clone(), self.clone());
     }
 

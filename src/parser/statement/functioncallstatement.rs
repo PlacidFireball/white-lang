@@ -20,7 +20,7 @@ impl ToAny for FunctionCallStatement {
 }
 
 impl Statement for FunctionCallStatement {
-    fn execute(&self, runtime: &mut Runtime) {
+    fn execute(&mut self, runtime: &mut Runtime) {
         self.expr.evaluate(runtime);
     }
 

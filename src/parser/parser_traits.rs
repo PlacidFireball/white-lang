@@ -1,5 +1,5 @@
 use crate::config::{WhiteLangBool, WhiteLangFloat, WhiteLangInt, WhiteLangList, WhiteLangString};
-use crate::javascript::{self, JavaScript};
+use crate::javascript::JavaScript;
 use crate::parser::expression::additiveexpression::AdditiveExpression;
 use crate::parser::expression::booleanliteralexpression::BooleanLiteralExpression;
 use crate::parser::expression::comparisonexpression::ComparisonExpression;
@@ -33,7 +33,6 @@ use crate::parser::statement::whilestatement::WhileStatement;
 
 use crate::runtime::Runtime;
 use crate::LOGGER;
-use crate::{Parser, CORE_OBJECTS};
 
 use crate::parser::symbol_table::SymbolTable;
 use crate::parser::whitetypes::Type;
@@ -119,7 +118,12 @@ pub trait Expression: ToAny + Debug {
     fn debug(&self) -> String; // for retrieving information about the expression
     fn get_white_type(&self) -> Type; // getting the type of the expression
     fn get_expr_type(&self) -> String; // get the rust type of the expression
-    fn set_name(&mut self, name: String) { panic!("set_name is not defined on {:?}", self) }
+    fn set_name(&mut self, _name: String) {
+        panic!("set_name is not defined on {:?}", self)
+    }
+    fn set_type(&mut self, _typ: Type) {
+        panic!("set_type is not defined on {:?}", self)
+    }
 }
 
 // using to any to downcast the dyn Expression to the concrete class
@@ -167,7 +171,7 @@ impl Clone for Box<dyn Expression> {
 
 #[allow(dead_code)]
 pub trait Statement: ToAny + Debug {
-    fn execute(&self, runtime: &mut Runtime); // execute the statement
+    fn execute(&mut self, runtime: &mut Runtime); // execute the statement
     fn compile(&self); // compile the statement to nasm
     fn transpile(&self, javascript: &mut JavaScript); // transpile the statement to Javascript
     fn validate(&mut self, st: &mut SymbolTable); // validate the statement via the symbol table

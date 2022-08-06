@@ -21,12 +21,12 @@ impl ToAny for AssignmentStatement {
 }
 
 impl Statement for AssignmentStatement {
-    fn execute(&self, runtime: &mut Runtime) {
+    fn execute(&mut self, runtime: &mut Runtime) {
         let ident = self
             .variable
             .to_any()
             .downcast_ref::<IdentifierExpression>()
-            .unwrap();
+            .expect("Unable to fetch identifier from the runtime when expecting to be able to");
         if let Some(boolean) = any_into_bool_literal(&self.expr.evaluate(runtime)) {
             runtime.set_value(ident.debug(), Box::new(boolean.clone()));
         } else if let Some(integer) = any_into_int_literal(&self.expr.evaluate(runtime)) {

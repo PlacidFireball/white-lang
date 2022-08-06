@@ -18,6 +18,7 @@ mod test {
     use crate::parser::expression::nullliteralexpression::NullLiteralExpression;
     use crate::parser::expression::parenthesizedexpression::ParenthesizedExpression;
     use crate::parser::expression::stringliteralexpression::StringLiteralExpression;
+    use crate::parser::expression::structexpression::StructExpression;
     use crate::parser::expression::unaryexpression::UnaryExpression;
     use crate::parser::parser_traits::Statement;
     use crate::parser::statement::assignmentstatement::AssignmentStatement;
@@ -35,10 +36,8 @@ mod test {
     use crate::Tokenizer;
     use crate::IS_TESTING;
     use crate::{CoreObjects, Parser};
-    use crate::parser::expression::structexpression::StructExpression;
 
     fn init_parser(src: String) -> Parser {
-        IS_TESTING.with(|test| test.set(true));
         let mut core: CoreObjects = CoreObjects::new(src.as_str());
         println!("Start test...");
         print!("Tokens: [");
@@ -151,12 +150,17 @@ mod test {
         let mut parser = init_parser("fn foo(y : int, z : int) {} foo(1 ,2);".to_string());
         let uncertain_fcs = parser.statement_list[1].clone();
         let uncertain_fds = parser.statement_list[0].clone();
-        let fcs = uncertain_fcs.to_any().downcast_ref::<FunctionCallStatement>().unwrap();
-        let fds = uncertain_fds.to_any().downcast_ref::<FunctionDefinitionStatement>().unwrap();
+        let fcs = uncertain_fcs
+            .to_any()
+            .downcast_ref::<FunctionCallStatement>()
+            .unwrap();
+        let fds = uncertain_fds
+            .to_any()
+            .downcast_ref::<FunctionDefinitionStatement>()
+            .unwrap();
         assert_eq!("This looks right 8/4/22", "This looks right 8/4/22");
         println!("{:?}", fds);
         println!("{:?}", fcs);
-
     }
 
     #[test]
@@ -344,10 +348,8 @@ mod test {
     #[test]
     #[should_panic]
     fn test_parse_variable_statement_bad_assignment_type() {
-        let mut parser = Parser::new(&mut Tokenizer::new(String::from("let x : string = 10;")));
-        IS_TESTING.with(|t| t.set(true));
-        let _ = parser.parse_variable_statement().unwrap();
-        assert!(!parser.has_errors()); // in reality the parser will have errors but we need CORE_OBJECTS to add an error
+        let mut parser = init_parser(String::from("let x : string = 10;"));
+        println!("{:?}", parser.statement_list);
     }
 
     #[test]
@@ -570,15 +572,22 @@ mod test {
 
     #[test]
     fn test_struct_expression_parses() {
-        let parser = init_parser("
+        let parser = init_parser(
+            "
         struct X { x: int };
         let myStruct = X(x = 1);
         struct Y { y: string, x: int } implement Y { fn foo(z: string) { print(z); } };
         let myStruct2 = Y(x = 2, y = \"Hello World\");
         print(myStruct.x);
         myStruct2.foo(\"Hello World\");
-        ".to_string());
-        assert!(parser.statement_list[1].clone().to_any().downcast_ref::<VariableStatement>().is_some());
+        "
+            .to_string(),
+        );
+        assert!(parser.statement_list[1]
+            .clone()
+            .to_any()
+            .downcast_ref::<VariableStatement>()
+            .is_some());
         let v_s = parser.statement_list[1].clone();
         let strct_expr = v_s.get_expr();
         println!("{:?}", strct_expr);

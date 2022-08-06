@@ -38,7 +38,7 @@ impl Default for FunctionDefinitionStatement {
 }
 
 impl Statement for FunctionDefinitionStatement {
-    fn execute(&self, runtime: &mut Runtime) {
+    fn execute(&mut self, runtime: &mut Runtime) {
         runtime.add_function(self.name.clone(), self.clone());
     }
 
@@ -136,19 +136,13 @@ impl FunctionDefinitionStatement {
         &self.arg_names
     }
 
-    pub fn invoke(&self, runtime: &mut Runtime, args: Vec<Box<dyn Expression>>) -> Box<dyn Any> {
+    pub fn invoke(&mut self, runtime: &mut Runtime, args: Vec<Box<dyn Expression>>) -> Box<dyn Any> {
         let id = Uuid::new_v4();
         runtime.push_scope(id.to_string());
         for (i, arg) in args.iter().enumerate() {
-            /*println!(
-                "Function Call: {} Argument: {} Value: {}",
-                self.name,
-                self.arg_names[i],
-                try_print_output(&arg.evaluate(runtime))
-            );*/
             runtime.set_value_in_scope(id.to_string(), self.arg_names[i].clone(), arg.clone());
         }
-        for statement in &self.statements {
+        for statement in &mut self.statements {
             statement.execute(runtime);
             if runtime.has_return() {
                 return runtime.get_return();

@@ -20,13 +20,13 @@ impl ToAny for WhileStatement {
     }
 }
 impl Statement for WhileStatement {
-    fn execute(&self, runtime: &mut Runtime) {
+    fn execute(&mut self, runtime: &mut Runtime) {
         runtime.push_scope(String::from("while"));
         let mut iterations: usize = 0;
         let mut is_broken = false;
         let mut cond: bool = *self.expr.evaluate(runtime).downcast_ref::<bool>().unwrap();
         while cond {
-            for statement in self.body.iter() {
+            for statement in self.body.iter_mut() {
                 statement.execute(runtime);
                 if runtime.get_break() {
                     is_broken = true; // interrogate break state

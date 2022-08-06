@@ -1,10 +1,10 @@
-struct Math {}
+struct Math {
+    //PI: float // TODO: default params
+}
 implement Math {
-    fn approx_sqrt(val: float) : float {
-        let k : float = val;
-        let r = (val - k * k) / ((k+1)*(k+1) - k*k);
-        return k + r;
-    }
+    fn e() : float { return 2.71828; }
+
+    fn pi() : float { return 3.141592653589793; }
 
     fn pow(val: float, power: int) : float {
         if (power > 0) {
@@ -16,17 +16,53 @@ implement Math {
             return val;
         } else {
             if (power < 0) {
-                let calculated : float = pow(val, -1*power);
+                let calculated = self.pow(val, -1*power);
                 return 1.0 / calculated;
             } else {
                 return 1.0;
             }
         }
     }
+
+    fn iabs(val: int) : int {
+        if (val > 0) {
+            return val;
+        }
+        if (val < 0) {
+            return -1*val;
+        }
+        return 0;
+    }
+
+    fn fabs(val: float) : float {
+        if (val > 0.0) {
+            return val;
+        }
+        if (val < 0.0) {
+            return -1.0*val;
+        }
+        return 0.0;
+    }
 };
 
 // test
-let math = Math();
+let math = Math(); // TODO: custom type signatures are broken
 print(math.pow(2.5, 2)); // pass
-print(math.pow(2, -1)); // fail
+print(math.pow(2.0, -1)); // pass
 print(math.pow(2000000.0, 0)); // pass
+print(math.fabs(-0.01)); // pass
+
+struct String {
+    s: string
+} implement String {
+
+};
+
+let str = String(s="hello world!");
+print(str.s); // pass
+
+struct Boolean {
+    b: bool
+} implement Boolean {
+
+};

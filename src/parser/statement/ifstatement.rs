@@ -20,20 +20,20 @@ impl ToAny for IfStatement {
     }
 }
 impl Statement for IfStatement {
-    fn execute(&self, runtime: &mut Runtime) {
+    fn execute(&mut self, runtime: &mut Runtime) {
         let eval = self.expr.evaluate(runtime);
         let downcast = *eval.downcast_ref::<WhiteLangBool>().unwrap();
         runtime.push_scope(String::from(uuid::Uuid::new_v4().to_string()));
         if downcast {
-            for statement in &self.true_stmts {
+            for statement in &mut self.true_stmts {
                 statement.execute(runtime);
             }
         } else {
-            for statement in &self.false_stmts {
+            for statement in &mut self.false_stmts {
                 statement.execute(runtime);
             }
         }
-        runtime.pop_scope();
+        //runtime.pop_scope(); // TODO: nested if in else causes double pop before return can evaluate the expression
     }
 
     fn compile(&self) {
@@ -79,7 +79,6 @@ impl Statement for IfStatement {
         st.push_scope();
         if !self.true_stmts.is_empty() {
             for i in 0..self.true_stmts.len() {
-                // TODO: Body Validation, variables within blocks and for statements (iterated vars)
                 self.true_stmts[i].validate(st);
             }
         }

@@ -1,6 +1,5 @@
 use crate::javascript::JavaScript;
 use crate::parser::parser_traits::{add_parser_error, Expression, ToAny};
-use crate::parser::statement::functiondefinitionstatement::FunctionDefinitionStatement;
 use crate::parser::symbol_table::SymbolTable;
 use crate::parser::whitetypes::Type;
 use crate::parser::whitetypes::Type::Struct;
@@ -45,7 +44,10 @@ impl Expression for StructExpression {
     fn evaluate(&self, runtime: &mut Runtime) -> Box<dyn Any> {
         // register fields
         for (name, expr) in self.fields.iter() {
-            crate::LOGGER.debug(format!("[RUNTIME] Registering {} with {:?}", name, expr), false);
+            crate::LOGGER.debug(
+                format!("[RUNTIME] Registering {} with {:?}", name, expr),
+                false,
+            );
             runtime.set_value(format!("{}.{}", self.name, name), expr.clone());
         }
         // register functions
@@ -54,9 +56,20 @@ impl Expression for StructExpression {
             _ => panic!("Something bad happened"),
         });
         for (name, fds) in obj.methods.iter() {
-            runtime.add_function(format!("{}.{}", self.name, name), fds.clone());
+            let copy = name
+                .split(".")
+                .collect::<Vec<&str>>()
+                .last()
+                .unwrap()
+                .to_string();
+            crate::LOGGER.debug(
+                format!("[RUNTIME] Registering {} with {:?}", name, fds),
+                false,
+            );
+            runtime.add_function(format!("{}", name), fds.clone());
+            runtime.add_function(format!("{}.{}", self.name, copy), fds.clone());
         }
-        Box::new(self.clone()) //
+        Box::new(self.clone())
     }
 
     fn compile(&self) {
@@ -90,7 +103,7 @@ impl Expression for StructExpression {
                     ),
                 );
                 unreachable!()
-            },
+            }
         };
         for (name, expr) in self.fields.iter() {
             let expected_typ = match strct.get_field_type(name.clone()) {
@@ -101,7 +114,7 @@ impl Expression for StructExpression {
                         format!("No such field `{}` on struct `{}`", name, struct_id),
                     );
                     Type::Error // this will never be reached, but gotta appease the compiler
-                },
+                }
             };
             if !expected_typ.is_assignable_to(expr.get_white_type()) {
                 add_parser_error(
