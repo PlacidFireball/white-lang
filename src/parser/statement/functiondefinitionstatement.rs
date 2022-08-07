@@ -11,11 +11,12 @@ use uuid::Uuid;
 #[derive(Clone, Debug)]
 pub struct FunctionDefinitionStatement {
     pub name: String,
-    return_type: Type,
-    args: Vec<Box<dyn Expression>>,
-    arg_names: Vec<String>,
-    arg_types: Vec<Type>,
-    statements: Vec<Box<dyn Statement>>,
+    pub(crate) return_type: Type,
+    pub(crate) args: Vec<Box<dyn Expression>>,
+    pub(crate) arg_names: Vec<String>,
+    pub(crate) arg_types: Vec<Type>,
+    pub(crate) statements: Vec<Box<dyn Statement>>,
+    pub(crate) is_intrinsic: bool,
 }
 
 impl ToAny for FunctionDefinitionStatement {
@@ -33,6 +34,7 @@ impl Default for FunctionDefinitionStatement {
             arg_names: vec![],
             arg_types: vec![],
             statements: vec![],
+            is_intrinsic: false
         }
     }
 }
@@ -109,6 +111,7 @@ impl FunctionDefinitionStatement {
             arg_types: vec![],
             arg_names: vec![],
             statements: vec![],
+            is_intrinsic: false,
         }
     }
 

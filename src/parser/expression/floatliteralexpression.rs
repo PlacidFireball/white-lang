@@ -6,6 +6,9 @@ use crate::parser::whitetypes::Type;
 use crate::runtime::Runtime;
 use std::any::Any;
 
+use super::integerliteralexpression::IntegerLiteralExpression;
+use super::stringliteralexpression::StringLiteralExpression;
+
 #[derive(Clone, Debug)]
 pub struct FloatLiteralExpression {
     value: WhiteLangFloat,
@@ -44,8 +47,17 @@ impl Expression for FloatLiteralExpression {
         String::from("FloatLiteralExpression")
     }
 }
+#[allow(dead_code)]
 impl FloatLiteralExpression {
     pub(crate) fn new(value: WhiteLangFloat) -> Self {
         FloatLiteralExpression { value }
+    }
+
+    pub(crate) fn to_integer_literal(&self) -> IntegerLiteralExpression {
+        IntegerLiteralExpression::new(self.value.round() as isize)
+    }
+
+    pub(crate) fn to_string_literal(&self) -> StringLiteralExpression {
+        StringLiteralExpression::new(self.value.to_string())
     }
 }

@@ -1,11 +1,28 @@
+use crate::parser::expression::identifierexpression::IdentifierExpression;
 use crate::parser::expression::syntaxerrorexpression::SyntaxErrorExpression;
 use crate::parser::parser_traits::Expression;
 use crate::parser::statement::functiondefinitionstatement::FunctionDefinitionStatement;
 use crate::parser::statement::structdefinitionstatement::StructDefinitionStatement;
+use crate::parser::statement::syntaxerrorstatement::SyntaxErrorStatement;
+use crate::parser::whitetypes::Type;
 use std::any::Any;
 use std::collections::HashMap;
 
 mod test;
+
+struct Intrinsic {
+    name: String,
+    return_type: Type,
+    args: HashMap<String, Type>
+} impl Intrinsic {
+    pub(crate) fn new(name: String, return_type: Type, args: HashMap<String, Type>) -> Self {
+        Intrinsic {
+            name,
+            return_type,
+            args,
+        }
+    }
+}
 
 pub struct Runtime {
     scopes: Vec<HashMap<String, Box<dyn Expression>>>,
@@ -29,6 +46,13 @@ impl Runtime {
             brk: false,
             __self: String::new(),
         }
+    }
+
+    /// Register some hard-coded intrinsics for basic whitetypes
+    #[allow(unused_variables)]
+    pub fn register_intrinsics(&mut self) {
+        // strings
+        let string_to_list = Intrinsic::new("String.to_list".to_string(), Type::ListString, HashMap::from([("s".to_string(), Type::String)]));
     }
 
     pub fn get_value(&mut self, name: String) -> Option<Box<dyn Any + '_>> {

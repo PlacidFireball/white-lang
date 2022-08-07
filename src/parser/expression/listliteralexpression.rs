@@ -82,6 +82,10 @@ impl Expression for ListLiteralExpression {
     fn get_expr_type(&self) -> String {
         String::from("ListLiteralExpression")
     }
+
+    fn set_type(&mut self, _typ: Type) {
+        self.typ = _typ;
+    }
 }
 impl ListLiteralExpression {
     pub fn new() -> ListLiteralExpression {
@@ -90,6 +94,7 @@ impl ListLiteralExpression {
             typ: Type::Initialized,
         }
     }
+    
     pub fn add_expr(&mut self, expr: Box<dyn Expression>) {
         self.exprs.push(expr);
     }

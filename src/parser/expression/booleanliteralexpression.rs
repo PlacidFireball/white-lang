@@ -5,6 +5,8 @@ use crate::parser::whitetypes::Type;
 use crate::runtime::Runtime;
 use std::any::Any;
 
+use super::stringliteralexpression::StringLiteralExpression;
+
 #[derive(Clone, Debug)]
 pub struct BooleanLiteralExpression {
     boolean: bool,
@@ -46,5 +48,9 @@ impl Expression for BooleanLiteralExpression {
 impl BooleanLiteralExpression {
     pub fn new(boolean: bool) -> BooleanLiteralExpression {
         BooleanLiteralExpression { boolean }
+    }
+
+    pub(crate) fn to_string_literal(&self) -> StringLiteralExpression {
+        StringLiteralExpression::new(self.boolean.to_string())
     }
 }

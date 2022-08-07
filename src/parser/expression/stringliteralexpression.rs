@@ -49,11 +49,19 @@ impl StringLiteralExpression {
         StringLiteralExpression { string_value }
     }
 
-    pub fn to_list_literal(&self) -> ListLiteralExpression/*list<char>*/ {
+    pub(crate) fn to_list_literal(&self) -> ListLiteralExpression/*list<char>*/ {
         let mut list = ListLiteralExpression::new();
         for c in self.string_value.chars() {
             list.add_expr(Box::new(StringLiteralExpression::new(c.to_string())));
         }
+        list.set_type(Type::ListString);
         list
+    }
+
+    pub(crate) fn concatenate(&self, other: &StringLiteralExpression) -> StringLiteralExpression {
+        let mut this = self.string_value.clone();
+        let that = other.debug();
+        this.push_str(that.as_str());
+        StringLiteralExpression::new(this)
     }
 }
