@@ -136,8 +136,6 @@ fn main() {
             return;
         }
 
-
-
         if matches.is_present("parse-info") {
             DEBUG_INFO_LOGGING_ENABLED.with(|c| c.set(true));
             LOGGER.info("parse-info is enabled".to_string());

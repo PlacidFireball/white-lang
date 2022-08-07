@@ -18,6 +18,9 @@ impl ToAny for EqualityExpression {
     fn to_any(&self) -> &dyn Any {
         self
     }
+    fn to_any_mut(&mut self) -> &mut dyn Any {
+        self
+    }
 }
 
 impl Expression for EqualityExpression {

@@ -16,11 +16,13 @@ pub struct FunctionDefinitionStatement {
     pub(crate) arg_names: Vec<String>,
     pub(crate) arg_types: Vec<Type>,
     pub(crate) statements: Vec<Box<dyn Statement>>,
-    pub(crate) is_intrinsic: bool,
 }
 
 impl ToAny for FunctionDefinitionStatement {
     fn to_any(&self) -> &dyn Any {
+        self
+    }
+    fn to_any_mut(&mut self) -> &mut dyn Any {
         self
     }
 }
@@ -34,7 +36,6 @@ impl Default for FunctionDefinitionStatement {
             arg_names: vec![],
             arg_types: vec![],
             statements: vec![],
-            is_intrinsic: false
         }
     }
 }
@@ -111,7 +112,6 @@ impl FunctionDefinitionStatement {
             arg_types: vec![],
             arg_names: vec![],
             statements: vec![],
-            is_intrinsic: false,
         }
     }
 
@@ -139,7 +139,11 @@ impl FunctionDefinitionStatement {
         &self.arg_names
     }
 
-    pub fn invoke(&mut self, runtime: &mut Runtime, args: Vec<Box<dyn Expression>>) -> Box<dyn Any> {
+    pub fn invoke(
+        &mut self,
+        runtime: &mut Runtime,
+        args: Vec<Box<dyn Expression>>,
+    ) -> Box<dyn Any> {
         let id = Uuid::new_v4();
         runtime.push_scope(id.to_string());
         for (i, arg) in args.iter().enumerate() {

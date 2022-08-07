@@ -43,6 +43,7 @@ use std::panic;
 
 pub trait ToAny: 'static {
     fn to_any(&self) -> &dyn Any;
+    fn to_any_mut(&mut self) -> &mut dyn Any;
 }
 
 pub fn default_expr() -> Box<dyn Expression> {

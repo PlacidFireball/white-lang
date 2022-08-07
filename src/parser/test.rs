@@ -10,7 +10,6 @@ mod test {
     use crate::parser::expression::equalityexpression::EqualityExpression;
     use crate::parser::expression::factorexpression::FactorExpression;
     use crate::parser::expression::floatliteralexpression::FloatLiteralExpression;
-    use crate::parser::expression::functioncallexpression::FunctionCallExpression;
     use crate::parser::expression::identifierexpression::IdentifierExpression;
     use crate::parser::expression::integerliteralexpression::IntegerLiteralExpression;
     use crate::parser::expression::listliteralexpression::ListLiteralExpression;
@@ -18,7 +17,6 @@ mod test {
     use crate::parser::expression::nullliteralexpression::NullLiteralExpression;
     use crate::parser::expression::parenthesizedexpression::ParenthesizedExpression;
     use crate::parser::expression::stringliteralexpression::StringLiteralExpression;
-    use crate::parser::expression::structexpression::StructExpression;
     use crate::parser::expression::unaryexpression::UnaryExpression;
     use crate::parser::parser_traits::Statement;
     use crate::parser::statement::assignmentstatement::AssignmentStatement;
@@ -34,7 +32,6 @@ mod test {
     use crate::parser::whitetypes::Type;
     use crate::TokenType::*;
     use crate::Tokenizer;
-    use crate::IS_TESTING;
     use crate::{CoreObjects, Parser};
 
     fn init_parser(src: String) -> Parser {
@@ -147,7 +144,7 @@ mod test {
     #[test]
     /// test parsing a function call expression, this time with args
     fn test_function_call_args_expression() {
-        let mut parser = init_parser("fn foo(y : int, z : int) {} foo(1 ,2);".to_string());
+        let parser = init_parser("fn foo(y : int, z : int) {} foo(1 ,2);".to_string());
         let uncertain_fcs = parser.statement_list[1].clone();
         let uncertain_fds = parser.statement_list[0].clone();
         let fcs = uncertain_fcs
@@ -168,7 +165,7 @@ mod test {
     /// test for errors when the function call doesn't have a closed paren
     fn test_fn_unterminated_args() {
         let mut parser = Parser::new(&mut Tokenizer::new("x(".to_string()));
-        let expr = parser.parse_function_call_expression();
+        let _ = parser.parse_function_call_expression();
     }
 
     #[test]
@@ -348,7 +345,7 @@ mod test {
     #[test]
     #[should_panic]
     fn test_parse_variable_statement_bad_assignment_type() {
-        let mut parser = init_parser(String::from("let x : string = 10;"));
+        let parser = init_parser(String::from("let x : string = 10;"));
         println!("{:?}", parser.statement_list);
     }
 

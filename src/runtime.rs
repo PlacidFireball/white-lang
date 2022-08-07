@@ -1,9 +1,9 @@
 use crate::parser::expression::identifierexpression::IdentifierExpression;
+use crate::parser::expression::stringliteralexpression::StringLiteralExpression;
 use crate::parser::expression::syntaxerrorexpression::SyntaxErrorExpression;
 use crate::parser::parser_traits::Expression;
 use crate::parser::statement::functiondefinitionstatement::FunctionDefinitionStatement;
 use crate::parser::statement::structdefinitionstatement::StructDefinitionStatement;
-use crate::parser::statement::syntaxerrorstatement::SyntaxErrorStatement;
 use crate::parser::whitetypes::Type;
 use std::any::Any;
 use std::collections::HashMap;
@@ -11,24 +11,28 @@ use std::collections::HashMap;
 mod test;
 
 struct Intrinsic {
-    name: String,
-    return_type: Type,
-    args: HashMap<String, Type>
-} impl Intrinsic {
+    name: Name,
+    _return_type: Type, // these fields are mostly for symbolic posturing, just so we know what happens here
+    _args: HashMap<Name, Type>, // typing will be inforced by the handler
+}
+impl Intrinsic {
     pub(crate) fn new(name: String, return_type: Type, args: HashMap<String, Type>) -> Self {
         Intrinsic {
             name,
-            return_type,
-            args,
+            _return_type: return_type,
+            _args: args,
         }
     }
 }
 
+type Name = String;
+
 pub struct Runtime {
     scopes: Vec<HashMap<String, Box<dyn Expression>>>,
     ids: Vec<String>,
-    functions: HashMap<String, FunctionDefinitionStatement>,
-    structs: HashMap<String, StructDefinitionStatement>,
+    functions: HashMap<Name, FunctionDefinitionStatement>,
+    structs: HashMap<Name, StructDefinitionStatement>,
+    intrinsics: HashMap<Name, Intrinsic>,
     ret: Box<dyn Expression>,
     pub(crate) output: String,
     brk: bool,
@@ -41,6 +45,7 @@ impl Runtime {
             ids: vec![String::from("global")],
             functions: HashMap::new(),
             structs: HashMap::new(),
+            intrinsics: HashMap::new(),
             ret: Box::new(SyntaxErrorExpression::new()),
             output: String::new(),
             brk: false,
@@ -52,10 +57,46 @@ impl Runtime {
     #[allow(unused_variables)]
     pub fn register_intrinsics(&mut self) {
         // strings
-        let string_to_list = Intrinsic::new("String.to_list".to_string(), Type::ListString, HashMap::from([("s".to_string(), Type::String)]));
+        let string_to_list = Intrinsic::new(
+            "String.to_list".to_string(),
+            Type::ListString,
+            HashMap::from([("s".to_string(), Type::String)]),
+        );
+
+        self.intrinsics.insert(string_to_list.name.clone(), string_to_list);
     }
 
-    pub fn get_value(&mut self, name: String) -> Option<Box<dyn Any + '_>> {
+    pub fn has_intrisic(&self, name: Name) -> bool {
+        self.intrinsics.contains_key(&name)
+    }
+
+    pub fn handle_intrinsic(&mut self, name: Name, args: HashMap<Name, Box<dyn Expression>>) -> Box<dyn Expression> {
+        match name.as_str() {
+            "String.to_list" => {
+                let mut expr = args.get(&"s".to_string()).unwrap().clone();
+                let to_list = if let Some(string) = expr.to_any().downcast_ref::<StringLiteralExpression>() {
+                    string.to_list_literal()
+                } else if let Some(identifier) = expr.to_any_mut().downcast_mut::<IdentifierExpression>() {
+                    if identifier.get_white_type() != Type::String {
+                        panic!("Identifier: {:?} is not a string!", identifier);
+                    }
+                    let eval = identifier.evaluate(self);
+                    let the_string = eval.downcast_ref::<String>().expect("Evaluated an identifier that I thought was a string but turns out it's not. What gives?");
+                    StringLiteralExpression::new(the_string.clone()).to_list_literal()
+                } else {
+                    panic!("Called intrinsic String.to_list without a string argument")
+                };
+                Box::new(to_list)
+            }
+
+            _ => panic!("No such intrinsic: {}", name),
+        }
+    }
+
+    pub fn get_value(&mut self, name: Name) -> Option<Box<dyn Any + '_>> {
+        if self.has_intrisic(name.clone()) {
+            // TODO: arg passing?
+        }
         let log_runtime_debug = crate::RUNTIME_DEBUG_LOGGING_ENABLED.with(|cell| !cell.get());
         crate::LOGGER.debug(
             format!("[RUNTIME] Searching for value: {}", name),

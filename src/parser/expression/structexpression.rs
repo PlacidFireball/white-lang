@@ -37,6 +37,9 @@ impl ToAny for StructExpression {
     fn to_any(&self) -> &dyn Any {
         self
     }
+    fn to_any_mut(&mut self) -> &mut dyn Any {
+        self
+    }
 }
 
 #[allow(dead_code, unused_variables)]

@@ -82,7 +82,7 @@ impl Program {
             self.stdout += &Program::try_print_output(&eval);
             self.stdout.push_str("\n");
         } else {
-            for statement in self.statements.iter_mut(){
+            for statement in self.statements.iter_mut() {
                 statement.execute(&mut self.runtime);
                 self.stdout = self.runtime.get_output();
             }

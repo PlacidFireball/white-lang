@@ -17,6 +17,9 @@ impl ToAny for ListLiteralExpression {
     fn to_any(&self) -> &dyn Any {
         self
     }
+    fn to_any_mut(&mut self) -> &mut dyn Any {
+        self
+    }
 }
 
 impl Expression for ListLiteralExpression {
@@ -94,7 +97,7 @@ impl ListLiteralExpression {
             typ: Type::Initialized,
         }
     }
-    
+
     pub fn add_expr(&mut self, expr: Box<dyn Expression>) {
         self.exprs.push(expr);
     }

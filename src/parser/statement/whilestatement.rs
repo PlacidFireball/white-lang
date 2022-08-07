@@ -18,6 +18,9 @@ impl ToAny for WhileStatement {
     fn to_any(&self) -> &dyn Any {
         self
     }
+    fn to_any_mut(&mut self) -> &mut dyn Any {
+        self
+    }
 }
 impl Statement for WhileStatement {
     fn execute(&mut self, runtime: &mut Runtime) {

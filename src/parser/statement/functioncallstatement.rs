@@ -17,6 +17,9 @@ impl ToAny for FunctionCallStatement {
     fn to_any(&self) -> &dyn Any {
         self
     }
+    fn to_any_mut(&mut self) -> &mut dyn Any {
+        self
+    }
 }
 
 impl Statement for FunctionCallStatement {
