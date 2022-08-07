@@ -329,7 +329,7 @@ impl Parser {
         let curr_tok = self.get_curr_tok().get_string_value();
         if self.st.has_symbol(curr_tok.clone()) {
             if let Some(obj) = self.st.get_struct(curr_tok.clone()) {
-                LOGGER.debug(format!("Found a custom type: {:?}", obj.get_type()), false);
+                self.consume_token();
                 return obj.get_type();
             }
         }
@@ -492,7 +492,8 @@ impl Parser {
             self.require_token(Identifier);
             let mut var_stmt = VariableStatement::new(name);
             if self.match_and_consume(Colon) {
-                var_stmt.set_type(self.require_a_type());
+                let typ = self.require_a_type();
+                var_stmt.set_type(typ);
             }
             self.require_token(Equal);
             var_stmt.set_expr(self.parse_expression());
@@ -724,16 +725,14 @@ impl Parser {
         None
     }
 
-    // -------------------------------------------------------------------------- //
-    /* Expression Parsing - all lexemes that can be evaluated to a specific value */
-    // -------------------------------------------------------------------------- //
-
-    /*
-    This is a pretty cool algorithm. I was taught this in my compilers class at
-    Montana State University. It is called recursive descent.
-    https://en.wikipedia.org/wiki/Recursive_descent_parser#:~:text=In%20computer%20science%2C%20a%20recursive,the%20nonterminals%20of%20the%20grammar.
-     */
-
+    ///
+    /// Expression Parsing - all lexemes that can be evaluated to a specific value
+    ///
+    ///
+    /// This is a pretty cool algorithm. I was taught this in my compilers class at
+    /// Montana State University. It is called recursive descent.
+    ///
+    /// https://en.wikipedia.org/wiki/Recursive_descent_parser#:~:text=In%20computer%20science%2C%20a%20recursive,the%20nonterminals%20of%20the%20grammar.
     fn parse_expression(&mut self) -> Box<dyn Expression> {
         let expr = self.parse_additive_expression();
         //if !IS_TESTING.with(|t| t.get()) {    // not sure if commenting this out is correct, we want to ensure that

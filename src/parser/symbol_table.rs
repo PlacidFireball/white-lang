@@ -2,12 +2,32 @@ use crate::parser::statement::functiondefinitionstatement::FunctionDefinitionSta
 use crate::parser::whitetypes::Type;
 use std::any::Any;
 use std::collections::HashMap;
+use std::fmt::{Debug, Formatter};
 
 use super::statement::structdefinitionstatement::StructDefinitionStatement;
 
 pub struct SymbolTable {
     symbol_stack: Vec<HashMap<String, Box<dyn Any>>>,
     __self: String,
+}
+
+impl Debug for SymbolTable {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        let mut display_str = String::new();
+        for stack in self.symbol_stack.iter() {
+            for key in stack.keys(){
+                if let Some(fds) = self.get_function(key.clone()) {
+                    display_str.push_str(format!("-- {} -> {:?}\n", key, fds).as_str());
+                } else if let Some(sds) = self.get_struct(key.clone()) {
+                    display_str.push_str(format!("-- {} -> {:?}\n", key, sds).as_str());
+                } else if let Some(typ) = self.get_symbol_type(key.clone()) {
+                    display_str.push_str(format!("-- {} -> {:?}\n", key, typ).as_str());
+                }
+            }
+            display_str.push_str("\n");
+        }
+        write!(f, "self: `{}`\nstacks:\n{}", self.__self, display_str)
+    }
 }
 
 #[allow(dead_code)]

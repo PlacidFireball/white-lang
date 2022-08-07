@@ -46,7 +46,8 @@ implement Math {
 };
 
 // test
-let math = Math(); // TODO: custom type signatures are broken
+let math : Math = Math();
+// TODO: seems that there a race condition causing this to non-deterministically run or not
 print(math.pow(2.5, 2)); // pass
 print(math.pow(2.0, -1)); // pass
 print(math.pow(2000000.0, 0)); // pass
@@ -55,10 +56,12 @@ print(math.fabs(-0.01)); // pass
 struct String {
     s: string
 } implement String {
-
+    fn to_list() {
+        //self.s.to_list(); // soon
+    }
 };
 
-let str = String(s="hello world!");
+let str : String = String(s="hello world!");
 print(str.s); // pass
 
 struct Boolean {
@@ -66,3 +69,6 @@ struct Boolean {
 } implement Boolean {
 
 };
+
+let boo : Boolean = Boolean(b=false);
+print(boo.b); // pass

@@ -98,6 +98,7 @@ impl Expression for FunctionCallExpression {
                     self.args[i].validate(st);
                     let param_type = self.args[i].get_white_type();
                     if !param_type.is_assignable_to(arg.get_white_type()) {
+                        crate::LOGGER.info(format!("symbol table state:\n{:?}", st));
                         add_parser_error(
                             IncompatibleTypes(param_type.clone(), arg.get_white_type()),
                             format!(
